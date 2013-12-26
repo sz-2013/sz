@@ -1,0 +1,36 @@
+	<form role="form" ng-controller="MessageEditorControllerSub">
+			<div class="form-group" >
+				<p class="overflow-hidden text-right">
+					<strong>{{place.name}}</strong>
+				</p>    		
+				<p ng-show="place.address" class="overflow-hidden text-right">{{place.address}}</p>
+				<p class="help-block">{{tmlText.hint.message}}</p>
+			</div>
+            <div class="form-group">
+                <textarea class="form-control" rows="2" placeholder="Some text here.." ng-model="text" sz-auto-resize-text-area="text" ></textarea>
+            </div>                        
+            <div class="form-group">
+                <input type="file" name="photo" sz-file-model="photo">                    
+            </div>  
+            <div class="form-group" style="text-align:center;display:none" id="photoBigCont">
+                <div  style="max-width:300px;display:inline-block">
+                    <div>
+                        <div style="float:left;margin-right:5px;"><i class="icon-remove icon-2x" style="cursor:pointer" ng-click="remove()"></i></div>
+                        <p style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-top:3px;font-weight:bold">
+                            <span id="photoPrevName"></span>
+                        </p>
+                    </div>
+                    <div  id="photoPrev">                                                        
+                    </div>
+                </div>      
+            </div>
+            <div class="form-group">
+                <button class="btn" ng-class="myClasses.btn.mainBig" ng-click="send()" ng-disabled="inProgress" >
+			 		{{tmlText.btn.submit}}
+		 		</button>
+            </div>
+        </form>        
+        <div class="row">
+            {{response}}
+        </div>
+</form> 

@@ -1,0 +1,50 @@
+
+	<div class="navbar-header">
+		<button class="navbar-toggle pull-left btn btn-link" type="button" 
+		data-toggle="collapse" data-target=".bs-navbar-collapse">
+	        <span class="sr-only">Toggle navigation</span>
+	        <i class="fa fa-reorder fa-2x"></i>
+  		</button>
+	    <!-- <button type="button" class="btn btn-default btn-top-menu pull-left" style="margin-top:5px" ng-click="toggleTopMenu()">
+	      <i class="fa fa-reorder fa-2x"></i>
+	    </button> -->
+	    <a href={{url.brand}} class="navbar-brand pull-right">ShmotZhmot</a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse " role="navigation">
+  		<ul class="nav navbar-nav ">
+	        <li ng-class="mainNav.newsfeed">
+                <a href={{url.newsfeed}}  >
+                    <div>News Feed</div>
+                </a>
+            </li>
+            <li ng-class="mainNav.search">
+                <a href={{url.search}} id="btn_search">
+                    <div>Search</div>
+                </a>
+            </li>
+            <li ng-show="session.is_authenticated" ng-class="mainNav.post">
+                <a href={{url.placeSelect}}>
+                    <div>Post</div>
+                </a>
+            </li>
+  		</ul>
+  		<ul class="nav navbar-nav navbar-right">
+            <li ng-show="session.is_authenticated">
+                <a href={{url.user}}>
+                    <div>{{session.email}}</div>
+                </a>
+            </li>
+            <li ng-show="!session.is_authenticated" >
+               <a href={{url.login}} id="btn-signin" > 
+                   <div><b>Sign In</b></div>
+                </a>
+            </li>
+            <li ng-show="session.is_authenticated" >
+                <a ng-click="session.$logout()" >
+                    <div>Exit</div>
+                </a>
+            </li>  			
+  		</ul>
+    </nav>
+
+      

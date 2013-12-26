@@ -1,0 +1,12 @@
+<div ng-controller="RegistrationConfirmation">
+	<h2 class="text-right">{{tmlText.header.main}}</h2>		
+	<p>{{tmlText.el.instruction}}</p>
+	<div>		
+		<button type="button" ng-class="myClasses.btn.second" data-loading-text={{tmlText.btn.loading}}
+		 ng-click="confirmation(user.email)" ng-disabled="inProgress">{{tmlText.btn.resend}}</button>			
+		<a class="pull-right" ng-class="myClasses.btn.main" ng-disabled="inProgress" href={{url.homePathAnon}}>{{tmlText.btn.return}}</a>	
+	 </div>
+	 <br>
+	<p>{{confirmationResponse}}</p>
+	<p ng-repeat="error in confirmationError" class="text-error" >{{error}}</p>
+</div>

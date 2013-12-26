@@ -1,0 +1,54 @@
+<div class="content-inner row">	
+	<form class="form-group col-lg-10 col-lg-push-1" role="form" name="message">
+		<h2 class="text-right">{{tmlText.header.main}}</h2>
+		<div class="form-group" >
+			<p class="help-block">{{tmlText.hint.emotion}}</p>
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn active" ng-class="myClasses.btn.radio" ng-click="emt='indifferent'">
+					<input type="radio" name="options" id="indifferent">
+						<i class="icon-circle-blank"></i>
+				</label>
+				<label class="btn" ng-class="myClasses.btn.radio" ng-click="emt='good'">
+					<input type="radio" name="options" id="good">
+						<i class="icon-smile"></i>
+				</label>
+				<label class="btn" ng-class="myClasses.btn.radio" ng-click="emt='bad'">
+					<input type="radio" name="options" id="bad"> 
+						<i class="icon-meh"></i>
+				</label>
+			</div>	
+		<div class="form-group" style="margin-top:10px">	
+			<!-- <p class="help-block" >{{tmlText.hint.faces}}</p>		 -->				
+			<div class="btn-group" data-toggle="buttons" style="height:65px">
+				<label class="btn" ng-class="myClasses.btn.radio"  ng-repeat="face in faces | filter:{'emotion':emt}" ng-click="$emit('updateFace',face)" >
+					<input type="radio" name="options" >
+						<img ng-src={{face.face}} style="width:50px;">					
+				</label>
+			</div>
+		</div>	
+		<div class="form-group text-center" >
+			<raphael width="100%" 
+				action="action" images="images" userface="face" canvas="canvas">				
+			</raphael>		
+			<!-- <img src="" style="max-width:100%;display:inline-block;" sz-message-photo-load=""> -->
+		</div>
+		<div class="form-group text-center" >
+			<!-- <p class="help-block">{{tmlText.hint.action}}</p>	 -->		
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn active" ng-class="myClasses.btn.radio"  ng-click="action=1" >
+					<input type="radio" name="options" >
+						<i class="icon-plus"></i>					
+				</label>
+				<label class="btn" ng-class="myClasses.btn.radio"  ng-click="action=0" >
+					<input type="radio" name="options" >
+						<i class="icon-minus"></i>					
+				</label>
+			</div>
+		</div>
+		<div class="form-group " >
+			<button class="btn" ng-class="myClasses.btn.mainBig" ng-click="send()">
+            	{{tmlText.btn.submit}}
+            </button>
+		</div>
+	</form>
+</div>

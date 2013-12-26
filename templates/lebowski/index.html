@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html ng-app="sz.client">
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="Lebowski - User Activity Generator" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}libs/bootstrap-3.0.0/bootstrap/css/bootstrap.min.css">        
+    <link rel="stylesheet" href="{{ STATIC_URL }}libs/font-awesome-4.0.1/css/font-awesome.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <link rel="icon" type="image/png" href="{{ STATIC_URL }}lebowski/favicon.png" />
+	<link rel="stylesheet" href="{{ STATIC_URL }}lebowski/style.css">
+    <title>Lebowski - User Activity Generator</title>
+</head>
+<body>
+{% csrf_token %}
+	<section id="screen-overflow"> 
+		<h1>Load API</h1>
+		<i class="fa fa-spinner fa-spin fa-4x"></i>
+	</section>
+    <div class="modal fade" id="modalNewUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">New users</h4>
+          </div>
+          <div class="modal-body">
+                <form class="form-horizontal" role="form" id="newUsersForm">
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-2 control-label">Количество</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" value="1" name="value">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-2 control-label">Активность</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" value="60" name="activity">
+                            <span class="help-block">Частота сообщений в минуту</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-2 control-label" >Скорость</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" value="60" name="speed">
+                            <span class="help-block">Клеток в минуту</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-2 control-label">Раса</label>
+                        <div class="col-sm-10">
+                            <div class="btn-group btn-group-justified margin-btm-sm" data-toggle="buttons">
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="race" value="f"> F
+                                </label>
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="race" value="u"> U
+                                </label>
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="race" value="a"> A
+                                </label>
+                                <label class="btn btn-default btn-sm active">
+                                    <input type="radio" name="race" value=""> ?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-2 control-label">Пол</label>
+                        <div class="col-sm-10">
+                            <div class="btn-group btn-group-justified margin-btm-sm" data-toggle="buttons">
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="gender" value="f"> F
+                                </label>
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="gender" value="m"> M
+                                </label>
+                                <label class="btn btn-default btn-sm">
+                                    <input type="radio" name="gender" value="u"> -
+                                </label>
+                                <label class="btn btn-default btn-sm active">
+                                    <input type="radio" name="gender" value=""> ?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal"  id="newUsersCreateBtn">Create</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <section id="main">
+        <!-- <div id="map-overlay"></div> -->
+        <div id="map">
+            <div id="map-boxes"></div>
+            <div id="map-towers"></div>
+            <div id="map-users"></div>
+        </div>
+        <div id="console" data-role="scrollbar"></div>
+    </section>   
+
+    <section id="settings"><!-- Hidding right menu with settings -->
+
+        <div id="main-settings"><!-- Main settings -->
+            <h2>
+                Main settings
+                <button class="btn btn-primary btn-lg pull-right" type="button" id="start-game">
+                    <i class="fa fa-play"></i>
+                </button>
+            </h2>
+            <section >
+                <fieldset id="box-value-set">
+	                <span class="help-block">Количество клеток</span>
+	                <div class="input-group" >
+	                  <input type="text" class="form-control" value="15">
+	                  <span class="input-group-btn">
+	                    <button class="btn btn-default" type="button" id="box-value-set-btn">Set</button>
+	                  </span>                  
+	                </div>
+	                <span class="help-block">Количество мест</span>
+	                <input type="text" class="form-control" value="100" id="place-value">
+                </fieldset>
+            </section>
+
+            <section>
+                <h3>Users</h3>
+                <div class="form-group">
+                    <button type="button" data-toggle="modal" data-target="#modalNewUser" class="btn btn-default btn-sm btn-block">Add users</button>
+                </div>
+                <div class="form-group">
+                    <fieldset disabled>
+                    <input type="text" class="form-control input-sm margin-btm-sm" placeholder="Search a user">
+                    <div class="btn-group btn-group-justified margin-btm-sm" data-toggle="buttons">
+                        <label class="btn btn-default btn-sm">
+                            <input type="radio" name="options"> F
+                        </label>
+                        <label class="btn btn-default btn-sm">
+                            <input type="radio" name="options"> U
+                        </label>
+                        <label class="btn btn-default btn-sm">
+                            <input type="radio" name="options"> A
+                        </label>
+                        <label class="btn btn-default btn-sm active">
+                            <input type="radio" name="options"> ?
+                        </label>
+                    </div>
+                    </fieldset>
+                    <ul class="nav nav-pills nav-stacked" id="all-users-list" data-role="scrollbar"></ul>
+                </div>
+            </section>
+
+            <section>
+                <h3>Places</h3>
+                <input disabled type="text" class="form-control input-sm margin-btm-sm" placeholder="Search a place">
+                <ul class="nav nav-pills nav-stacked" id="all-places-list" data-role="scrollbar"></ul>
+            </section>
+        </div><!-- End Main settings -->
+
+        <div id="place-settings"> <!--Place settings -->
+            <p class="close-settings"><button type="button" class="close" aria-hidden="true" class="pull-right" >&times;</button></p>        
+            <h4 class="settings-header"><span id="place-header-name"></span><span id="place-header-level" class="pull-right"></span></h4>
+            <section>
+                <h5>Main</h5>
+                <div class="settings-location">
+                    <p>Lng: <span></span></p>
+                    <p>Lat: <span></span></p>
+                </div>
+            </section>
+            <section>
+                <h5>Users list</h5>
+                <p>You must do get on server for this stuff</p>
+                <ul class="nav nav-pills nav-stacked" id="place-userslist"></ul>
+            </section>
+        </div> <!-- End Place settings -->
+
+        <div id="user-settings"> <!--User settings -->
+            <p class="close-settings"><button type="button" class="close" aria-hidden="true" class="pull-right" >&times;</button></p>        
+            <h4 class="settings-header"><span id="user-header-name"></span><span id="user-header-zp" class="pull-right"></span></h4>
+            <section>
+                <h5>Main</h5>
+                <p id="user-email">E-mail: <span></span></p>
+                <p id="user-radius">Radius: <span></span></p>
+                <p id="user-activity">Activity: <span></span></p>
+                <p id="user-speed">Speed: <span></span></p>
+                <div class="settings-location">
+                    <p>Lng: <span></span></p>
+                    <p>Lat: <span></span></p>
+                </div>
+                <button type="button" class="margin-btm-sm btn btn-default btn-sm btn-block disabled" >Explore</button>
+            </section>
+            <section id="user-new-message">
+            	<h5>New message</h5>
+            	<button type="button" class="margin-btm-sm btn btn-default btn-sm btn-block" data-toggle="button" id="pick-place">Pick the Place</button>
+            	<p id="selected-place"></p>
+            	<textarea class="form-control margin-btm-sm" rows="3"></textarea>
+            	<button type="button" class="btn btn-default btn-sm btn-block" id="user-send-message">Add message</button>
+            </section>
+            <section>
+                <h5>Places list</h5>
+                <ul class="nav nav-pills nav-stacked" id="user-places"></ul>
+            </section>
+        </div> <!-- End User settings -->
+
+        <div class="unwrap-menu"> <!-- Wrap button -->
+            <i class="fa fa-arrow-circle-o-left fa-3x"></i>
+        </div>
+
+    </section><!-- End hidding right menu -->
+
+    
+
+<script type="text/javascript">
+function get_random_num(max, min){
+    var min = min || 0;
+    return Math.floor(Math.random()*max+min)   
+}
+function get_random(list){return list[get_random_num(list.length)]}
+function get_random_name(){return get_random(usernamesList)}
+function get_random_float(n){
+	// n - number of decimal places
+	var n = n || 2, dec = Math.pow( 10, n )
+	return Math.round( Math.random()*dec )/dec
+}
+function get_random_text(len) {
+    var len = len || get_random_num(80, 20), start = get_random_num(separate_words_length), end = start + len, splice = [];
+    if(end>(separate_words_length-1)){var end = separate_words_length-1, start = end - len;}
+    for (var i = start; i < end; i++) {
+        if(get_random_num(10)==1) splice.push(get_random(keywords));
+        splice.push(separate_words[i]);
+    };
+    return splice.join(' ')
+}
+var MAX_POSITION = 0.033;
+var BOX_VALUE ; //only odd
+var BOX_WIDTH;
+var BOX_HEIGHT;
+var BOX_STEP;
+
+function get_box_size(){
+	BOX_WIDTH = Math.round(document.getElementById("map").getBoundingClientRect().width/BOX_VALUE); 
+	BOX_HEIGHT = Math.round(document.getElementById("map").getBoundingClientRect().height/BOX_VALUE); 
+}
+function get_box_step(){BOX_STEP = MAX_POSITION/BOX_VALUE;}
+
+
+var AUTORS_LIST = [
+	{cls:'client-sz',name:'Client', to:'SZ'},
+	{cls:'sz-bl',name:'SZ',to:'BigLebowski'},
+	{cls:'bl',name:'BigLebowski', to:'SZ'},
+	{cls:'sz-client',name:'SZ',to:'Client'},
+	{cls:'client',name:'Client', to:'You'},
+];
+var COLOR_LIST = ['red', 'blue', 'green', 'gray', '#16a085', '#27ae60', '#2980b9', '#8e44ad', '#2c3e50', '#f1c40f', '#f39c12', '#d35400', 'yellow', 'white', '#c0392b', '#e74c3c', '#7f8c8d']
+
+var PLACES_LIST = new Array;
+var RACES_LIST = new Array;
+var GENDERS_LIST = new Array;
+var FACES_LIST = new Array;
+var API;
+var CSRF;
+
+
+var PICK_PLACE;
+var SELECTED_PLACE = {name:'not selected'};
+</script>	
+	<script src="{{ STATIC_URL }}libs/jquery/jquery-1.9.1.min.js"></script>
+	<script src="{{ STATIC_URL }}libs/jquery/jquery.tinyscrollbar.min.js"></script>
+	<script src="{{ STATIC_URL }}libs/bootstrap-3.0.0/bootstrap/js/bootstrap.min.js"></script>
+	<script src="{{ STATIC_URL }}lebowski/usernameslist.js"></script>	
+	<script src="{{ STATIC_URL }}lebowski/randomwords.js"></script>
+	<script src="{{ STATIC_URL }}lebowski/game.js"></script>
+	<script src="{{ STATIC_URL }}lebowski/main.js"></script>
+</body>

@@ -1,0 +1,30 @@
+<div class="content-inner row">	
+	<div class="col-lg-10 col-lg-push-1">
+		<h2 class="text-right">{{tmlText.header.main}}</h2>
+		<p class="help-block">{{tmlText.hint.main}}</p>
+		<leaflet center="center" markers="markers" paths="circles" height="250px" width="100%" >
+	    </leaflet>
+		<div class="input-group" style="margin-top:15px">
+	    	<input type="text" class="form-control" placeholder="Name or address here..." ng-disabled="inProgress" ng-model="searchQuery">
+	    	<span class="input-group-btn">
+	    		<button class="btn btn-default" type="button" 
+	    		ng-disabled="inProgress || !searchQuery" ng-click="searchWithQuery()">{{tmlText.btn.search}}</button>
+	    	</span>
+	    </div>
+	    <div class="dropdown clearfix searchTips" ng-show="true">
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" ng-show="showSearchTips">
+                <li ng-repeat="p in placesQuery | limitTo:tmlText.el.searchtips.searchLimit" 
+                	ng-click="$emit('searchTipsClick',p)">
+	                <a>
+	            		<p class="overflow-hidden ">
+	            			{{p.name}}
+	            		</p>
+	            		<p class="overflow-hidden" ng-show="p.address">{{p.address}}</p>
+	                </a>
+                </li>
+              </ul>
+        </div>
+        <div ng-show="!showSearchTips && place" style="margin-top:10px" ng-include src='partials.messageEdit'>        
+        </div>
+    </div>
+</div>

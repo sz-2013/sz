@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html ng-app="sz.client">
+<head>
+	<title>SZ</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<script src="../static/libs/jquery/jquery-1.9.1.min.js"></script>
+	<script src="../static/libs/angularjs/1.0.5/angular.min.js"></script>
+    <script src="../static/libs/angularjs/1.0.5/angular-resource.min.js"></script>
+    <script src="../static/libs/angularjs/1.0.5/angular-cookies.min.js"></script>
+    
+    
+
+    <link rel="stylesheet" href="../static/libs/bootstrap-3.0.0/bootstrap/css/bootstrap.min.css">
+    <link href="../static/libs/font-awesome-4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/libs/leafletjs/0.5.1/leaflet.css" />
+    <link rel="stylesheet" href="../static//sz/css/new.css">
+    <link rel="stylesheet" href="../static//sz/css/new-fonts.css">
+
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <![endif]-->
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+</head>
+
+<body  ng-controller="MasterPageController">
+    <div id="wrap" >
+        <header class="navbar navbar-inverse navbar-fixed-top">
+            <div ng-include="headerCurrent" class="container" >            
+            </div>
+        </header>        
+        <div  ng-view class="clearfix container" id="main" ng-show="showContent"></div>
+    </div>
+    <footer class="navbar navbar-inverse navbar-static-top">
+        <div class="container">       
+            <span class="pull-left">ShmotZhmot 2013</span>     
+            <span class="pull-right">
+                We &lt;3 
+                <a href="">Bootstrap</a>,
+                <a href="">Font Awesome</a>,
+                <a href="">Raphael</a> and
+                <a href="">Leafletjs</a>
+            </span>
+        </div>
+    </footer>
+    <script src="../static/libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
+    <script src="../static/libs/bootstrap-3.0.0/bootstrap/js/bootstrap.min.js"></script>        
+    <script src="../static/libs/bootstrap-3.0.0/js/carousel.js"></script>        
+    <script src="../static/sz/js/services.js"></script>
+    <script src="../static/sz/js/directives.js"></script>
+    <script src="../static/sz/js/controllers.js"></script>
+    <script src="../static/sz/js/app.js"></script>
+
+    <script src="../static/libs/leafletjs/0.5.1/leaflet.js"></script>
+    <script src="../static/sz/js/leaflet-directive.js"></script>
+
+    <script src="../static/libs/raphael/2.1.2/raphael-min.js"></script>
+    <script src="../static/sz/js/raphael-directive.js"></script>    
+    
+</body>
+

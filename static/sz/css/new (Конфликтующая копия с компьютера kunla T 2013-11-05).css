@@ -1,0 +1,246 @@
+/*Прибиваем футер к низу*/
+* { margin:0; padding:0; } 
+html, body, #wrap { height: 100%;}
+body > #wrap {height: auto; min-height: 100%;}
+#main { 
+	min-height: 520px;
+	padding-bottom: 120px;}  /* must be same height as the footer */
+footer{ 	
+	font-size: 10px;
+    position: relative;
+    margin-top: -40px; /* negative value of footer height */
+    height: 40px;
+    clear:both;
+} 
+footer .container{
+	padding-top: 10px
+}
+.clearfix:after {
+	content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {display: inline-block;}
+/* Hides from IE-mac \*/
+* html .clearfix { height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+/*Конец прибития футера к низу*/
+
+a{
+	color:#7f8c8d;
+}
+a:hover{
+	color:#34495e;
+}
+.navbar-inverse{
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.btn-top-menu, .navbar-inverse .navbar-toggle{
+	margin-top: 0.2em;
+	text-align: center;
+	width: 3.3em;
+	height: 3.3em;
+	background-color: transparent;
+	border:none;
+}
+.btn-top-menu>i, .navbar-inverse .navbar-toggle>i{
+	margin-left: -1px;
+	margin-top: 1px;
+}
+.navbar-inverse .navbar-collapse{
+	box-shadow:0 0 4px #AAA;
+	text-align: justify;
+	border:1px solid #CCC;
+	border-radius: 15px;
+	overflow: hidden;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
+body {
+	font-family: 'Lato', sans-serif;	
+}
+body,.navbar-inverse{
+	background-color: #FBFBFB;
+	border:none;
+}
+.navbar-inverse .navbar-nav > li > a:hover{
+	color: #34495e;
+}
+.navbar-inverse .navbar-brand,
+.navbar-inverse .navbar-toggle, .btn-top-menu,
+footer{
+	font-weight: bold;
+	color: #7f8c8d;
+	color: #bdc3c7;
+}
+.navbar-inverse .navbar-brand:hover,
+.btn-top-menu:hover, .navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus{
+	background-color: transparent;
+	color: #2c3e50;
+}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus{
+	text-decoration: underline;
+}
+#main{
+	padding-top: 80px;
+}
+.container {
+	background-color: transparent;
+	max-width: 800px;
+}
+.big-bordered-box{	
+	background-color: white;
+	margin-bottom: 1.5em;
+	padding: 0.5em;
+}
+.big-bordered-box>div{
+	text-align: center;
+	padding: 0.8em;
+	padding-bottom: 2em;
+}
+.big-bordered-box, .box-content{	
+	width: 100%;
+}
+.box-header{
+	margin: 0.5em 0.3em;
+}
+.box-content{	
+	bottom: 0;
+	left: 0;
+	height: 4.4em;	
+	padding: 0.8em;
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-bottom: 0.8em;
+
+}
+.box-content>div{
+	padding: 0.8em;
+	padding-bottom: 0;
+	padding-top: 0;
+}
+.box-content>div>p{
+	text-align: justify;
+	margin: 0;
+	margin-top: 0.5em;
+}
+.img-main{
+	display: inline-block;
+	max-height: 15em;
+	text-align: center;
+}
+
+.img-main img{
+	display: inline-block;
+	margin-top: -10%;
+}
+.cat-parent{
+	text-align: center;
+	max-height: 2.9em;
+}
+.catDiv{
+    margin-top:0.3em;
+    margin-right:0.3em;
+    width:2.5em;
+    height:2.5em;
+}
+.cat-parent>.catDiv:first-child{
+	margin-left:0.3em;
+}
+.catDiv>span{	
+	width: 50%;
+	height: 98%;
+	right: 0;
+	top: 1%;	
+}
+.catDivI{
+	top:15%;
+    left:15%;
+    width:70%;
+    height:70%;    
+}
+.cat-skirts{background-color:#e74c3c;}
+.cat-skirts>i{background-image:url("../img/ico/categories/skirt.png" );}
+
+.cat-head{background-color:#27ae60;}
+.cat-head>i{background-image:url("../img/ico/categories/hat.png" );}
+
+.cat-suits{background-color:#95a5a6;}
+.cat-suits>i{background-image:url("../img/ico/categories/suit.png" );}
+
+.cat-socks{background-color:#d35400;}
+.cat-socks>i{background-image:url("../img/ico/categories/socks.png" );}
+
+.cat-top1{background-color:#2980b9;}
+.cat-top1>i{background-image:url("../img/ico/categories/glyphicons_283_t-shirt.png" );}
+
+.cat-top2{background-color:#16a085;}
+.cat-top2>i{background-image:url("../img/ico/categories/glyphicons_285_sweater.png" );}
+
+.cat-shoes{background-color:#f1c40f;}
+.cat-shoes>i{background-image:url("../img/ico/categories/shoes.png" );}
+
+.cat-trousers{background-color:#34495e;}
+.cat-trousers>i{background-image:url("../img/ico/categories/glyphicons_284_pants.png" );}
+
+.cat-outer{background-color:#8e44ad;}
+.cat-outer>i{background-image:url("../img/ico/categories/outer.png" );}
+
+.cat-accessories{background-color:#99CC00;}
+.cat-accessories>i{background-image:url("../img/ico/categories/umbr.png" );}
+
+.cat-under{background-color:#330066;}
+.cat-under>i{background-image:url("../img/ico/categories/under.png" );}
+
+.cat-bags{background-color:#f39c12;}
+.cat-bags>i{background-image:url("../img/ico/categories/bags.png" );}
+
+.btn-primary{
+	background-color: #95a5a6;
+	border-color: #7f8c8d;
+}
+.btn-primary:hover{
+	background-color: #7f8c8d;
+	border-color: #7f8c8d;
+}
+
+label{
+	font-weight: normal;
+}
+.progress{
+	text-align: left;
+	margin-bottom: 0.1em;
+	border-radius: 0;
+	background-color:transparent;
+	box-shadow: none;
+}
+#skillsDescr{
+	float: left;
+	width: 5em;	
+}
+#skillsDescr span{
+	display: block;
+	float:left;
+	text-align: left;
+}
+.progress-bar{
+	text-align: left;
+	box-shadow: none;
+	border-radius: 0 5px 5px 0;
+}
+.progress-bar>span{
+	display: inline-block;
+	margin-left: 1.5em;
+}
+
+form{
+	text-align: justify;
+}
+
