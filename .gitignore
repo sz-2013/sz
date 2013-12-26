@@ -1,10 +1,12 @@
+*.[oa]
+*~
+*.pyc
+generated_place.*
 *Font-Awesome*
 *bootstrap*
 *tmpviews*
 media/*
-sz/core/migrations
-static/sz/img
-generated_place.*
+sz/core/migrations/
+static/sz/img/
 sz/passwords.py
-static/libs
-*.pyc
+static/libs/
