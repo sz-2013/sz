@@ -2,9 +2,9 @@
 *bootstrap*
 *tmpviews*
 media/*
-sz/core/migrations/*
-static/sz/img/*
+sz/core/migrations
+static/sz/img
 generated_place.*
 sz/passwords.py
-static/libs/*
+static/libs
 *.pyc
