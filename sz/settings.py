@@ -240,4 +240,4 @@ CATEGORIES = [
     {'alias':u'Юбки','description':u'','name':'skirts','keywords':[u'американка',u'годе',u'карандаш',u'килт',u'колокол',u'кринолин',u'мини',u'парео',u'пачка',u'полусолнце',u'саронг',u'солнце',u'тюлбпан',u'юбка'],},
 ]
 
-
+STANDART_ROLE_NAME = "player"

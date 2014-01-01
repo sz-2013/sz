@@ -7,11 +7,14 @@ from sz.core import models, gis as gis_core
 class UserCreateSerializer(serializers.Serializer):
     id = serializers.Field()
     email = serializers.EmailField(required=True)
-    race = serializers.ChoiceField(required=False, choices=[
+    race = serializers.ChoiceField(required=True, choices=[
         (race.pk, race.name) for race in models.Races.objects.all()
     ])
-    gender = serializers.ChoiceField(required=False, choices=[
+    gender = serializers.ChoiceField(required=True, choices=[
         (gender.pk, gender.name) for gender in models.Gender.objects.all()
+    ])
+    role = serializers.ChoiceField(required=True, choices=[
+        (role.pk, role.name) for role in models.Role.objects.all()
     ])
     date_confirm = serializers.Field()
     def validate(self, attrs):
@@ -51,8 +54,9 @@ class UserBigLSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(source="id")    
     user_email = serializers.EmailField(source="email")
     user_gender = serializers.IntegerField(source="gender.id")    
-    user_race = serializers.IntegerField(source="race.id")    
-    user_date_confirm = serializers.Field(source="get_string_date_confirm")    
+    user_race = serializers.IntegerField(source="race.id")
+    user_role = serializers.IntegerField(source="role.id")
+    user_date_confirm = serializers.Field(source="get_string_date_confirm")        
 
 
 class PlaceSerializer(serializers.Serializer):

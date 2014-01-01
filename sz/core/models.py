@@ -18,6 +18,9 @@ from imagekit import models as imagekit_models
 from imagekit import processors
 from south.modelsinspector import add_introspection_rules
 
+from sz.settings import STANDART_ROLE_NAME
+
+
 """Static clases"""
 
 EMOTION_CHOICES = (
@@ -127,7 +130,7 @@ class Face(models.Model):
 
 class Role(models.Model):
     """user role: player, bot, other"""
-    name = models.CharField(max_length=32, choices=ROLE_CHOICES)
+    name = models.CharField(max_length=32, choices=ROLE_CHOICES, unique=True)
     def __unicode__(self):
         return str(self.pk)
 	
@@ -312,6 +315,7 @@ class RegistrationManager(models.Manager):
 
     def create_inactive_user(self, email, password, race, gender):
         new_user = User.objects.create_user(email, race, gender, password)
+        new_user.role = Role.objects.get(name=STANDART_ROLE_NAME)
         new_user.is_active = False
         new_user.save()
         self.create_profile(new_user)

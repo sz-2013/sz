@@ -11,6 +11,7 @@ from sz.settings import LEBOWSKI_MODE_TEST
 from sz.core.views import activate_user
 
 class UsersRoot(SzApiView):
+    """ Create a new user """
     if not LEBOWSKI_MODE_TEST:
         permission_classes = (permissions.AllowAny,)
 
