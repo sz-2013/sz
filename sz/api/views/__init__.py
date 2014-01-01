@@ -52,6 +52,7 @@ class ApiRoot(SzApiView):
                 'static_races': reverse('static-races', request=request),
                 'static_genders': reverse('static-genders', request=request),
                 'static_faces': reverse('static-faces', request=request),
+                'static_races': reverse('static-races', request=request),
                 # 'categories': reverse('category-list', request=request),
             },
             'test_mode':{
