@@ -219,11 +219,14 @@ $( document ).ready(function() {
             add_log_element('client', 'Selected place for message is not set.');
             return
         }
-        var user = USERS.list.filter( function(u){return u.email==$( "#user-settings #user-email span" ).text()} )[0]
         var target = TOWERS.created().filter( function(t){return t.bd_id==bd_id} )[0]
         var text = $("#user-new-message textarea").val()
         $("#user-new-message textarea").val('')
-        user.message(target, text)
-    })
+        USERS.get_active().message(target, text)
+    });
+
+    $( "#user-move-btns .btn" ).click(function(){
+        USERS.get_active().move_to(this.getAttribute("data-direction"))
+    });
 
 });

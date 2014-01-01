@@ -3,6 +3,7 @@
 *.pyc
 generated_place.*
 *Font-Awesome*
+*font-awesome*
 *bootstrap*
 *tmpviews*
 media/*
