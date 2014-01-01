@@ -32,6 +32,10 @@ LANGUAGE_CHOICES = (
     ('ru', _('Russian')),
 )
 
+ROLE_CHOICES = (
+    ('player','Player'),
+)
+
 def get_string_date(date):
     return [date.year, date.month, date.day, date.hour, date.minute, date.second]
 
@@ -121,7 +125,12 @@ class Face(models.Model):
         verbose_name = _('face')
         verbose_name_plural = _('face')
 
-		
+class Role(models.Model):
+    """user role: player, bot, other"""
+    name = models.CharField(max_length=32, choices=ROLE_CHOICES)
+    def __unicode__(self):
+        return str(self.pk)
+	
 class Category(models.Model):
 
     alias = models.SlugField(
@@ -241,7 +250,9 @@ class User(AbstractBaseUser):
     gender = models.ForeignKey(
         Gender, verbose_name=_('gender'), blank=True, null=True
     )
-
+    role = models.ForeignKey(
+        Role, verbose_name=_('role'), blank=True, null=True
+    )
     USERNAME_FIELD = 'email'   
     def get_full_name(self):
     	# Overcode standart django methods
