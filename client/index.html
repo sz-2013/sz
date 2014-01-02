@@ -9,13 +9,14 @@
     <script src="../static/libs/angularjs/1.0.5/angular-resource.min.js"></script>
     <script src="../static/libs/angularjs/1.0.5/angular-cookies.min.js"></script>
     
-    
+
 
     <link rel="stylesheet" href="../static/libs/bootstrap-3.0.0/bootstrap/css/bootstrap.min.css">
     <link href="../static/libs/font-awesome-4.0.1/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/libs/leafletjs/0.5.1/leaflet.css" />
     <link rel="stylesheet" href="../static//sz/css/new.css">
     <link rel="stylesheet" href="../static//sz/css/new-fonts.css">
+    <link rel="stylesheet" href="../static/libs/slidebar/slideBarComponents.css">    
 
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
@@ -24,7 +25,52 @@
 </head>
 
 <body  ng-controller="MasterPageController">
-    <div id="wrap" >
+    <mobile-check></mobile-check>
+
+    <div id="st-container" class="st-container">
+        <!-- content push wrapper -->
+        <div class="st-pusher">
+            <nav class="st-menu st-effect-8" id="mainnav">
+                <!-- <div class="scrollbar" ><div class="track" ><div class="thumb"><div class="end"></div></div></div></div>
+                <div class="viewport"> <div class="overview" > -->
+                    <h2 class="icon icon-lab">Sidebar</h2>
+                    <ul>
+                        <li><a class="icon" href="#">1</a></li>
+                        <li><a class="icon" href="#">2</a></li>
+                        <li><a class="icon" href="#">3</a></li>
+                        <li><a class="icon" href="#">4</a></li>
+                        <li><a class="icon" href="#">5</a></li>
+                        <li><a class="icon" href="#">6</a></li>
+                        <li><a class="icon" href="#">7</a></li>
+                        <li><a class="icon" href="#">8</a></li>
+                        <li><a class="icon" href="#">9</a></li>
+                        <li><a class="icon" href="#">10</a></li>
+                        <li><a class="icon" href="#">11</a></li>
+                        <li><a class="icon" href="#">12</a></li>
+                        <li><a class="icon" href="#">13</a></li>
+                        <li><a class="icon" href="#">14</a></li>
+                        <li><a class="icon" href="#">15</a></li>
+                        <li><a class="icon" href="#">16</a></li>
+                        <li><a class="icon" href="#">17</a></li>
+                    </ul>                    
+                <!-- </div></div> -->
+            </nav>
+            <div class="st-content"><!-- this is the wrapper for the content -->  
+                <div class="st-content-inner">
+                    <div id="st-trigger-effects" class="column">
+                        <button sz-slide-bar="mainnav" sz-slide-bar-effect="st-effect-8" >3D rotate out</button>
+                    </div>
+                    <div id="test">
+                        {{ is_mobile }}
+                    </div>
+                </div>
+            </div><!-- /st-content -->
+        </div><!-- /st-pusher -->
+    </div><!-- /st-container -->
+
+
+
+    <!-- <div id="wrap" >
         <header class="navbar navbar-inverse navbar-fixed-top">
             <div ng-include="headerCurrent" class="container" >            
             </div>
@@ -42,8 +88,9 @@
                 <a href="">Leafletjs</a>
             </span>
         </div>
-    </footer>
+    </footer> -->
     <script src="../static/libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
+    <script src="../static/libs/jquery/jquery.tinyscrollbar.min.js"></script>
     <script src="../static/libs/bootstrap-3.0.0/bootstrap/js/bootstrap.min.js"></script>        
     <script src="../static/libs/bootstrap-3.0.0/js/carousel.js"></script>        
     <script src="../static/sz/js/services.js"></script>
@@ -56,6 +103,10 @@
 
     <script src="../static/libs/raphael/2.1.2/raphael-min.js"></script>
     <script src="../static/sz/js/raphael-directive.js"></script>    
+
+    <script src="../static/sz/js/slidebar-directive.js"></script>    
+    <script src="../static/libs/slidebar/jquery.sidebar.js"></script>
+    
     
 </body>
 

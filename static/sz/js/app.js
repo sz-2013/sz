@@ -1,5 +1,15 @@
 'use strict';
-var szApp = angular.module('sz.client', ['sz.client.directives', 'sz.client.services', 'ngResource', 'ngCookies', 'leaflet-directive', 'raphael-directive'])
+var szApp = angular.module(
+    'sz.client', 
+    ['sz.client.directives', 
+    'sz.client.services', 
+    'ngResource', 
+    'ngCookies', 
+    'leaflet-directive', 
+    'raphael-directive',
+    'slidebar-directive'
+    ]
+)
 
 szApp.config(['$routeProvider', function($routeProvider) {
     $routeProvider

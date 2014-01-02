@@ -12,13 +12,15 @@ def main_post(data,prefix):
 	req.add_header('Content-Type', 'application/json')
 	send_data = json.dumps(data)
 	try:
-		data = json.loads(urllib2.urlopen(req, send_data).read())
-	except (urllib2.HTTPError,urllib2.URLError), e:
-		reason,code = 'urllib2.HTTPError' in str(type(e)) and (e.reason,e.code) or (e,400)
-		data = {"data": str(reason), "status": code}	
+		answer = urllib2.urlopen(req, send_data)
+		data = json.loads(answer.read())
+		status = answer.code
+	except (urllib2.HTTPError, urllib2.URLError), e:
+		data, status = (e.reason,e.code) if 'urllib2.HTTPError' in str(type(e)) else (e,400)
+	main_data = dict(data=data, status=status)
 	if LEBOWSKI_MODE_TEST:
-		data['data'] = dict(receive=data['data'], tranceive=send_data)
-	return data
+		main_data['data'] = dict(receive=main_data['data'], tranceive=send_data)
+	return main_data
 
 
 def main_get(data,prefix):  
