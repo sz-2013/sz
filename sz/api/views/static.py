@@ -21,6 +21,10 @@ class CategoriesRoot(StaticObjects):
 class RacesRoot(StaticObjects):
 	model = models.Races
 	serializer = serializers.RacesSerializer
+	def get_data(self,obj,root_url):
+		data = self.serializer(instance = obj).data
+		data['blazon'] = obj.get_img_absolute_urls(root_url)
+		return data
 
 class GendersRoot(StaticObjects):
 	model = models.Gender
