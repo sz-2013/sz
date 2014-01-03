@@ -8,15 +8,15 @@ import re
 engineurl = "http://%(host)s:%(port)s/"%{'host':settings.LEBOWSKI['HOST'],'port':settings.LEBOWSKI['PORT']}
 
 def main_post(data,prefix):
+	send_data = json.dumps(data)
 	req = urllib2.Request(engineurl+prefix)
 	req.add_header('Content-Type', 'application/json')
-	send_data = json.dumps(data)
 	try:
 		answer = urllib2.urlopen(req, send_data)
 		data = json.loads(answer.read())
 		status = answer.code
 	except (urllib2.HTTPError, urllib2.URLError), e:
-		data, status = (e.reason,e.code) if 'urllib2.HTTPError' in str(type(e)) else (e,400)
+		data, status = (e.reason,e.code) if 'urllib2.HTTPError' in str(type(e)) else (str(e),400)
 	main_data = dict(data=data, status=status)
 	if LEBOWSKI_MODE_TEST:
 		main_data['data'] = dict(receive=main_data['data'], tranceive=send_data)

@@ -13,11 +13,11 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from sz import settings
 from imagekit import models as imagekit_models
 from imagekit import processors
 from south.modelsinspector import add_introspection_rules
 
+from sz import settings
 from sz.settings import STANDART_ROLE_NAME
 
 
@@ -35,9 +35,14 @@ LANGUAGE_CHOICES = (
     ('ru', _('Russian')),
 )
 
-ROLE_CHOICES = (
+ROLE_USER_CHOICES = (
     ('player','Player'),
 )
+
+ROLE_PLACE_CHOICES = (
+    ('shop','SHOP'),
+)
+
 
 def get_string_date(date):
     return [date.year, date.month, date.day, date.hour, date.minute, date.second]
@@ -93,13 +98,13 @@ class Races(models.Model):
     )
     name = models.CharField(max_length=32)
     def __unicode__(self):
-        return str(self.pk)
+        return self.name
 
 class Gender(models.Model):
 	"""user gender: {'u':1,'m':2,'f':3}"""
 	name = models.CharField(max_length=1)
 	def __unicode__(self):
-		return str(self.pk)
+		return self.name
 
 class Face(models.Model):
     emotion = models.CharField(
@@ -128,11 +133,11 @@ class Face(models.Model):
         verbose_name = _('face')
         verbose_name_plural = _('face')
 
-class Role(models.Model):
+class RoleUser(models.Model):
     """user role: player, bot, other"""
-    name = models.CharField(max_length=32, choices=ROLE_CHOICES, unique=True)
+    name = models.CharField(max_length=32, choices=ROLE_USER_CHOICES, unique=True)
     def __unicode__(self):
-        return str(self.pk)
+        return self.name
 	
 class Category(models.Model):
 
@@ -254,7 +259,7 @@ class User(AbstractBaseUser):
         Gender, verbose_name=_('gender'), blank=True, null=True
     )
     role = models.ForeignKey(
-        Role, verbose_name=_('role'), blank=True, null=True
+        RoleUser, verbose_name=_('role'), blank=True, null=True
     )
     USERNAME_FIELD = 'email'   
     def get_full_name(self):
@@ -315,7 +320,8 @@ class RegistrationManager(models.Manager):
 
     def create_inactive_user(self, email, password, race, gender):
         new_user = User.objects.create_user(email, race, gender, password)
-        new_user.role = Role.objects.get(name=STANDART_ROLE_NAME)
+        role, create = RoleUser.objects.get_or_create(name=STANDART_ROLE_NAME)
+        new_user.role = role
         new_user.is_active = False
         new_user.save()
         self.create_profile(new_user)

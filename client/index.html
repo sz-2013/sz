@@ -12,7 +12,7 @@
 
 
     <link rel="stylesheet" href="../static/libs/bootstrap-3.0.0/bootstrap/css/bootstrap.min.css">
-    <link href="../static/libs/font-awesome-4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/libs/font-awesome-4.0.1/css/font-awesome.min.css" >
     <link rel="stylesheet" href="../static/libs/leafletjs/0.5.1/leaflet.css" />
     <link rel="stylesheet" href="../static//sz/css/new.css">
     <link rel="stylesheet" href="../static//sz/css/new-fonts.css">
@@ -24,8 +24,7 @@
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 </head>
 
-<body  ng-controller="MasterPageController">
-    <mobile-check></mobile-check>
+<body  ng-controller="MasterPageController" mobile-check>
 
     <div id="st-container" class="st-container">
         <!-- content push wrapper -->
@@ -56,15 +55,18 @@
                 <!-- </div></div> -->
             </nav>
             <div class="st-content"><!-- this is the wrapper for the content -->  
-                <div class="st-content-inner">
-                    <div id="st-trigger-effects" class="column">
-                        <button sz-slide-bar="mainnav" sz-slide-bar-effect="st-effect-8" >3D rotate out</button>
-                    </div>
-                    <div id="test">
-                        {{ is_mobile }}
-                    </div>
+                <div class="well well-lg">
+                    <p>Open main menu</p>
+                    <button sz-slide-bar sz-slide-bar-effect="st-effect-8" >Open</button>
+                </div>
+                <div class="well well-lg">
+                    <p>Open sub page</p>
+                    <button sz-slide-sub-page>Open</button>
                 </div>
             </div><!-- /st-content -->
+            <div id="sub-page">
+                <h2>Sub page</h2>
+            </div>
         </div><!-- /st-pusher -->
     </div><!-- /st-container -->
 
@@ -104,8 +106,8 @@
     <script src="../static/libs/raphael/2.1.2/raphael-min.js"></script>
     <script src="../static/sz/js/raphael-directive.js"></script>    
 
-    <script src="../static/sz/js/slidebar-directive.js"></script>    
-    <script src="../static/libs/slidebar/jquery.sidebar.js"></script>
+    <script src="../static/sz/js/slidebar-directive.js"></script>
+    <script src="../static/sz/js/slidesubpage-directive.js"></script>
     
     
 </body>

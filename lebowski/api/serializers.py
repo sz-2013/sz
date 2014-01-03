@@ -14,7 +14,7 @@ class UserCreateSerializer(serializers.Serializer):
         (gender.pk, gender.name) for gender in models.Gender.objects.all()
     ])
     role = serializers.ChoiceField(required=True, choices=[
-        (role.pk, role.name) for role in models.Role.objects.all()
+        (role.pk, role.name) for role in models.RoleUser.objects.all()
     ])
     date_confirm = serializers.Field()
     def validate(self, attrs):
@@ -53,9 +53,9 @@ class UserSerializer(serializers.Serializer):
 class UserBigLSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(source="id")    
     user_email = serializers.EmailField(source="email")
-    user_gender = serializers.IntegerField(source="gender.id")    
-    user_race = serializers.IntegerField(source="race.id")
-    user_role = serializers.IntegerField(source="role.id")
+    user_gender = serializers.IntegerField(source="gender.name")    
+    user_race = serializers.IntegerField(source="race.name")
+    user_role = serializers.IntegerField(source="role.name")
     user_date_confirm = serializers.Field(source="get_string_date_confirm")        
 
 

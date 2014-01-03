@@ -23,9 +23,9 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Category
 
-class RoleSerializer(serializers.ModelSerializer):
+class RoleUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Role
+        model = models.RoleUser
 
 class UserSerializer(serializers.Serializer):    
     email = serializers.EmailField(required=True)

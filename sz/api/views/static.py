@@ -34,6 +34,6 @@ class FacesRoot(StaticObjects):
 		data['face'] = obj.get_img_absolute_urls(root_url)
 		return data
 
-class RolesRoot(StaticObjects):
-	model = models.Role
-	serializer = serializers.RoleSerializer
+class RolesUserRoot(StaticObjects):
+	model = models.RoleUser
+	serializer = serializers.RoleUserSerializer

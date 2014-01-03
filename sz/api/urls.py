@@ -40,7 +40,7 @@ urlpatterns = patterns('',
 	url(r'^static/races/$', static.RacesRoot.as_view(), name='static-races'),
     url(r'^static/genders/$', static.GendersRoot.as_view(), name='static-genders'),
     url(r'^static/faces/$', static.FacesRoot.as_view(), name='static-faces'),
-    url(r'^static/roles/$', static.RolesRoot.as_view(), name='static-roles'),
+    url(r'^static/roles-user/$', static.RolesUserRoot.as_view(), name='static-roles-user'),
 
 	url(r'^users/register/?$', users.UsersRoot.as_view(),
         name='users-registration'),

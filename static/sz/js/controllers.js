@@ -78,7 +78,6 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
         }        
     }
     $scope.showContent = true;
-    $scope.is_mobile = false;
     $scope.partials = {
         'regConfirm':'partials/registration-confirmation.html',
         'messageEdit':'partials/message-edit-sub.html',
