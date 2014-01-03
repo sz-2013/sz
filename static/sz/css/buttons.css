@@ -1,0 +1,31 @@
+.navbar-brand{
+    float:none;
+    display: inline-block;
+    margin-top: 6px;
+    padding: 0;
+}
+.btn-primary{
+    background-color: transparent;
+    border: none;
+    color: #7f8c8d;
+    font-size: 1.8em;
+    padding: 0;
+    text-decoration: none solid rgb(127, 140, 141);
+}
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus, .btn-primary.active{
+    background-color: transparent;
+    border: none;
+    color:#2c3e50;
+    box-shadow: none;
+}
+.btn-link{
+    padding: 0;
+    color: #7f8c8d;
+    margin-bottom: 0;
+}
+.btn-link:hover{
+    color:#2c3e50;
+}
+.main-btn-group{
+    padding: 0 1em;
+}

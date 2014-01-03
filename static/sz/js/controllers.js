@@ -66,16 +66,16 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
         }
     })*/
     $scope.redirectAuth = function(){
-        if($scope.session.is_authenticated){
+        /*if($scope.session.is_authenticated){
             var path = $scope.url.homePathAuth
             $location.path(path.slice(1,path.length))
-        }        
+        }        */
     }    
     $scope.redirectAnon = function(){
-        if($scope.session.is_anonimous){
+        /*if($scope.session.is_anonimous){
             var path = $scope.url.homePathAuth
             $location.path(path.slice(1,path.length))
-        }        
+        }        */
     }
     $scope.showContent = true;
     $scope.partials = {
@@ -122,7 +122,6 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
         $scope.isTopMenuCollapsed = !$scope.isTopMenuCollapsed;
     }
     
-
 }
 
 var events = {}
@@ -210,7 +209,7 @@ function RigistrationController($scope, userService){
             'intellect':'Intellect: ',
         },
         'btn':{
-            'registration':'Registration'
+            'registration':'Do it!'
         },
     }
     var errorsText = {

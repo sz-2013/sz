@@ -1,0 +1,30 @@
+/*Прибиваем футер к низу*/
+* { margin:0; padding:0; } 
+html, body, #wrap { height: 100%;}
+body > #wrap {height: auto; min-height: 100%;}
+#main { 
+    min-height: 520px;
+    padding-bottom: 120px;}  /* must be same height as the footer */
+footer{     
+    font-size: 10px;
+    position: relative;
+    margin-top: -40px; /* negative value of footer height */
+    height: 40px;
+    clear:both;
+} 
+footer .container{
+    padding-top: 10px
+}
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.clearfix {display: inline-block;}
+/* Hides from IE-mac \*/
+* html .clearfix { height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
+/*Конец прибития футера к низу*/

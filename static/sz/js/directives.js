@@ -1,3 +1,10 @@
+//+ Jonas Raoni Soares Silva
+//@ http://jsfromhell.com/array/shuffle [v1.0]
+function shuffle(o){ //v1.0
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
 'use strict';
 
 /* Directives */
@@ -13,6 +20,27 @@ angular.module('sz.client.directives', [])
             }
             scope.is_mobile = mobilecheck();
         };
+    })
+    .directive('szColorizeMenu', function(){
+        return function(scope, element, attrs){
+            var colors = ['turquoise', 'greensea', 'emerald', 'nephritis', 'peterriver', 'belizehole', 'amethyst', 'wisteria', 'wetasphalt', 'midnightblue', 'sunflower', 'orange', 'carrot', 'pumpkin', 'alizarin', 'pomegranate', 'clouds', 'silver', 'concrete', 'asbestos'];
+            //var colors = ['greensea', 'nephritis', 'belizehole', 'wisteria', 'midnightblue', 'orange', 'pumpkin', 'pomegranate',  'asbestos'];
+            //var colors = ['turquoise', 'emerald', 'peterriver', 'amethyst', 'wetasphalt', 'sunflower', 'carrot', 'alizarin', 'concrete'] ;
+           /* var colors_list = shuffle(colors);
+            $.each(element.children(), function(i, li){
+                var color = 'bg-' + colors_list[ Math.floor(Math.random()*colors_list.length)  ];
+                $(li).addClass( color )
+            });*/
+        }
+    })
+    .directive('szScrollDetect', function($window) {
+        return function(scope, element, attrs) {
+            var cl = "header-shadow", header = $("header") 
+            angular.element(element).bind("scroll", function() {
+                if(element.scrollTop()) header.addClass(cl)
+                else header.removeClass(cl)
+            })
+        }
     })
     .directive('szFileModel', function() {
         return function(scope, element, attrs) {
