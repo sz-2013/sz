@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from sz.api import views as root
-from sz.api.views import auth, messages, places, static, users, testmode
+from sz.api.views import auth, messages, places, static, users, testmode, gamemap
 
 urlpatterns = patterns('',
 	url(r'^$', root.ApiRoot.as_view()),
@@ -27,6 +27,7 @@ urlpatterns = patterns('',
         messages.MessagePreviewInstance.as_view(),
         name='message-previews-detail'),
 
+    url(r'^gamemap/?$', gamemap.GameMapRoot.as_view(), name='gamemap'),
 
 	url(r'^places/newsfeed/?$', places.PlaceRootNews.as_view(), name='place-news'),
     # url(r'^places/search$', places.PlaceSearch.as_view(), name='place-search'),

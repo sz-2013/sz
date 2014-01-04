@@ -13,7 +13,7 @@ class UsersCreate(ProjectApiView):
     def create(self, data):
     	serializer = serializers.UserSerializer(data=data)
         if serializer.is_valid():
-            user = serializer.object['user']
+            user = serializer.object
             user_data = serializers.UserBigLSerializer(instance=user).data
             engine_data = posts.users_create(user_data)
             user.create_in_engine()

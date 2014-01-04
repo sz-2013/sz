@@ -44,3 +44,6 @@ class NewsRequestForm(MessageRequestForm):
         initial=0
         )
 
+class GameMapRequestForm(forms.Form):
+    latitude = forms.FloatField(required=True, min_value=-90.0, max_value=90.0, label=u'Широта')
+    longitude = forms.FloatField(required=True, min_value=-180.0, max_value=180.0, label=u'Долгота')

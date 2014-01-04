@@ -2,6 +2,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from sz.api import fields as sz_api_fields
@@ -44,11 +45,7 @@ class AuthUserIsVerified(serializers.BooleanField):
     def field_to_native(self, obj, field_name):
         if isinstance(obj, AnonymousUser):
             return False
-        return super(
-            AuthUserIsVerified, self
-        ).field_to_native(
-            obj, field_name
-        )
+        return super(AuthUserIsVerified, self).field_to_native(obj, field_name)
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
@@ -59,11 +56,7 @@ class AuthUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.User
-        fields = (
-            'email',
-            'is_anonymous',
-            'is_authenticated',
-        )
+        fields = ('email', 'is_anonymous', 'is_authenticated', )
 
 
 class AuthenticationSerializer(serializers.Serializer):
@@ -73,7 +66,9 @@ class AuthenticationSerializer(serializers.Serializer):
         super(AuthenticationSerializer, self).__init__(*args, **kwargs)
 
     token = serializers.Field(source='key')
-    user = sz_api_fields.NestedField(transform=lambda p, a: a.get('user', None), serializer=UserSerializer)
+    user = sz_api_fields.NestedField(
+        transform=lambda p, a: a.get('user', None),
+        serializer=UserSerializer)
 
 
 class AuthRequestSerializer(serializers.Serializer):
@@ -135,10 +130,7 @@ class RegistrationSerializer(serializers.Serializer):
 class ResendingConfirmationKeySerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     def validate(self, attrs):
-        attrs = super(
-            ResendingConfirmationKeySerializer, 
-            self
-        ).validate(attrs)
+        attrs = super(ResendingConfirmationKeySerializer, self ).validate(attrs)
         email = attrs.get('email')
         models.RegistrationProfile.objects.send_key(email)
         return attrs
@@ -151,12 +143,11 @@ class PlaceSerializer(serializers.Serializer):
     date = serializers.Field()
     def restore_object(self, instance=None):
         try:
-            place = models.Place.objects.get(
+            return models.Place.objects.get(
                 name=name,position = gis_core.ll_to_point(longitude,latitude))
-        except:
+        except ObjectDoesNotExist:
             raise serializers.ValidationError(_("Place with name %s, lng %f,\
                     lat %f is not create in sz"%(name,longitude,latitude)))
-        return place
 
 class MessageBaseSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
@@ -168,11 +159,7 @@ class MessageBaseSerializer(serializers.ModelSerializer):
         """
         Check that the start is before the stop.
         """
-        text = attrs.get('text', None)
-        if text is None:
-            text = ''
-        else:
-            text = attrs['text'].strip()
+        text = attrs.get('text').strip() if attrs.get('text') else ''        
         photo = attrs.get('photo', None)
         if not (photo or text != ""):
             raise serializers.ValidationError("Message don't must be empty")

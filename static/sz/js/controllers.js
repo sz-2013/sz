@@ -308,7 +308,7 @@ function RegistrationConfirmation($scope, userService){
 
 function PlaceSelectionController($scope, placeService){
     //@TODO:половина мест определяется как китай-не знаю даже что с этим делать  
-    $scope.center = {zoom:1, lat: 0, lng: 0}
+    /*$scope.center = {zoom:1, lat: 0, lng: 0}*/
     $scope.tmlText = {
         header:{
             main:'New post'
@@ -330,7 +330,7 @@ function PlaceSelectionController($scope, placeService){
     }
     $scope.tmlText.btn.search = $scope.tmlText.hint.search
     
-    $scope.markers = {}
+    /*$scope.markers = {}
     $scope.placesQuery = []
     $scope.circles = {}
     var local_icons = {
@@ -382,18 +382,17 @@ function PlaceSelectionController($scope, placeService){
             shadowAnchor: [4, 62],
             popupAnchor: [1,-12]
         }),
-    }
+    }*/
     
     var params = {};    
     $scope.inProgress = false    
-    $scope.$watch('session',function(){
+    /*$scope.$watch('session',function(){
         if($scope.session){
-            $scope.redirectAnon()
             params.radius = $scope.session.radius || 250
         }
-    }) 
+    }) */
 
-    function createMarkers(list,icon){
+    /*function createMarkers(list,icon){
         for(var i in list){
             var p = list[i].place,
                 distance = list[i].distance;
@@ -504,15 +503,13 @@ function PlaceSelectionController($scope, placeService){
             var p = {latitude:$scope.center.lat, longitude:$scope.center.lng, radius: params.radius}
             searchHere(p)
         }
-    })
-    $scope.$watch('coordinates',function(){   
-    //@TODO: почему-то не меняются в вотче координаты центра, 
-    //поэтому нужно щелкнуть в произвольном месте для смены    
+    })*/
+    $scope.$watch('coordinates',function(){     
         if($scope.coordinates){                        
             params.latitude = $scope.coordinates.latitude
             params.longitude = $scope.coordinates.longitude
             params.radius = params.radius || 250          
-            $scope.markers.user = {lat: params.latitude, lng: params.longitude, message: "It is you", icon:local_icons.user_icon}             
+            /*$scope.markers.user = {lat: params.latitude, lng: params.longitude, message: "It is you", icon:local_icons.user_icon}             
             $scope.circles.user = {
                 fillColor:'white',
                 weight: 1,
@@ -522,17 +519,18 @@ function PlaceSelectionController($scope, placeService){
                 radius:params.radius,
                 type:'circle',
                 latlngs: { lat: params.latitude, lng: params.longitude },
-            }            
-            searchHere(params,true)
+            }            */
+            /*searchHere(params,true)*/
+
+            //first do explore in point
+            var new_places = placeService.exploreInVenues(params, function(r) { 
+                console.log(r)
+            });
         }        
     })
 }
 function MessageEditorController($scope){}
-function MessageEditorControllerSub($scope, messagePreviewService, $routeParams, $location){
-    $.each($scope.mainNav, function(n, val){
-        $scope.mainNav[n] = ''
-    })
-    $scope.mainNav.post = 'active';
+function MessageEditorControllerSub($scope, messagePreviewService, $routeParams, $location){    
     if (angular.isDefined($routeParams.placeId))
         placeService.get({placeId: $routeParams.placeId}, function(resp){ $scope.placeHeader = resp; })  
     if (angular.isDefined($routeParams.previewId))

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from sz.core import models, gis as gis_core
 
@@ -22,18 +23,20 @@ class UserCreateSerializer(serializers.Serializer):
         email = attrs['email']
         try:
             user = models.User.objects.get(email = email)               
-        except:
-            raise serializers.ValidationError(_("User with email %s is not create in sz"%email))
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError(
+                _("User with email %s is not create in sz"%email))
         if user.is_in_engine is not False:
-                raise serializers.ValidationError(_("User with email %s arleady created in lebowski"%email)) 
-        attrs['user'] = user
-        return attrs
+            raise serializers.ValidationError(
+                _("User with email %s arleady created in lebowski"%email)) 
+        return user
 
 
 
 class UserSerializer(serializers.Serializer):
     id = serializers.Field()
-    email = serializers.EmailField(required=True)
+    # email = serializers.EmailField(required=True)
+    email = serializers.CharField(required=True)
     race = serializers.ChoiceField(required=False, choices=[
         (race.pk, race.name) for race in models.Races.objects.all()
     ])
@@ -41,14 +44,13 @@ class UserSerializer(serializers.Serializer):
         (gender.pk, gender.name) for gender in models.Gender.objects.all()
     ])
     date_confirm = serializers.Field()
-    def validate(self, attrs):
+    def validate(self, attrs):   
         attrs = super(UserSerializer, self).validate(attrs) 
-        email = attrs['email']
         try:
-            attrs['user'] = models.User.objects.get(email = email)
-        except:
-            raise serializers.ValidationError(_("User with email %s is not create in sz"%email))
-        return attrs
+            return models.User.objects.get(email = attrs['email'])
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError(
+                _("User with email %s is not create in sz"%attrs['email']))
 
 class UserBigLSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(source="id")    
@@ -70,13 +72,11 @@ class PlaceSerializer(serializers.Serializer):
         longitude = attrs.get('longitude')
         latitude = attrs.get('latitude')
         try:
-            # place = Place.objects.get(
-            attrs['place'] = models.Place.objects.get(
+            return models.Place.objects.get(
                 name=name,position = gis_core.ll_to_point(longitude,latitude))
-        except:
+        except ObjectDoesNotExist:
             raise serializers.ValidationError(_("Place with name %s, lng %f,\
              lat %f is not create in sz"%(name,longitude,latitude)))
-        return attrs
 
 class PlaceBigLSerializer(serializers.Serializer):
     place_id = serializers.IntegerField(source="id")
@@ -97,7 +97,7 @@ class MessageSerializer(serializers.Serializer):
         pk = attrs.get('id')
         try:
             attrs['message'] = models.Message.objects.get(pk=pk)
-        except:
+        except ObjectDoesNotExist:
             # raise serializers.ValidationError(_("Message with id %s \
             #     is not create in sz"%pk))
             raise serializers.ValidationError(_("%s"%attrs))

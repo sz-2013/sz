@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.http import Http404
 from rest_framework import permissions, status
-from sz.api.views import SzApiView, news_feed_service, place_service
 from rest_framework.reverse import reverse
+from sz.api.views import SzApiView, news_feed_service, place_service
 from sz.api import serializers, forms
 from sz.api import response as sz_api_response
 from sz import settings
-from lebowski.api.views import places as lebowski_places
 from sz.settings import LEBOWSKI_MODE_TEST
+
 
 class PlaceRootNews(SzApiView):
     """
@@ -37,22 +37,23 @@ class PlaceVenueExplore(SzApiView):
             "place": item_serializer.data, "creator": item["creator"]}
         return serialized_item          
     def get(self, request,format=None):
-    	params = self.validate_and_get_params(
+        params = self.validate_and_get_params(
             forms.PlaceExploreRequestForm, request.QUERY_PARAMS)
+        params['limit'] = 10
         params[u'creator'] = request.user.email  if not LEBOWSKI_MODE_TEST \
             else request.QUERY_PARAMS.get('email')        
         place_response =  map(self._serialize_item, 
             place_service.explore_in_venues(**params))
         data = dict(places = place_response)
-        if place_response:
-            #@TODO - change it when bl will be answer normal stuff
-            engina_data = lebowski_places.PlacesCreate().create(place_response)            
-            if LEBOWSKI_MODE_TEST:
-                data['bl'] = engina_data
-                status = 200
-            else:
-                status = engina_data['status']
-            return sz_api_response.Response(data,status=status)
+        # if place_response:
+        #     #@TODO - change it when bl will be answer normal stuff
+        #     engina_data = lebowski_places.PlacesCreate().create(place_response)
+        #     if LEBOWSKI_MODE_TEST:
+        #         data['bl'] = engina_data
+        #         status = 200
+        #     else:
+        #         status = engina_data['status']
+        #     return sz_api_response.Response(data,status=status)
         return sz_api_response.Response(data)  
 
 class PlaceVenueSearch(SzApiView):
@@ -67,16 +68,16 @@ class PlaceVenueSearch(SzApiView):
         serialized_item = {
             "place": item_serializer.data, 'distance':item['distance']}
         return serialized_item          
+    def _serialize_list(self, places):
+        return map(self._serialize_item ,places) if type(places) is list else []
     def get(self, request,format=None):
         params = self.validate_and_get_params(
             forms.PlaceSearchRequestForm, request.QUERY_PARAMS)
         params['user'] = request.user.email
-        places_list = place_service.search_in_venue(**params)        
-        place_response = dict(map(
-            lambda (k,places):(k,
-                map(lambda p:self._serialize_item(p),places)),
-            places_list.items()
-        ))
+        params['limit'] = 10
+        places_list = place_service.search_in_venue(**params)
+        categories = places_list.keys() # in_radius, out_radius
+        place_response = dict([(c, self._serialize_list(places_list.get(c))) for c in categories])
         return sz_api_response.Response(place_response)    
 
 class PlaceInstanceMessages(SzApiView):

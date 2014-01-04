@@ -18,12 +18,12 @@ def search_places(**kwargs):
         latitude = mode_test.STEP*mode_test.COUNT/2
         longitude = mode_test.STEP*mode_test.COUNT/2        
     query = kwargs.get(params_names.QUERY)
-    limit = 10 #kwargs.get(params_names.LIMIT)
+    limit = kwargs.get(params_names.LIMIT)
     current_position = fromstr("POINT(%s %s)" % (longitude, latitude))
     radius = kwargs.get(params_names.RADIUS)    
     # filtered_places = models.Place.objects.annotate(messages_count=dj_models.Count('message__id'))\
     #     .order_by('-messages_count')
-    filtered_places = models.Place.objects.all()
+    filtered_places = models.Place.objects.filter(is_active=True)
     if query:
         filtered_places = filtered_places.filter(name__icontains=query)
     if radius == 0 or radius is None:
@@ -35,7 +35,9 @@ def search_places(**kwargs):
     else:
         distance_kwargs = {'m': '%i' % radius}
         filtered_places = filtered_places.filter(position__distance_lte=(current_position, D(**distance_kwargs)))        
-    filtered_places = filtered_places.distance(current_position).order_by('distance')[:limit]
+    filtered_places = filtered_places.distance(current_position).order_by('distance')
+    if limit:        
+        filtered_places = filtered_places[:limit]
     return filtered_places
 
 

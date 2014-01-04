@@ -37,11 +37,11 @@ def get_string_date(date):
 #     }
 #     return response
 
-def users_coordinate_response(serialiser,position):
-    if serialiser.is_valid():
-        serialiser.object["user_latitude"] = position.get("latitude")
-        serialiser.object["user_longitude"] = position.get("longitude")
-    return serialiser
+# def users_coordinate_response(serialiser,position):
+#     if serialiser.is_valid():
+#         serialiser.object["user_latitude"] = position.get("latitude")
+#         serialiser.object["user_longitude"] = position.get("longitude")
+#     return serialiser
 
 
 # def places_create_response(data):    

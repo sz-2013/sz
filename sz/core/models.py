@@ -397,7 +397,7 @@ class Place(models.Model):
     position = models.PointField(verbose_name=u"координаты")
     objects = models.GeoManager()
 
-    is_active = models.BooleanField(_('active'), default=True,
+    is_active = models.BooleanField(_('active'), default=False,
         help_text=_(
             'Designates whether this place should be treated as '
             'active. Unselect this instead of place has no owner too long'
@@ -450,6 +450,7 @@ class Place(models.Model):
 
     def create_in_engine(self):
         self.is_in_engine = True
+        self.is_active = True
         self.date_is_active = timezone.now()
         self.save()
 

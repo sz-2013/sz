@@ -82,6 +82,7 @@ class ApiRoot(SzApiView):
                 'message_previews_detail': reverse('message-previews-detail', request=request, kwargs={'pk': 22}),
                 # 'messages-search': reverse('message-search', request=request),
             },
+            'gamemap': reverse('gamemap', request=request),
             # 'city-nearest': reverse('city-nearest', request=request),
         })
 

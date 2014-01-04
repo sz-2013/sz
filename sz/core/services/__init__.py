@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
+import os
+import datetime
+from PIL import Image, ImageDraw
+from django.utils import timezone
+from django.db.models import Max
+from django.core.files import File
+from sz import settings
+from sz.settings import LEBOWSKI_MODE_TEST
 from sz.core.services import parameters
 from sz.core.services.parameters import names as params_names
 from sz.core.gis import venue
 from sz.core import models, queries, gis as gis_core, utils
-# from sz.core import lists, models, queries, gis as gis_core, utils
-import datetime
-from django.utils import timezone
-from django.db.models import Max
-from PIL import Image, ImageDraw
-from sz import settings
-from django.core.files import File
-import os
-from sz.settings import LEBOWSKI_MODE_TEST
-
+from lebowski.api.views import places as lebowski_places
 
 class FeedService:
     def _make_result(self, items, count, params):
@@ -37,32 +36,58 @@ class PlaceService(FeedService):
     def __init__(self, city_service):
         self.city_service = city_service
 
-    def create_place(self,params, city_id):  
+    def create_place(self,params, city_id, creator, radius):
+        if not self._filter_place(params, creator, radius):
+            return False
         location = params.get(u'location',{})
-        params['position'] = gis_core.ll_to_point(
-            location.get(u'lng'), params[u'location'].get(u'lat'))
-        params['address'] = location.get('address')
-        params['crossStreet'] = location.get('crossStreet')
-        params['contact'] = location.get('contact')
-        if location:
-            del params[u'location']
+        place_params = dict(
+            position = gis_core.ll_to_point(
+                location.get(u'lng'), params[u'location'].get(u'lat')),
+            address = location.get('address'),
+            crossStreet = location.get('crossStreet'),
+            contact = location.get('contact'),
+            fsq_id = params.get('id'),
+            city_id = city_id,
+            name = params.get('name'),
+        )
         foursquare_cat = params.get(u'categories')[0] \
             if len(params.get(u'categories',[])) else {}        
         if foursquare_cat:
             foursquare_icon = foursquare_cat.get('icon',{})
-            params['foursquare_icon_suffix'] = foursquare_icon.get(u'suffix')
-            params['foursquare_icon_prefix'] = foursquare_icon.get(u'prefix')
-            del params[u'categories']
-        params['fsq_id'] = params.get(u'id')    
-        if params['fsq_id']:
-            del params[u'id']
-        params['city_id'] = city_id
-        p, is_created = models.Place.objects.get_or_create(**params)
-        if not is_created:
-            p.is_active = True
-            p.date_is_active = timezone.now()
-            p.save()        
-        return p
+            place_params['foursquare_icon_suffix'] = foursquare_icon.get(u'suffix')
+            place_params['foursquare_icon_prefix'] = foursquare_icon.get(u'prefix')
+        p, is_create = models.Place.objects.get_or_create(**place_params)
+        place_params['latitude'] = p.latitude()
+        place_params['longitude'] = p.longitude()
+        engine_data = lebowski_places.PlacesCreate().create(place_params, creator)    
+        if engine_data['status'] != 201:
+            print engine_data['data']
+            return False
+        data = dict(
+            distance=gis_core.distance(
+                creator['longitude'], creator['latitude'],
+                p.longitude(), p.latitude()),
+            azimuth=gis_core.azimuth(
+                creator['longitude'], creator['latitude'], 
+                p.longitude(), p.latitude()),
+            creator=creator, place=p,
+        )
+        p.create_in_engine()
+        return data
+
+    def _filter_place(self, p, creator, radius):
+        distance = gis_core.distance(
+            creator['longitude'], creator['latitude'],
+            p[u'location'].get('lng'), p[u'location'].get('lat'))
+        #filter only in radius
+        if distance>radius:
+            return False
+        position = gis_core.ll_to_point(
+            p[u'location'].get(u'lng'), p[u'location'].get(u'lat'))
+        place = models.Place.objects.filter(name=p['name'], position=position)
+        #take only not created or not active in db places
+        is_create = place[0].is_active if place else False
+        return not is_create
 
     def explore_in_venues(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
@@ -73,57 +98,20 @@ class PlaceService(FeedService):
         query = params.get(params_names.QUERY)
         radius = params.get(params_names.RADIUS)
         creator = {
-            'email':kwargs[u'creator'],
-            'latitude':latitude,
-            'longitude':longitude
+            'email':kwargs[u'creator'], 'latitude':latitude, 'longitude':longitude
         }
         #get place_list from 4qk        
         result = venue.search(
-            {'latitude': latitude, 'longitude': longitude},
-            query,
-            radius
+            {'latitude': latitude, 'longitude': longitude}, query, radius
         )['venues']
-        #filter only in radius
-        result_filter_by_radius = filter(
-            lambda p: gis_core.distance(
-                    creator['longitude'], creator['latitude'],
-                    p[u'location'].get('lng'), p[u'location'].get('lat')
-                )<=radius,
-            result
-        )
-        #take only not created in db places
-        result_filter_by_created = filter(
-            lambda p: 
-                #place not created in db
-                not models.Place.objects.filter(
-                    name=p.get(u'name'),
-                    position=gis_core.ll_to_point(
-                        p[u'location'].get(u'lng'), p[u'location'].get(u'lat')
-                    )
-                ) 
-                #or place created in db but not active
-                or models.Place.objects.get(
-                    name=p.get(u'name'),
-                    position=gis_core.ll_to_point(
-                        p[u'location'].get(u'lng'), p[u'location'].get(u'lat')
-                    )
-                ).is_active is False,                    
-            result_filter_by_radius
-        )
         place_and_distance_list = []
-        for p in result_filter_by_created:
-            new_place = dict(
-                distance=gis_core.distance(
-                    creator['longitude'], creator['latitude'],
-                    p[u'location'].get('lng'), p[u'location'].get('lat')
-                ),
-                azimuth=gis_core.azimuth(longitude, latitude,
-                    p[u'location'].get(u'lng'), p[u'location'].get(u'lat')),
-                creator=creator,
-                place=self.create_place(p,city_id),
-            )
-            place_and_distance_list.append(new_place)
+        for p in result:
+            new_place = self.create_place(p,city_id,creator,radius)
+            if new_place:
+                place_and_distance_list.append(new_place)
         return place_and_distance_list
+    def _make_distance_items_list(self, params, places):
+        return [self._make_place_distance_item(p,params) for p in places]
     def search_in_venue(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
@@ -133,16 +121,21 @@ class PlaceService(FeedService):
             places_in_radius = queries.search_places(**params.get_db_params())
         newparams = params.get_db_params()
         newparams['radius'] = None
+        # From all places list remove places who in places_in_radius list
         places_out_radius = \
             list(set(queries.search_places(**newparams))-set(places_in_radius))
+        #Puts boths list in one dict        
         places = {
-            'out_radius':[self._make_place_distance_item(p,params) \
-                for p in places_out_radius],
-            'in_radius':[self._make_place_distance_item(p,params) \
-                for p in places_in_radius]
+            'out_radius': self._make_distance_items_list(params, places_out_radius),
+            'in_radius': self._make_distance_items_list(params, places_in_radius)
         }
         return places
-    
+    def get_gamemap(self, **kwargs):
+        params = parameters.PlaceSearchParametersFactory.create(
+            kwargs, self.city_service)
+        print params.get_db_params().get(params_names.CITY_ID)
+        places = queries.search_places(**params.get_db_params())
+        return self._make_distance_items_list(params, places)
 
 
 

@@ -2,70 +2,72 @@ from rest_framework import permissions, status
 
 from lebowski.api import serializers
 from lebowski.api.response import Response as root_api_response
-from lebowski.api.response import  users_coordinate_response
 from lebowski.api.views import ProjectApiView
 from lebowski.api import posts
 
 class PlacesCreate(ProjectApiView):
-	"""
-	Create place in engibe
-	Example of request:
-	[
-	  {
-        "place": {
-            "longitude": 127.526587228, 
-            "latitude": 50.2642421188, 
-            "foursquare_details_url": "https://foursquare.com/v/4c636f6f79d1e21e62cbd815", 
-            "id": None, 
-            "name": u'\u0410\u0437\u0438\u0430\u0442\u0441\u043a\u043e-\u0422\u0438\u0445\u043e\u043e\u043a\u0435\u0430\u043d\u0441\u043a\u0438\u0439 \u0411\u0430\u043d\u043a', 
-            "address": u'\u0443\u043b. \u0410\u043c\u0443\u0440\u0441\u043a\u0430\u044f, 225', 
-            "crossStreet": None, 
-            "contact": {}, 
-            "fsq_id": u'4f62a7afe4b02cbb7d650e72', 
-            "foursquare_icon_prefix": "https://foursquare.com/img/categories_v2/shops/mall_", 
-            "foursquare_icon_suffix": ".png", 
-            "city_id": 1
-        }, 
-        "creator": 
-        	{
-        		'email':u'admin@admin.com',
-        		'latitude':50.0,
-        		'longitude':127.0
-        	}
-	    }, 
-	]
-	"""
-	permission_classes = (permissions.IsAuthenticated,)
-	def create(self, data):		
-		serializers_list = [(
-			serializers.PlaceSerializer(data=d['place']),
-			users_coordinate_response(
-					serializers.UserSerializer(data=d['creator']),
-					d['creator']
-				)			
-			) for d in data]
-		serializers_not_valid_list = map(
-			lambda (p,c):p.errors and p.errors or c.errors and c.errors,
-			filter(
-				lambda (p,c):p.errors or c.errors,
-				serializers_list))
-		if not serializers_not_valid_list:			
-			places_and_creators_list = [(
-				serializers.PlaceBigLSerializer(
-					instance=p.object['place']).data,
-				dict(
-					serializers.UserBigLSerializer(
-						instance=c.object['user']).data,
-					**{
-						'user_latitude':c.object['user_latitude'],
-						'user_longitude':c.object['user_longitude']}
-					)
-				) for (p,c) in serializers_list]
-			# places_data_list = map(places_create_response, places_and_creators_list)
-			places_data_list = [dict(place_data,**creator_data) for (place_data,creator_data) in places_and_creators_list]
-			engine_data = posts.places_create(places_data_list)
-			return engine_data
-		return {'data':serializers_not_valid_list,'status':status.HTTP_400_BAD_REQUEST}
-	def post(self, request):
-		data = create(request.DATA)
-		return root_api_response(data['data'],status=data['status'])
+    """
+    Create place in engibe
+    Example of request:
+    `place_params`:
+
+        ```json
+        {
+            "city_id"                 : 0000,
+            "address"                 : "Some str, 42", 
+            "name"                    : "SZ Point",
+            "foursquare_icon_suffix"  : ".png"
+            "foursquare_icon_prefix"  : "", 
+            "longitude"               : 12.34567890123456,
+            "contact"                 : None, 
+            "fsq_id"                  : "", 
+            "crossStreet"             : None, 
+            "latitude"                : 12.34567890123456,
+            "position"                : <Point object at 0xaf4ae440L>, 
+
+        }
+        ```
+
+        `creator`:
+
+        ```json
+        {
+            "latitude"  : 12.34567890123456,
+            "email"     : "cool_dude@sz.com", 
+            "longitude" : 12.34567890123456,
+        }
+        ```
+  
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+    def create(self, place, creator):
+        data = {'status': status.HTTP_400_BAD_REQUEST, 'data': False}
+        user_latitude = creator.get('latitude')
+        user_longitude = creator.get('longitude')
+        if not user_latitude or not user_longitude:
+            data['data'] = [('user_position', 'user position is required')]
+            return data
+        serializer_place = serializers.PlaceSerializer(data=place)
+        serializer_user = serializers.UserSerializer(data=creator)
+        if serializer_place.is_valid() and serializer_user.is_valid():
+            place = serializer_place.object
+            user = serializer_user.object
+            bl_place_data = serializers.PlaceBigLSerializer(
+                instance=place).data
+            bl_user_data = serializers.UserBigLSerializer(
+                instance=user).data
+            bl_data = dict(bl_place_data, **bl_user_data)
+            bl_data.update(user_longitude=user_longitude, user_latitude=user_latitude)
+            # bl_data.update(user_longitude=user_longitude, user_latitude=user_latitude, **bl_user_data)
+            print bl_data            
+            # data = posts.places_create(bl_data)
+            # 
+        else:
+            errors = serializer_place.errors if serializer_place.errors else {}
+            if serializer_user.errors:
+                errors.update(**serializer_user.errors)
+            data['data'] = errors
+        return data
+    def post(self, request):
+        data = create(request.DATA)
+        return root_api_response(data['data'],status=data['status'])
