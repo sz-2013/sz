@@ -14,7 +14,7 @@ class PlaceAdmin(admin.ModelAdmin):
 admin.site.register(Place, PlaceAdmin)
 
 admin.site.register(RoleUser)
-# admin.site.register(RolePlace)
+admin.site.register(RolePlace)
 admin.site.register(Face)
 admin.site.register(Category)
 admin.site.register(MessagePreview)

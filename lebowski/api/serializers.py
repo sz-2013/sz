@@ -88,7 +88,8 @@ class PlaceBigLSerializer(serializers.Serializer):
     place_name = serializers.CharField(source="name")
     place_latitude = serializers.FloatField(source="latitude")
     place_longitude = serializers.FloatField(source="longitude")
-    place_date = serializers.Field(source="get_string_date")            
+    place_date = serializers.Field(source="get_string_date")     
+    place_role = serializers.Field(source="role.name")
 
 class MessageSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)
