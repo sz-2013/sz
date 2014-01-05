@@ -61,6 +61,11 @@ class UserBigLSerializer(serializers.Serializer):
     user_date_confirm = serializers.Field(source="get_string_date_confirm")        
 
 
+class UserBigLShortSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(source="id")    
+    user_email = serializers.EmailField(source="email")
+
+
 class PlaceSerializer(serializers.Serializer):
     # id = serializers.Field()
     name = serializers.CharField(required=True)    

@@ -11,7 +11,7 @@ from sz.core.services import parameters
 from sz.core.services.parameters import names as params_names
 from sz.core.gis import venue
 from sz.core import models, queries, gis as gis_core, utils
-from lebowski.api.views import places as lebowski_places
+
 
 class FeedService:
     def _make_result(self, items, count, params):
@@ -57,23 +57,19 @@ class PlaceService(FeedService):
             place_params['foursquare_icon_suffix'] = foursquare_icon.get(u'suffix')
             place_params['foursquare_icon_prefix'] = foursquare_icon.get(u'prefix')
         p, is_create = models.Place.objects.get_or_create(**place_params)
-        place_params['latitude'] = p.latitude()
-        place_params['longitude'] = p.longitude()
-        engine_data = lebowski_places.PlacesCreate().create(place_params, creator)    
-        if engine_data['status'] != 201:
-            print engine_data['data']
-            return False
-        data = dict(
-            distance=gis_core.distance(
-                creator['longitude'], creator['latitude'],
-                p.longitude(), p.latitude()),
-            azimuth=gis_core.azimuth(
-                creator['longitude'], creator['latitude'], 
-                p.longitude(), p.latitude()),
-            creator=creator, place=p,
-        )
-        p.create_in_engine()
-        return data
+        # place_params['latitude'] = p.latitude()
+        # place_params['longitude'] = p.longitude()
+        
+        # data = dict(
+        #     distance=gis_core.distance(
+        #         creator['longitude'], creator['latitude'],
+        #         p.longitude(), p.latitude()),
+        #     azimuth=gis_core.azimuth(
+        #         creator['longitude'], creator['latitude'], 
+        #         p.longitude(), p.latitude()),
+        #     creator=creator, place=p,
+        # )
+        return p
 
     def _filter_place(self, p, creator, radius):
         distance = gis_core.distance(
@@ -102,16 +98,19 @@ class PlaceService(FeedService):
         }
         #get place_list from 4qk        
         result = venue.search(
-            {'latitude': latitude, 'longitude': longitude}, query, radius
-        )['venues']
-        place_and_distance_list = []
-        for p in result:
+            {'latitude': latitude, 'longitude': longitude},
+            query, radius
+        )
+        places_list = []
+        for p in result['venues']:
             new_place = self.create_place(p,city_id,creator,radius)
             if new_place:
-                place_and_distance_list.append(new_place)
-        return place_and_distance_list
+                places_list.append(new_place)
+        return places_list, creator
+
     def _make_distance_items_list(self, params, places):
         return [self._make_place_distance_item(p,params) for p in places]
+
     def search_in_venue(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)

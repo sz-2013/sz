@@ -7,7 +7,7 @@ from sz.api import serializers, forms
 from sz.api import response as sz_api_response
 from sz import settings
 from sz.settings import LEBOWSKI_MODE_TEST
-
+from lebowski.api.views import places as lebowski_places
 
 class PlaceRootNews(SzApiView):
     """
@@ -42,18 +42,17 @@ class PlaceVenueExplore(SzApiView):
         params['limit'] = 10
         params[u'creator'] = request.user.email  if not LEBOWSKI_MODE_TEST \
             else request.QUERY_PARAMS.get('email')        
-        place_response =  map(self._serialize_item, 
-            place_service.explore_in_venues(**params))
-        data = dict(places = place_response)
-        # if place_response:
-        #     #@TODO - change it when bl will be answer normal stuff
-        #     engina_data = lebowski_places.PlacesCreate().create(place_response)
-        #     if LEBOWSKI_MODE_TEST:
-        #         data['bl'] = engina_data
-        #         status = 200
-        #     else:
-        #         status = engina_data['status']
-        #     return sz_api_response.Response(data,status=status)
+        places_list, creator = place_service.explore_in_venues(**params)
+        if places_list:
+            #@TODO - change it when bl will be answer normal stuff
+            engina_data = lebowski_places.PlacesCreate().create(places_list, creator)
+            if LEBOWSKI_MODE_TEST:
+                data = dict(places = place_response, bl=engina_data)
+                status = 200
+            else:
+                data = engina_data['data']
+                status = engina_data['status']
+            return sz_api_response.Response(data,status=status)
         return sz_api_response.Response(data)  
 
 class PlaceVenueSearch(SzApiView):
