@@ -4,28 +4,16 @@ from lebowski.api import serializers
 from lebowski.api.response import Response as root_api_response
 from lebowski.api.views import ProjectApiView
 from lebowski.api import posts
+from sz.settings import LEBOWSKI_MODE_TEST
 
 class PlacesCreate(ProjectApiView):
     """
-    Create place in engibe
-    Example of request:
-    
-    `places`: [<Place>, ...]
-
-    `creator`:
-
-    `
-    {
-        "latitude"  : 12.34567890123456,
-        "email"     : "cool_dude@sz.com", 
-        "longitude" : 12.34567890123456,
-    }
-    `
-  
+    Create place in engine
+    [look here](https://github.com/sz-2013/sz/wiki/PLACE:-CREATE#%D0%9E%D1%82%D0%B2%D0%B5%D1%82-%D0%BE%D1%82-%D0%A1%D1%82%D0%BE%D1%80%D0%BE%D0%BD%D0%BD%D0%B5%D0%B9-%D0%91%D0%94-%D0%BA-sz)
     """
     permission_classes = (permissions.IsAuthenticated,)
     def create(self, places_list, creator):
-        data = {'status': status.HTTP_400_BAD_REQUEST, 'data': False}
+        data = {'status': status.HTTP_400_BAD_REQUEST, 'data': {}}
         user_latitude = creator.get('latitude')
         user_longitude = creator.get('longitude')
         if not user_latitude or not user_longitude:
@@ -41,10 +29,23 @@ class PlacesCreate(ProjectApiView):
             bl_data['places'] = map(
                 lambda p: serializers.PlaceBigLSerializer(instance=p).data, 
                 places_list)
-            print bl_data            
-            # p.create_in_engine()
-            # data = posts.places_create(bl_data)
-            # 
+            engine_data = posts.places_create(bl_data)
+
+            data['data'] = dict(user=creator, places_explored=len(places_list))
+            data['status'] = 201
+            # data['data'] = dict(user=engine_data["data"].get("user", {}))
+            # data['status'] = engine_data.get("status")
+            # if engine_data['status'] == 201:
+            #     for p_data in engine_data['data'].get('places', []):
+            #         s = serializers.PlaceBigLSerializer(data=p_data)
+            #         if s.is_valid():
+            #             p = s.object
+            #             p.create_in_engine()
+            #             val+=1
+            # data['places_explored'] = val
+            # if LEBOWSKI_MODE_TEST:
+            #     data['bl'] = engine_data
+            #     data['status'] = 201
         else:
             data['data'] = serializer_user.errors
         return data

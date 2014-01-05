@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
 import datetime
+import math
 from PIL import Image, ImageDraw
 from django.utils import timezone
 from django.db.models import Max
 from django.core.files import File
+from django.db import IntegrityError
 from sz import settings
 from sz.settings import LEBOWSKI_MODE_TEST
 from sz.core.services import parameters
@@ -37,45 +39,50 @@ class PlaceService(FeedService):
         self.city_service = city_service
 
     def create_place(self,params, city_id, creator, radius):
-        if not self._filter_place(params, creator, radius):
+        distance = gis_core.distance(
+            creator['longitude'], creator['latitude'],
+            params[u'location'].get('lng'), params[u'location'].get('lat'))
+        #filter only in radius        
+        if distance>radius:
             return False
         location = params.get(u'location',{})
+        position = gis_core.ll_to_point(
+            location.get(u'lng'), params[u'location'].get(u'lat'))                
         place_params = dict(
-            position = gis_core.ll_to_point(
-                location.get(u'lng'), params[u'location'].get(u'lat')),
             address = location.get('address'),
             crossStreet = location.get('crossStreet'),
             contact = location.get('contact'),
-            fsq_id = params.get('id'),
+            fsq_id = params.get('id'),            
             city_id = city_id,
-            name = params.get('name'),
+            position=position, 
+            name=params.get('name')
         )
         foursquare_cat = params.get(u'categories')[0] \
             if len(params.get(u'categories',[])) else {}        
         if foursquare_cat:
             foursquare_icon = foursquare_cat.get('icon',{})
             place_params['foursquare_icon_suffix'] = foursquare_icon.get(u'suffix')
-            place_params['foursquare_icon_prefix'] = foursquare_icon.get(u'prefix')
-        p, is_create = models.Place.objects.get_or_create(**place_params)
-        # place_params['latitude'] = p.latitude()
-        # place_params['longitude'] = p.longitude()
-        
-        # data = dict(
-        #     distance=gis_core.distance(
-        #         creator['longitude'], creator['latitude'],
-        #         p.longitude(), p.latitude()),
-        #     azimuth=gis_core.azimuth(
-        #         creator['longitude'], creator['latitude'], 
-        #         p.longitude(), p.latitude()),
-        #     creator=creator, place=p,
-        # )
-        return p
+            place_params['foursquare_icon_prefix'] = foursquare_icon.get(u'prefix')        
+        '''
+        Зачем здесь экспешн ?
+        Да потому что из-за уникальной географической позиции в городе тестирования 
+        city_id определяется поразному в разных точках города 
+        и с таким ид, name, position  место не находится, но и создавать не даст
+        '''
+        print city_id
+        try:
+            p, is_create = models.Place.objects.get_or_create(**place_params)
+        except IntegrityError:
+            p = models.Place.objects.filter(
+                position=position, name=params.get('name'))
+            if p: p = p[0]
+        return p if (p and not p.is_active) else False
 
     def _filter_place(self, p, creator, radius):
         distance = gis_core.distance(
             creator['longitude'], creator['latitude'],
             p[u'location'].get('lng'), p[u'location'].get('lat'))
-        #filter only in radius
+        #filter only in radius        
         if distance>radius:
             return False
         position = gis_core.ll_to_point(
@@ -132,9 +139,43 @@ class PlaceService(FeedService):
     def get_gamemap(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
-        print params.get_db_params().get(params_names.CITY_ID)
-        places = queries.search_places(**params.get_db_params())
-        return self._make_distance_items_list(params, places)
+        city_id = params.get_db_params().get(params_names.CITY_ID)
+        places_list = models.Place.objects.filter(city_id=city_id)
+        #нужно получить нечетное целое число, чтобы оно стало длиной ребра
+        num = math.sqrt(len(places_list)) 
+        #если корень из длины - четное или не целое число
+        #нужер найти ближайшее сверху нечетное
+        if num%1 or not num%2:
+            #прибавляем к нему единицу. четное станет нечетным. нечетное - четным.
+            num=int(num+1)
+            #и поэтому к нему мы снова прибавим единицу.
+            if not num%2: num+=1
+        #на всякий случай опять делаем инт, чтобы округлилось вниз
+        map_width = int(num)
+        #теперь мы получаем два списка,
+        #которые представляют собой проекции мест на оси
+        places_sorted_by_x = sorted(places_list, key=lambda p: p.position.x )
+        def generate_list(places, n):
+            len_places = len(places)
+            def sub_list(i):
+                return places[i:i+n] if (i+n*2)<len_places else places[i:]
+            return [sub_list(i) for i in xrange(0, len_places, n) \
+                if (i+n)<len_places]
+        #теперь проекции нужно сгрупировать по (len/map_width) элементов
+        #два группированных списка [(0, [p1, p2,..]), ....], 
+        #где каждый (..) фактически означает номер клетки
+        places_x = generate_list(places_sorted_by_x, len(places_list)/map_width)
+        places_data = []        
+        for x, gr in enumerate(places_x):               
+            for y, p in enumerate(sorted(gr, key=lambda p_y:p_y.position.y)):
+                item = self._make_place_distance_item(p, params)
+                item['position'] = [x+1, y+1]
+                places_data.append(item)
+        columns = [item['position'][0] for item in places_data]
+        map_height = sorted(
+            map(lambda y: columns.count(y), columns) , reverse=True)[0]
+        print map_height
+        return places_data, map_width, map_height
 
 
 

@@ -1,6 +1,6 @@
-var raphaelDirective = angular.module("slidebar-directive", []);
+var raphaelDirective = angular.module("sidebar-directive", []);
 
-raphaelDirective.directive('szSlideBar', [ function ( ) {   
+raphaelDirective.directive('szSideBar', [ function ( ) {   
     return function(scope, element, attrs) {
         /**
          * sidebarEffects.js v1.0.0
@@ -16,13 +16,11 @@ raphaelDirective.directive('szSlideBar', [ function ( ) {
         $("#"+attrs.szSlideBar).tinyscrollbar(); */           
         /*element.slideBar( { effect: attrs.szSlideBarEffect } );*/
         var params = attrs.params || {},
-                container_id = params.container_id || 'st-container',
-                container_class = params.container_class || 'st-container',
-                open_class = params.open_class || 'st-menu-open',
-                menu_class = params.menu_class || 'st-menu',
-                effect = attrs.szSlideBarEffect || 'st-effect-8';
-
-       
+            container_id = params.container_id || 'st-container',
+            container_class = params.container_class || 'st-container',
+            open_class = params.open_class || 'st-menu-open',
+            menu_class = params.menu_class || 'st-menu',
+            effect = attrs.szSideBarEffect || 'st-effect-8';       
 
         function init(){
             function hasParentClass( e, classname ) {
@@ -40,10 +38,10 @@ raphaelDirective.directive('szSlideBar', [ function ( ) {
                 },
                 bodyClickFn = function(evt) {
                     // event type (if mobile use touch events)
-                    if( !hasParentClass( evt.target, menu_class ) ) {
+                    /*if( !hasParentClass( evt.target, menu_class ) ) {*/
                         resetMenu();
                         document.removeEventListener( eventtype, bodyClickFn );
-                    }
+                    /*}*/
                 };
 
             function bind_function(){                

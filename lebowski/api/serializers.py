@@ -66,30 +66,39 @@ class UserBigLShortSerializer(serializers.Serializer):
     user_email = serializers.EmailField(source="email")
 
 
-class PlaceSerializer(serializers.Serializer):
+def get_place(latitude, longitude, name):
+    try:
+        return models.Place.objects.get(
+            name=name,position = gis_core.ll_to_point(longitude,latitude))
+    except ObjectDoesNotExist:
+        raise serializers.ValidationError(_("Place with name %s, lng %f,\
+         lat %f is not create in sz"%(name,longitude,latitude)))
+
+
+class PlaceSerializer():
     # id = serializers.Field()
     name = serializers.CharField(required=True)    
     latitude = serializers.FloatField(required=True)
     longitude = serializers.FloatField(required=True)
     def validate(self, attrs):
         attrs = super(PlaceSerializer, self).validate(attrs) 
-        name = attrs.get('name')
-        longitude = attrs.get('longitude')
-        latitude = attrs.get('latitude')
-        try:
-            return models.Place.objects.get(
-                name=name,position = gis_core.ll_to_point(longitude,latitude))
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError(_("Place with name %s, lng %f,\
-             lat %f is not create in sz"%(name,longitude,latitude)))
+        return get_place(
+            attrs.get('latitude'), attrs.get('longitude'), attrs.get('name'))
+
+        
 
 class PlaceBigLSerializer(serializers.Serializer):
     place_id = serializers.IntegerField(source="id")
-    place_name = serializers.CharField(source="name")
-    place_latitude = serializers.FloatField(source="latitude")
-    place_longitude = serializers.FloatField(source="longitude")
+    place_name = serializers.CharField(source="name", required=True)
+    place_latitude = serializers.FloatField(source="latitude", required=True)
+    place_longitude = serializers.FloatField(source="longitude", required=True)
     place_date = serializers.Field(source="get_string_date")     
     place_role = serializers.Field(source="role.name")
+    def validate(self, attrs):
+        attrs = super(PlaceBigLSerializer, self).validate(attrs) 
+        return get_place(
+            attrs.get('place_latitude'), attrs.get('place_longitude'),
+            attrs.get('place_name'))
 
 class MessageSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)

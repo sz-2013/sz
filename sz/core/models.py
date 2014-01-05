@@ -63,7 +63,8 @@ ROLE_PLACE_CHOICES = (
 
 
 def get_string_date(date):
-    return [date.year, date.month, date.day, date.hour, date.minute, date.second]
+    return [date.year, date.month, date.day, date.hour, \
+        date.minute, date.second] if date else []
 
 class ModifyingFieldDescriptor(object):
     """ Modifies a field when set using the field's (overriden) .to_python() method. """
@@ -112,7 +113,8 @@ class Races(models.Model):
         return os.path.join(directory, filename)
     blazon = imagekit_models.ProcessedImageField(
         upload_to=get_blazon_path, null=False, blank=True, default=None,
-        processors=[processors.ResizeToFit(150, 150), ], options={'quality': 85}
+        processors=[processors.ResizeToFit(150, 150), ],
+        options={'quality': 85}
     )
     name = models.CharField(max_length=32)
     def __unicode__(self):
@@ -153,13 +155,15 @@ class Face(models.Model):
 
 class RoleUser(models.Model):
     """user role: player, bot, other"""
-    name = models.CharField(max_length=32, choices=ROLE_USER_CHOICES, unique=True)
+    name = models.CharField(max_length=32, 
+        choices=ROLE_USER_CHOICES, unique=True)
     def __unicode__(self):
         return self.name
 
 class RolePlace(models.Model):
     """place role: shop, bot castle, other"""
-    name = models.CharField(max_length=32, choices=ROLE_PLACE_CHOICES, unique=True)
+    name = models.CharField(max_length=32, 
+        choices=ROLE_PLACE_CHOICES, unique=True)
     def __unicode__(self):
         return self.name
 
@@ -170,7 +174,8 @@ class Category(models.Model):
         verbose_name=u"псевдоним", max_length=32,
         db_index=True, unique=True)
 
-    name = models.CharField(verbose_name=u"наименование", max_length=64, db_index=True)
+    name = models.CharField(verbose_name=u"наименование", 
+        max_length=64, db_index=True)
 
     description = models.CharField(
         verbose_name=u"описание", max_length=256,
@@ -182,7 +187,8 @@ class Category(models.Model):
 
     def get_keywords_list(self):
         normalized_keywords = u' '.join(self.keywords.split()).lower()
-        return sorted([kw.strip() for kw in normalized_keywords.split(',')])
+        return sorted(
+            [kw.strip() for kw in normalized_keywords.split(',')])
 
     def save(self, *args, **kwargs):
         self.keywords = u', '.join(self.get_keywords_list())
@@ -490,7 +496,7 @@ class Place(models.Model):
         ordering = ("name",)
     def save(self, *args, **kwargs):
         if not self.__dict__.get('role_id'):
-            self.role, is_create = RolePlace.get_or_create(name=STANDART_ROLE_PLACE_NAME)
+            self.role, is_create = RolePlace.objects.get_or_create(name=STANDART_ROLE_PLACE_NAME)
         super(Place, self).save(*args, **kwargs)
 
 class MessageBase(models.Model):

@@ -44,16 +44,9 @@ class PlaceVenueExplore(SzApiView):
             else request.QUERY_PARAMS.get('email')        
         places_list, creator = place_service.explore_in_venues(**params)
         if places_list:
-            #@TODO - change it when bl will be answer normal stuff
-            engina_data = lebowski_places.PlacesCreate().create(places_list, creator)
-            if LEBOWSKI_MODE_TEST:
-                data = dict(places = place_response, bl=engina_data)
-                status = 200
-            else:
-                data = engina_data['data']
-                status = engina_data['status']
-            return sz_api_response.Response(data,status=status)
-        return sz_api_response.Response(data)  
+            engins_data = lebowski_places.PlacesCreate().create(places_list, creator)
+            return sz_api_response.Response(**engins_data)        
+        return sz_api_response.Response({})  
 
 class PlaceVenueSearch(SzApiView):
     """

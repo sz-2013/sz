@@ -306,7 +306,7 @@ function RegistrationConfirmation($scope, userService){
     }
 }
 
-function PlaceSelectionController($scope, placeService){
+function PlaceSelectionController($scope, placeService, gameMap){
     //@TODO:половина мест определяется как китай-не знаю даже что с этим делать  
     /*$scope.center = {zoom:1, lat: 0, lng: 0}*/
     $scope.tmlText = {
@@ -329,181 +329,9 @@ function PlaceSelectionController($scope, placeService){
         }
     }
     $scope.tmlText.btn.search = $scope.tmlText.hint.search
-    
-    /*$scope.markers = {}
-    $scope.placesQuery = []
-    $scope.circles = {}
-    var local_icons = {
-        blue_icon: L.icon({
-            iconUrl: 'http://cdn.leafletjs.com/leaflet-0.6.4/images/marker-icon.png',
-            shadowUrl: 'http://cdn.leafletjs.com/leaflet-0.6.4/images/marker-shadow.png',
-            iconSize: [25,41],
-            shadowSize: [41, 41],            
-            iconAnchor: [12, 41],            
-            shadowAnchor: [4, 62],
-            popupAnchor: [1,-34],
-            sense: 'in_radius'
-        }),
-        green_icon: L.icon({
-            iconUrl: 'img/marker-icon-green.png',
-            shadowUrl: 'img/marker-shadow.png',
-            iconSize: [25,41],
-            shadowSize: [41, 41],            
-            iconAnchor: [12, 41],            
-            shadowAnchor: [4, 62],
-            popupAnchor: [1,-34],
-            sense: 'new'
-        }),
-        orange_icon: L.icon({
-            iconUrl: 'img/marker-icon-orange.png',
-            shadowUrl: 'img/marker-shadow.png',
-            iconSize: [25,41],
-            shadowSize: [41, 41],            
-            iconAnchor: [12, 41],            
-            shadowAnchor: [4, 62],
-            popupAnchor: [1,-34]
-        }),
-        gray_icon: L.icon({
-            iconUrl: 'img/marker-icon-gray.png',
-            shadowUrl: 'img/marker-shadow.png',
-            iconSize: [25,41],
-            shadowSize: [41, 41],            
-            iconAnchor: [12, 41],            
-            shadowAnchor: [4, 62],
-            popupAnchor: [1,-34],
-            sense: 'out_radius'
-        }),
-        user_icon: L.icon({
-            iconUrl: 'img/user-marker.png',
-            shadowUrl:'img/marker-shadow.png',
-            iconSize: [25,25],
-            shadowSize: [0, 0],            
-            iconAnchor: [12, 12],            
-            shadowAnchor: [4, 62],
-            popupAnchor: [1,-12]
-        }),
-    }*/
-    
     var params = {};    
     $scope.inProgress = false    
-    /*$scope.$watch('session',function(){
-        if($scope.session){
-            params.radius = $scope.session.radius || 250
-        }
-    }) */
-
-    /*function createMarkers(list,icon){
-        for(var i in list){
-            var p = list[i].place,
-                distance = list[i].distance;
-            p.distance = Math.round(distance)
-            var m = {
-                    lat:p.latitude,lng:p.longitude,
-                    icon:icon,
-                    place:p,
-                    message:'<div class="text-center">' + p.distance + ' ' + $scope.tmlText.el.distancev + '</div>'
-                },
-                key = p.id.toString(); 
-            if(!(key in $scope.markers)){
-                $scope.markers[key] = m                   
-            }            
-        }
-    }
-    function exploreHere(p, tips){
-        var markerNewIcon = local_icons.green_icon;
-        $scope.inProgress = true     
-        var placesNew = placeService.exploreInVenues(p, function(r) { 
-            createMarkers(placesNew.data,markerNewIcon)
-            if(tips){searchInRecievedPlaces()}
-            $scope.inProgress = false            
-        });
-    }
-    function searchHere(p, explore, tips){
-        //@TODO:когда начинаешь перемещаться по карте - отсылаются же координаты центра карты
-        //и поэтому дистанция не от пользователя, а от центра карты        
-        var explore = explore || false,
-            tips = tips || false
-        if($scope.inProgress==false){
-            $scope.inProgress = true     
-            var markerInIcon = explore && local_icons.blue_icon || local_icons.gray_icon,
-                markerOutIcon = local_icons.gray_icon;            
-            var places = placeService.searchInVenues(p, function(r) { 
-                createMarkers(places.in_radius,markerInIcon)
-                createMarkers(places.out_radius,markerOutIcon)                
-                if(explore){exploreHere(p, tips)}
-                else{searchInRecievedPlaces()}
-                if($scope.center.lat===0&&$scope.center.lng===0) {
-                    $scope.center = {'zoom':16, 'lat': params.latitude, 'lng': params.longitude };}
-            });
-            $scope.inProgress = false
-        }
-    }
-    $scope.searchWithQuery = function(){
-        var explore = false
-        if($scope.center.lat==params.latitude && $scope.center.lng==params.longitude){var explore=true}
-        var p = {
-            latitude:$scope.center.lat,
-            longitude:$scope.center.lng,
-            radius:params.radius,
-            query:$scope.searchQuery
-        }
-        searchHere(p,explore, tips)
-    }
-    var searchInRecievedPlaces = function (){
-        if($scope.searchQuery){
-            var query = $scope.searchQuery.toLowerCase();
-            $scope.placesQuery = []
-            function queryInPlace(p){
-                if(p.name.toLowerCase().indexOf(query)>=0){return true}
-                if(p.address && p.address.toLowerCase().indexOf(query)>=0){return true}
-                return false
-            }
-            for(var i in $scope.markers){
-                if(i!='user'){
-                    var m = $scope.markers[i],
-                        p = m.place,
-                        sense = m.icon.sense;
-                    p.sense = sense
-                    if(queryInPlace(p)){
-                        $scope.placesQuery.push(p)
-                    }
-                }
-            }
-            if($scope.placesQuery.length){                
-                $scope.showSearchTips = true}
-        }
-    }
-    $scope.showSearchTips = false    
-    $scope.$on('searchTipsClick',function(e,place){
-        $scope.place = place
-        $scope.searchQuery = ''
-        $scope.center.lat = place.latitude
-        $scope.center.lng = place.longitude
-        $scope.markers[place.id.toString()].focus = true        
-    })    
-    $scope.$on('leafletDirectiveMap.click', function(event,e){
-        if($scope.center.lat==0 && $scope.center.lng==0){
-            $scope.center = {'zoom':16, 'lat': params.latitude, 'lng': params.longitude }
-        }
-    }); 
-    $scope.$on('leafletDirectiveMarker.click', function(event,e){
-        var markerName = e.markerName.toString(),
-            m = $scope.markers[markerName];
-        $scope.place = m.place
-    });
-    $scope.$watch('searchQuery',function(){
-        $scope.showSearchTips = false
-        $scope.tmlText.btn.search = $scope.tmlText.hint.search
-        searchInRecievedPlaces()
-    })
-    $scope.$watch('center.lat',function(){
-        if($scope.center.lat!=0 && $scope.center.lng!=0 && 
-            $scope.center.lat.toFixed($scope.geoAccur)!=params.latitude.toFixed($scope.geoAccur) &&
-            $scope.center.lng.toFixed($scope.geoAccur)!=params.longitude.toFixed($scope.geoAccur)){
-            var p = {latitude:$scope.center.lat, longitude:$scope.center.lng, radius: params.radius}
-            searchHere(p)
-        }
-    })*/
+    
     $scope.$watch('coordinates',function(){     
         if($scope.coordinates){                        
             params.latitude = $scope.coordinates.latitude
@@ -523,9 +351,17 @@ function PlaceSelectionController($scope, placeService){
             /*searchHere(params,true)*/
 
             //first do explore in point
-            var new_places = placeService.exploreInVenues(params, function(r) { 
+            /*var new_places = placeService.exploreInVenues(params, function(r) { 
                 console.log(r)
-            });
+            });*/
+            var gamemap = gameMap.getMap(params, function(r){
+                $scope.gamemap = r.map
+                $scope.current_box = r.current_box
+                $scope.old_box = r.old_box
+                $scope.map_width = r.map_width
+                $scope.map_height = r.map_height
+                $scope.radius = params.radius
+            })
         }        
     })
 }

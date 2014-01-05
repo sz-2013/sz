@@ -1,5 +1,4 @@
 import random
-import math
 from sz.api import serializers, forms
 from sz.api import response as sz_api_response
 from sz.api.views import SzApiView, place_service
@@ -12,33 +11,24 @@ class GameMapRoot(SzApiView):
     """
     def _get_random_race(self):
         races = [ r.name for r in models.Races.objects.all() ]
-        races.append(False)
-        races.append(True)
+        races.append('nobody')
         num = random.randint(0, len(races)-1)
         return  races[num]
     def _serialize_item(self, item):
         data = serializers.PlaceSerializer(instance=item[u'place']).data
-        data['distance'] = item['distance']
+        data['position'] = item['position']
+        data['distance'] = int(round(item['distance']))
         data['owner'] = self._get_random_race()
+        data['is_owner'] = True if random.randint(0,10)==1 else False
         return data
-    def _create_matrix(self, places, num, matrix=None):
-        if matrix is None: matrix = []
-        if places:
-            if len(places) < num:
-                num = len(places)        
-            row = places[:num]
-            del places[:num]
-            matrix.append(row)
-            print len(places)
-            return self._create_matrix(places, num, matrix)
-        else:
-            return matrix
     def get(self, request, format=None):
         params = self.validate_and_get_params(
             forms.GameMapRequestForm, request.QUERY_PARAMS)
-        #gets all places in player city
-        places_list = place_service.get_gamemap(**params)
-        places_data = map(self._serialize_item, places_list)        
-        num_in_row = int(math.sqrt(len(places_data)))
-        matrix = self._create_matrix(places_data, num_in_row)
-        return sz_api_response.Response({'map': matrix})
+        places_list, map_width, map_height = place_service.get_gamemap(**params)
+        places_data = map(self._serialize_item, places_list)
+        user_box = self._serialize_item(
+            sorted(places_list, key=lambda item: item['distance'])[0])
+        return sz_api_response.Response({
+            "map":places_data, "map_width": map_width, "map_height": map_height,
+            "current_box": user_box, "old_box": {}
+        })

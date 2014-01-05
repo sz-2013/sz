@@ -13,6 +13,13 @@ szServices.factory('staticValueService', function($resource){
     });
 });
 
+szServices.factory('gameMap', function($resource){
+    return $resource('../../api/gamemap/', {}, {
+        getMap: { method:'GET' , isArray:false },
+    });
+});
+
+
 szServices.factory('placeService', function($resource){
     return $resource('../../api/places/:listCtrl:placeId/:docCtrl', {placeId: '@id'}, {
       /*  $newsfeed: { method:'GET', params:{docCtrl: 'newsfeed' }, isArray:false },*/
@@ -22,7 +29,6 @@ szServices.factory('placeService', function($resource){
         exploreInVenues:{ method:'GET', params:{listCtrl: 'explore-in-venues' }, isArray:false },
     });
 });
-
 
 szServices.factory('userService', function($http,$resource){
     return $resource('../../api/users/:action', {}, {
