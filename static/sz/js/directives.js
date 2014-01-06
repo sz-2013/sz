@@ -109,59 +109,59 @@ angular.module('sz.client.directives', [])
     })
     .directive('szNewsFeedFilter', function () {
         return {
-                restrict: 'EA',
-                replace: true,
-                template:'<div class="filter-box text-center">'+
-                            '<div id="filterBody">'+
-                                '<div class="form-group">'+
-                                    '<div class="btn-group" data-toggle="buttons" ng-init="btncls = myClasses.btn.radio">'+
-                                        '<label class="btn btn-default" ng-click="radiusActive=250" ng-class="{\'active\':250==radiusActive}">'+
-                                            '<input type="radio" name="options" id="option1">250m'+
-                                        '</label>'+
-                                        '<label class="btn btn-default" ng-click="radiusActive=1000" ng-class="{\'active\':1000==radiusActive}">'+
-                                            '<input type="radio" name="options" id="option2">1km'+
-                                        '</label>'+
-                                        '<label class="btn btn-default" ng-click="radiusActive=3000" ng-class="{\'active\':3000==radiusActive}">'+
-                                            '<input type="radio" name="options" id="option3">3km'+
-                                        '</label>'+
-                                        '<label class="btn btn-default" ng-click="radiusActive=0" ng-class="{\'active\':0==radiusActive}">'+
-                                            '<input type="radio" name="options" id="option3">city'+
-                                        '</label>'+
-                                    '</div>'+
-                                '</div>'+
-                                '<div class="form-group">'+
-                                    '<select class="form-control" ng-model="category" ng-options="c.alias for c in categories">'+
-                                        '<option value="" >Любая категория</option>'+
-                                    '</select>'+
-                                '</div>'+
-                                '<div class="main-btn-group text-left">'+
-                                    '<button type="button" class="btn btn-link" ng-click="hideFilter()">'+
-                                      '<i class="fa fa-times fa-2x"></i>'+
-                                    '</button>'+
-                                    '<button type="button" class="btn btn-link pull-right" ng-click="hideFilter(true)">'+
-                                      '<i class="fa fa-check fa-2x"></i>'+
-                                    '</button>'+
+            restrict: 'EA',
+            replace: true,
+            template:'<div class="filter-box text-center">'+
+                        '<div id="filterBody">'+
+                            '<div class="form-group">'+
+                                '<div class="btn-group" data-toggle="buttons" ng-init="btncls = myClasses.btn.radio">'+
+                                    '<label class="btn btn-default" ng-click="radiusActive=250" ng-class="{\'active\':250==radiusActive}">'+
+                                        '<input type="radio" name="options" id="option1">250m'+
+                                    '</label>'+
+                                    '<label class="btn btn-default" ng-click="radiusActive=1000" ng-class="{\'active\':1000==radiusActive}">'+
+                                        '<input type="radio" name="options" id="option2">1km'+
+                                    '</label>'+
+                                    '<label class="btn btn-default" ng-click="radiusActive=3000" ng-class="{\'active\':3000==radiusActive}">'+
+                                        '<input type="radio" name="options" id="option3">3km'+
+                                    '</label>'+
+                                    '<label class="btn btn-default" ng-click="radiusActive=0" ng-class="{\'active\':0==radiusActive}">'+
+                                        '<input type="radio" name="options" id="option3">city'+
+                                    '</label>'+
                                 '</div>'+
                             '</div>'+
-                            '<div class="text-center">'+
-                                '<button type="button" class="btn btn-link" ng-click="showFilter()" id="filterBtn">'+
-                                  '<i class="fa fa-filter fa-2x"></i>'+
+                            '<div class="form-group">'+
+                                '<select class="form-control" ng-model="category" ng-options="c.alias for c in categories">'+
+                                    '<option value="" >Любая категория</option>'+
+                                '</select>'+
+                            '</div>'+
+                            '<div class="main-btn-group text-left">'+
+                                '<button type="button" class="btn btn-link" ng-click="hideFilter()">'+
+                                  '<i class="fa fa-times fa-2x"></i>'+
+                                '</button>'+
+                                '<button type="button" class="btn btn-link pull-right" ng-click="hideFilter(true)">'+
+                                  '<i class="fa fa-check fa-2x"></i>'+
                                 '</button>'+
                             '</div>'+
-                        '</div>',
-                link: function ($scope, element, attrs) {
-                    $scope.showFilter = function(){
-                        $(window).scrollTop(0)
-                        $("#filterBody").animate({maxHeight:'145px'},100)
-                        $("#filterBtn").hide()
-                    }
-                    $scope.hideFilter = function(update){
-                        $("#filterBody").animate({maxHeight:0},100)
-                        $("#filterBtn").show()   
-                        if(update)$scope.changePath()
-                    }
-                } 
-            }      
+                        '</div>'+
+                        '<div class="text-center">'+
+                            '<button type="button" class="btn btn-link" ng-click="showFilter()" id="filterBtn">'+
+                              '<i class="fa fa-filter fa-2x"></i>'+
+                            '</button>'+
+                        '</div>'+
+                    '</div>',
+            link: function ($scope, element, attrs) {
+                $scope.showFilter = function(){
+                    $(window).scrollTop(0)
+                    $("#filterBody").animate({maxHeight:'145px'},100)
+                    $("#filterBtn").hide()
+                }
+                $scope.hideFilter = function(update){
+                    $("#filterBody").animate({maxHeight:0},100)
+                    $("#filterBtn").show()   
+                    if(update)$scope.changePath()
+                }
+            } 
+        }      
     })
     .directive('szNewsFeedMessageBox', function () {
             return {

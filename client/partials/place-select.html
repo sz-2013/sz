@@ -1,49 +1,13 @@
-<div class="big-bordered-box">  
-    <div class="big-bordered-box-inner">
-        
-            <h2 class="text-right">{{tmlText.header.main}}</h2>
-            <p class="help-block">{{tmlText.hint.main}}</p>
-            <h3>
-                <span class="label label-default bg-silver">Player</span>
-                <span class="label label-default bg-belizehole">0-250</span>
-                <span class="label label-default bg-emerald">250-500</span>
-                <span class="label label-default bg-sunflower">500-1000</span>
-                <span class="label label-default bg-wisteria">1000-3000</span>
-                <span class="label label-default bg-alizarin">3000-...</span>
-            </h3>
-            <gamemap width="map_width" height="map_height" radius="radius"
-                boxes="gamemap" currentbox="current_box" oldbox="old_box"></gamemap>
-        
-    </div>
-</div>
-
-<!-- <div class="content-inner row">	
-	<div class="col-lg-10 col-lg-push-1">
-		<h2 class="text-right">{{tmlText.header.main}}</h2>
-		<p class="help-block">{{tmlText.hint.main}}</p>
-		<leaflet center="center" markers="markers" paths="circles" height="250px" width="100%" >
-	    </leaflet>
-		<div class="input-group" style="margin-top:15px">
-	    	<input type="text" class="form-control" placeholder="Name or address here..." ng-disabled="inProgress" ng-model="searchQuery">
-	    	<span class="input-group-btn">
-	    		<button class="btn btn-default" type="button" 
-	    		ng-disabled="inProgress || !searchQuery" ng-click="searchWithQuery()">{{tmlText.btn.search}}</button>
-	    	</span>
-	    </div>
-	    <div class="dropdown clearfix searchTips" ng-show="true">
-              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" ng-show="showSearchTips">
-                <li ng-repeat="p in placesQuery | limitTo:tmlText.el.searchtips.searchLimit" 
-                	ng-click="$emit('searchTipsClick',p)">
-	                <a>
-	            		<p class="overflow-hidden ">
-	            			{{p.name}}
-	            		</p>
-	            		<p class="overflow-hidden" ng-show="p.address">{{p.address}}</p>
-	                </a>
-                </li>
-              </ul>
-        </div>
-        <div ng-show="!showSearchTips && place" style="margin-top:10px" ng-include src='partials.messageEdit'>        
-        </div>
+<!-- <div class="big-bordered-box">  
+    <div class="big-bordered-box-inner">        
+        <h2 class="text-right">{{tmlText.header.main}}</h2>
+        <p class="help-block">{{tmlText.hint.main}}</p>
+        <p class="help-block" ng-show="explored_val">You explored {{explored_val}} new places and gets XX ZP. Congrats!</p>
+        <h5>
+            {{selected_place}}
+        </h5>    
     </div>
 </div> -->
+<sz-select-place placeslist="places_list"></sz-select-place>
+<!-- <gamemap width="map_width" height="map_height" radius="radius"
+    boxes="gamemap" currentbox="current_box" oldbox="old_box"></gamemap> -->

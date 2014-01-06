@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="../static/sz/css/new-fonts.css">
     <link rel="stylesheet" href="../static/sz/css/footer-to-down.css">
     <link rel="stylesheet" href="../static/sz/css/buttons.css">
+    <link rel="stylesheet" href="../static/sz/css/selectplace.css">
 
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
@@ -33,10 +34,12 @@
     <div id="st-container" class="st-container">
         <!-- content push wrapper -->
         <div class="st-pusher">
-            <nav class="st-menu st-effect-8" id="mainnav">
+            <nav class="st-menu st-effect-8 dark-nav" id="mainnav">
                 <!-- <div class="scrollbar" ><div class="track" ><div class="thumb"><div class="end"></div></div></div></div>
                 <div class="viewport"> <div class="overview" > -->
-                    <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
+                    <div class="dark-nav-header">
+                        <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
+                    </div>
                     <ul>
                         <li><a href="">
                             World</a>
@@ -112,6 +115,7 @@
     <script src="../static/sz/js/sidebar-directive.js"></script>
     <script src="../static/sz/js/slidesubpage-directive.js"></script>
     <script src="../static/sz/js/gamemap-directive.js"></script>
+    <script src="../static/sz/js/selectplace-directive.js"></script>
     
     
 </body>

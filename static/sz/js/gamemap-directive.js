@@ -23,11 +23,16 @@ raphaelDirective.directive('gamemap', [ '$rootScope', function ( $rootScope ) {
                     for (var x = $scope.width; x > 0; x--) {
                         tr.append('<td></td>')
                         var td = $(tr.children()[$scope.width - x]);
-                        var box = $scope.boxes.filter(function(box){
-                            var pos = box.position;
-                            return pos[0]==x && pos[1]==y
+                        var boxes = $scope.boxes.filter(function(b){
+                            var pos = b.position;
+                            var in_cell = pos[0]==x && pos[1]==y
+                            if(in_cell&&b.id===undefined){
+                                td.addClass('bg-midnightblue');
+                                return false
+                            }
+                            return in_cell
                         });
-                        td.text( box.map(function(b){
+                        td.text( boxes.map(function(b){
                             if(b.distance<=250) td.addClass('bg-belizehole');
                             if(b.distance>250 && b.distance<=500) td.addClass('bg-emerald');
                             if(b.distance>500 && b.distance<=1000) td.addClass('bg-sunflower');

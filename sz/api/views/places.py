@@ -58,7 +58,7 @@ class PlaceVenueSearch(SzApiView):
     def _serialize_item(self, item):
         item_serializer = serializers.PlaceSerializer(instance=item[u'place'])
         serialized_item = {
-            "place": item_serializer.data, 'distance':item['distance']}
+            "place": item_serializer.data, 'distance':round(item['distance'])}
         return serialized_item          
     def _serialize_list(self, places):
         return map(self._serialize_item ,places) if type(places) is list else []
@@ -68,8 +68,7 @@ class PlaceVenueSearch(SzApiView):
         params['user'] = request.user.email
         params['limit'] = 10
         places_list = place_service.search_in_venue(**params)
-        categories = places_list.keys() # in_radius, out_radius
-        place_response = dict([(c, self._serialize_list(places_list.get(c))) for c in categories])
+        place_response = map(self._serialize_item, places_list)
         return sz_api_response.Response(place_response)    
 
 class PlaceInstanceMessages(SzApiView):

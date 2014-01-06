@@ -1,3 +1,7 @@
+body.modal-open{
+    margin-right: 0
+}
+
 html{font-size: 100% }
 body{text-align: center}
 a{color:#7f8c8d; }
@@ -31,14 +35,6 @@ header{
 .header-shadow{
     box-shadow: 0 4px 2px -2px #ecf0f1;
 }
-header .container{
-}
-/*header{
-    box-shadow: 0 4px 2px -2px #FBFBFB;
-}*/
-/*.navbar{
-    z-index: 0;
-}*/
 #main{
     padding-top: 60px;    
 }

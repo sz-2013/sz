@@ -331,37 +331,34 @@ function PlaceSelectionController($scope, placeService, gameMap){
     $scope.tmlText.btn.search = $scope.tmlText.hint.search
     var params = {};    
     $scope.inProgress = false    
+
+    $scope.$on("selectItem", function(i, item){
+        $scope.selected_place = item;
+    });
     
     $scope.$watch('coordinates',function(){     
         if($scope.coordinates){                        
-            params.latitude = $scope.coordinates.latitude
-            params.longitude = $scope.coordinates.longitude
+            /*params.latitude = $scope.coordinates.latitude 
+            params.longitude = $scope.coordinates.longitude*/
+            params.latitude = 50.2616113
+            params.longitude = 127.5266082
+            /*params.latitude = 0
+            params.longitude = 0*/
             params.radius = params.radius || 250          
-            /*$scope.markers.user = {lat: params.latitude, lng: params.longitude, message: "It is you", icon:local_icons.user_icon}             
-            $scope.circles.user = {
-                fillColor:'white',
-                weight: 1,
-                opacity: 1,
-                color: '#E31A1C',
-                dashArray: '5, 5',
-                radius:params.radius,
-                type:'circle',
-                latlngs: { lat: params.latitude, lng: params.longitude },
-            }            */
-            /*searchHere(params,true)*/
-
-            //first do explore in point
             /*var new_places = placeService.exploreInVenues(params, function(r) { 
-                console.log(r)
-            });*/
-            var gamemap = gameMap.getMap(params, function(r){
-                $scope.gamemap = r.map
-                $scope.current_box = r.current_box
-                $scope.old_box = r.old_box
-                $scope.map_width = r.map_width
-                $scope.map_height = r.map_height
-                $scope.radius = params.radius
-            })
+                $scope.explored_val = r.places_explored*/
+                var places_list = placeService.searchInVenues(params, function(r) { 
+                    $scope.places_list = r
+                    var gamemap = gameMap.getMap(params, function(r){
+                        $scope.gamemap = r.map
+                        $scope.current_box = r.current_box
+                        $scope.old_box = r.old_box
+                        $scope.map_width = r.map_width
+                        $scope.map_height = r.map_height
+                        $scope.radius = params.radius
+                    });
+                })
+           /* });*/
         }        
     })
 }

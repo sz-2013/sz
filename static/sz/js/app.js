@@ -8,8 +8,9 @@ var szApp = angular.module(
     'leaflet-directive', 
     'raphael-directive',
     'sidebar-directive',
-    'slidesubpage-directive',
+//    'slidesubpage-directive',
     'gamemap-directive',
+    'selectplace-directive'
     ]
 )
 
@@ -19,7 +20,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/login', {templateUrl: 'partials/login.html', controller: LoginController})
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
         .when('/places/select', {templateUrl: 'partials/place-select.html', controller: PlaceSelectionController})
-        .when('/messages/:previewId/edit', {templateUrl: 'partials/message-edit.html', controller: MessageEditorController})
+        .when('/places/:previewId/edit', {templateUrl: 'partials/message-edit.html', controller: MessageEditorController})
         .when('/messages/:previewId/publish', {templateUrl: 'partials/message-pub.html', controller: MessagePublisherController})
         .when('/feed', {templateUrl: 'partials/news-feed.html', controller: NewsFeedController})
 

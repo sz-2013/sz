@@ -23,9 +23,7 @@ def search_places(**kwargs):
     radius = kwargs.get(params_names.RADIUS)    
     # filtered_places = models.Place.objects.annotate(messages_count=dj_models.Count('message__id'))\
     #     .order_by('-messages_count')
-    filtered_places = models.Place.objects.filter(is_active=True)
-    if query:
-        filtered_places = filtered_places.filter(name__icontains=query)
+    filtered_places = models.Place.objects.all()#filter(is_active=True)
     if radius == 0 or radius is None:
         # TODO: определять город по координатам
         city_id = kwargs.get(params_names.CITY_ID)  
@@ -35,6 +33,8 @@ def search_places(**kwargs):
     else:
         distance_kwargs = {'m': '%i' % radius}
         filtered_places = filtered_places.filter(position__distance_lte=(current_position, D(**distance_kwargs)))        
+    if query:
+        filtered_places = filtered_places.filter(name__icontains=query)
     filtered_places = filtered_places.distance(current_position).order_by('distance')
     if limit:        
         filtered_places = filtered_places[:limit]

@@ -2,6 +2,7 @@
 import os
 import datetime
 import math
+import random
 from PIL import Image, ImageDraw
 from django.utils import timezone
 from django.db.models import Max
@@ -69,7 +70,6 @@ class PlaceService(FeedService):
         city_id определяется поразному в разных точках города 
         и с таким ид, name, position  место не находится, но и создавать не даст
         '''
-        print city_id
         try:
             p, is_create = models.Place.objects.get_or_create(**place_params)
         except IntegrityError:
@@ -121,21 +121,8 @@ class PlaceService(FeedService):
     def search_in_venue(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
-        places_in_radius = []
-        places_in_params = []
-        if params.get_db_params().get('radius'):
-            places_in_radius = queries.search_places(**params.get_db_params())
-        newparams = params.get_db_params()
-        newparams['radius'] = None
-        # From all places list remove places who in places_in_radius list
-        places_out_radius = \
-            list(set(queries.search_places(**newparams))-set(places_in_radius))
-        #Puts boths list in one dict        
-        places = {
-            'out_radius': self._make_distance_items_list(params, places_out_radius),
-            'in_radius': self._make_distance_items_list(params, places_in_radius)
-        }
-        return places
+        places_list = queries.search_places(**params.get_db_params())
+        return self._make_distance_items_list(params, places_list)
     def get_gamemap(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
@@ -166,15 +153,29 @@ class PlaceService(FeedService):
         #где каждый (..) фактически означает номер клетки
         places_x = generate_list(places_sorted_by_x, len(places_list)/map_width)
         places_data = []        
-        for x, gr in enumerate(places_x):               
-            for y, p in enumerate(sorted(gr, key=lambda p_y:p_y.position.y)):
-                item = self._make_place_distance_item(p, params)
+        def random_cell(len_random, max_random, rand_num=None):
+            if rand_num is None: rand_num = []
+            num = random.randint(0, max_random)
+            if num not in rand_num: rand_num
+
+        #берем столбец
+        for x, gr in enumerate(places_x): 
+            #и сортируем его ячейки по рядам
+            places_y = sorted(gr, key=lambda p_y:p_y.position.y)            
+            #если длина столбца меньше map_width - дополняем его пустыми ячейками
+            #в случайных местах
+            cell_deficit = map_width - len(places_y)
+            random_num = random.sample(xrange(map_width), cell_deficit)
+            map(lambda i: places_y.insert(i, None), random_num)
+            for y, p in enumerate(places_y):
+                item = self._make_place_distance_item(p, params) if p \
+                    else dict(place=None)
                 item['position'] = [x+1, y+1]
                 places_data.append(item)
-        columns = [item['position'][0] for item in places_data]
-        map_height = sorted(
-            map(lambda y: columns.count(y), columns) , reverse=True)[0]
-        print map_height
+        # columns = [item['position'][0] for item in places_data]
+        # map_height = sorted(
+        #     map(lambda y: columns.count(y), columns) , reverse=True)[0]
+        map_height = map_width
         return places_data, map_width, map_height
 
 

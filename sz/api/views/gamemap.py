@@ -15,19 +15,23 @@ class GameMapRoot(SzApiView):
         num = random.randint(0, len(races)-1)
         return  races[num]
     def _serialize_item(self, item):
-        data = serializers.PlaceSerializer(instance=item[u'place']).data
+        p = item[u'place']
+        if p:
+            data = serializers.PlaceSerializer(instance=p).data
+            data['distance'] = int(round(item['distance']))
+            data['owner'] = self._get_random_race()
+            data['is_owner'] = True if random.randint(0,10)==1 else False
+        else:
+            data = dict(distance=None)
         data['position'] = item['position']
-        data['distance'] = int(round(item['distance']))
-        data['owner'] = self._get_random_race()
-        data['is_owner'] = True if random.randint(0,10)==1 else False
         return data
     def get(self, request, format=None):
         params = self.validate_and_get_params(
             forms.GameMapRequestForm, request.QUERY_PARAMS)
         places_list, map_width, map_height = place_service.get_gamemap(**params)
         places_data = map(self._serialize_item, places_list)
-        user_box = self._serialize_item(
-            sorted(places_list, key=lambda item: item['distance'])[0])
+        real_boxes = filter(lambda p:p.get('id'), places_data)
+        user_box = sorted(real_boxes, key=lambda item: item['distance'])[0]
         return sz_api_response.Response({
             "map":places_data, "map_width": map_width, "map_height": map_height,
             "current_box": user_box, "old_box": {}
