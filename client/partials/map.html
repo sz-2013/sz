@@ -36,9 +36,15 @@
  </div>
 
 
-<div class="achivment" ng-show="showThis" ng-init="showThis=true"> 
-    You explored {{explored_val}} new places and gets XX ZP. Congrats!
+<div class="achivment animate" ng-show="showAchive" ng-init="showAchive=explored_val" ng-click="showAchive=false" sz-achivment timeout="3000">
+    <div class="media">
+      <div class="pull-left">
+        <i class="fa fa-star fa-5x"></i> 
+      </div>
+      <div class="media-body">
+        <h4 class="media-heading">Congrats!</h4>
+        You explored {{explored_val}} new places and gets {{zp_add_val}} ZP. 
+      </div>
+    </div>
 </div>
-<button ng-click="showThis=false">Close</button>
-<button ng-click="showThis=true">Show</button>
 {{messagePlace}}

@@ -107,7 +107,7 @@ angular.module('sz.client.directives', [])
             })
         };
     })
-    .directive('szSelectPlaceB', function() {
+    .directive('szSelectPlace', function() {
         return function(scope, element, attrs) {
             scope.showDetail = function(id){
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
@@ -117,7 +117,6 @@ angular.module('sz.client.directives', [])
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
                 li.animate({marginLeft: 0}, w*2)
             }
-
             /*$scope.$watch("placeslist", function(){
                 if($scope.placeslist&&$scope.show) element.modal({show:true});
             })*/
@@ -125,6 +124,16 @@ angular.module('sz.client.directives', [])
                 if(newval) element.modal({show: true});
                 else element.find("[data-dismiss=modal]").click() //както это неправильно
             })
+        };
+    })
+    .directive('szAchivment', function($timeout) {
+        return function(scope, element, attrs) {          
+            function hideAchive(){
+                scope.showAchive = false
+            } 
+            scope.$watch(attrs.ngShow, function(val){
+                if(val)$timeout(hideAchive, attrs.timeout);
+            });
         };
     })
     .directive('szNewsFeedFilter', function () {

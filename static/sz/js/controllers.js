@@ -599,7 +599,6 @@ function NewsFeedController($routeParams, $location, $scope, placeService){
 function RaphaelController($scope){}
 
 function GameMapController($scope, placeService, $routeParams, $location){
-    $scope.$emit("setShowLoader", true)
     $scope.isMessage = $routeParams.message
     $scope.messagePlace = $routeParams.place
     $scope.$on("selectItem", function(i, item){
@@ -609,6 +608,7 @@ function GameMapController($scope, placeService, $routeParams, $location){
     $scope.showPlaceSelect = false;
     var params =new Object;    
     $scope.inProgress = false    
+    /*$scope.$emit("setShowLoader", true)*/
     $scope.$watch('coordinates',function(){     
         if($scope.coordinates){                        
             /*params.latitude = $scope.coordinates.latitude 
@@ -617,10 +617,11 @@ function GameMapController($scope, placeService, $routeParams, $location){
             params.longitude = 127.5266082
             /*params.latitude = 0
             params.longitude = 0*/
-            params.radius = 1000    
+            params.radius = 250
             /*var new_places = placeService.exploreInVenues(params, function(r) { 
-                $scope.explored_val = r.places_explored*/
-                var places_list = placeService.searchInVenues(params, function(r) { 
+                $scope.explored_val = r.places_explored
+                $scope.zp_add_val = 10*/
+                /*var places_list = placeService.searchInVenues(params, function(r) { 
                     $scope.places_list = r.places
                     $scope.current_box = r.map.current_box
                     $scope.old_box = r.map.old_box
@@ -628,8 +629,8 @@ function GameMapController($scope, placeService, $routeParams, $location){
                     $scope.map_height = r.map.map_height
                     $scope.radius = params.radius
                     $scope.$emit("setShowLoader", false)
-                    /*if(!$scope.messagePlace) $scope.showPlaceSelect = true;*/
-                });
+                    if(!$scope.messagePlace) $scope.showPlaceSelect = true;
+                });*/
            /* });*/
         }        
     })   
