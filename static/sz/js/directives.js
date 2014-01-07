@@ -107,6 +107,26 @@ angular.module('sz.client.directives', [])
             })
         };
     })
+    .directive('szSelectPlaceB', function() {
+        return function(scope, element, attrs) {
+            scope.showDetail = function(id){
+                var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
+                li.animate({marginLeft: -1*w + 'px'}, w*2)
+            }
+            scope.hideDetail = function(id){
+                var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
+                li.animate({marginLeft: 0}, w*2)
+            }
+
+            /*$scope.$watch("placeslist", function(){
+                if($scope.placeslist&&$scope.show) element.modal({show:true});
+            })*/
+            scope.$watch(attrs.show, function(newval){                
+                if(newval) element.modal({show: true});
+                else element.find("[data-dismiss=modal]").click() //както это неправильно
+            })
+        };
+    })
     .directive('szNewsFeedFilter', function () {
         return {
             restrict: 'EA',

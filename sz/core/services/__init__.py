@@ -16,6 +16,8 @@ from sz.core.gis import venue
 from sz.core import models, queries, gis as gis_core, utils
 
 
+
+
 class FeedService:
     def _make_result(self, items, count, params):
         return dict(count=count, items=items, params=params.get_api_params())
@@ -32,6 +34,9 @@ class FeedService:
 
     def _get_max_id(self):
         return models.Message.objects.aggregate(max_id=Max('id'))["max_id"]
+
+    def _make_distance_items_list(self, params, places):
+        return [self._make_place_distance_item(p,params) for p in places]
 
 class PlaceService(FeedService):
 #place is created, when user send on server a explore_in_venues request
@@ -101,7 +106,7 @@ class PlaceService(FeedService):
         query = params.get(params_names.QUERY)
         radius = params.get(params_names.RADIUS)
         creator = {
-            'email':kwargs[u'creator'], 'latitude':latitude, 'longitude':longitude
+            'email':kwargs[u'user'], 'latitude':latitude, 'longitude':longitude
         }
         #get place_list from 4qk        
         result = venue.search(
@@ -113,21 +118,22 @@ class PlaceService(FeedService):
             new_place = self.create_place(p,city_id,creator,radius)
             if new_place:
                 places_list.append(new_place)
-        return places_list, creator
-
-    def _make_distance_items_list(self, params, places):
-        return [self._make_place_distance_item(p,params) for p in places]
+        return places_list
 
     def search_in_venue(self, **kwargs):
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
         places_list = queries.search_places(**params.get_db_params())
         return self._make_distance_items_list(params, places_list)
-    def get_gamemap(self, **kwargs):
-        params = parameters.PlaceSearchParametersFactory.create(
-            kwargs, self.city_service)
-        city_id = params.get_db_params().get(params_names.CITY_ID)
-        places_list = models.Place.objects.filter(city_id=city_id)
+
+class GameMapService(FeedService):
+    def __init__(self, city_service):
+        self.city_service = city_service    
+    def update_gamemap(self, params):
+        city_id = self.city_service.get_city_by_position(
+            params.get('longitude'), params.get('latitude'))['geoname_id']
+        #dont forget add is_active in filter
+        places_list = models.Place.objects.filter(city_id=city_id) 
         #нужно получить нечетное целое число, чтобы оно стало длиной ребра
         num = math.sqrt(len(places_list)) 
         #если корень из длины - четное или не целое число
@@ -151,13 +157,11 @@ class PlaceService(FeedService):
         #теперь проекции нужно сгрупировать по (len/map_width) элементов
         #два группированных списка [(0, [p1, p2,..]), ....], 
         #где каждый (..) фактически означает номер клетки
-        places_x = generate_list(places_sorted_by_x, len(places_list)/map_width)
-        places_data = []        
+        places_x = generate_list(places_sorted_by_x, len(places_list)/map_width)        
         def random_cell(len_random, max_random, rand_num=None):
             if rand_num is None: rand_num = []
             num = random.randint(0, max_random)
             if num not in rand_num: rand_num
-
         #берем столбец
         for x, gr in enumerate(places_x): 
             #и сортируем его ячейки по рядам
@@ -165,19 +169,12 @@ class PlaceService(FeedService):
             #если длина столбца меньше map_width - дополняем его пустыми ячейками
             #в случайных местах
             cell_deficit = map_width - len(places_y)
-            random_num = random.sample(xrange(map_width), cell_deficit)
-            map(lambda i: places_y.insert(i, None), random_num)
+            if cell_deficit>0:
+                random_num = random.sample(xrange(map_width), cell_deficit)
+                map(lambda i: places_y.insert(i, None), random_num)
             for y, p in enumerate(places_y):
-                item = self._make_place_distance_item(p, params) if p \
-                    else dict(place=None)
-                item['position'] = [x+1, y+1]
-                places_data.append(item)
-        # columns = [item['position'][0] for item in places_data]
-        # map_height = sorted(
-        #     map(lambda y: columns.count(y), columns) , reverse=True)[0]
-        map_height = map_width
-        return places_data, map_width, map_height
-
+                if p: p.update_gamemap(x+1, y+1)
+    
 
 
 class MessageService(FeedService):

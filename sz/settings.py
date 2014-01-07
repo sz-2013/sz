@@ -133,7 +133,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'sz.core',
     'sz.api',
-    'lebowski',
+    # 'lebowski',
     'south',
     'imagekit',
     # 'rest_framework.authtoken',

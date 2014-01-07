@@ -28,11 +28,13 @@ class RoleUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RoleUser
 
+
+"""
+Auth section
+"""
 class UserSerializer(serializers.Serializer):    
     email = serializers.EmailField(required=True)
     id = serializers.Field()
-
-
 
 class AuthUserEmail(serializers.EmailField):
     def field_to_native(self, obj, field_name):
@@ -40,13 +42,11 @@ class AuthUserEmail(serializers.EmailField):
             field_name = 'username'
         return super(AuthUserEmail, self).field_to_native(obj, field_name)
 
-
 class AuthUserIsVerified(serializers.BooleanField):
     def field_to_native(self, obj, field_name):
         if isinstance(obj, AnonymousUser):
             return False
         return super(AuthUserIsVerified, self).field_to_native(obj, field_name)
-
 
 class AuthUserSerializer(serializers.ModelSerializer):
     email = AuthUserEmail()
@@ -69,7 +69,6 @@ class AuthenticationSerializer(serializers.Serializer):
     user = sz_api_fields.NestedField(
         transform=lambda p, a: a.get('user', None),
         serializer=UserSerializer)
-
 
 class AuthRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -135,6 +134,30 @@ class ResendingConfirmationKeySerializer(serializers.Serializer):
         models.RegistrationProfile.objects.send_key(email)
         return attrs
 
+"""
+User section
+"""
+class UserStandartDataSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(source="id")    
+    user_email = serializers.EmailField(source="email")
+    user_gender = serializers.IntegerField(source="gender.name")    
+    user_race = serializers.IntegerField(source="race.name")
+    user_role = serializers.IntegerField(source="role.name")
+    user_date_confirm = serializers.Field(source="get_string_date_confirm")  
+
+
+"""
+Place section
+"""
+
+def get_place(latitude, longitude, name):
+    try:
+        return models.Place.objects.get(
+            name=name,position = gis_core.ll_to_point(longitude,latitude))
+    except ObjectDoesNotExist:
+        raise serializers.ValidationError(_("Place with name %s, lng %f,\
+         lat %f is not create in sz"%(name,longitude,latitude)))
+
 class PlaceSerializer(serializers.Serializer):
     id = serializers.Field()
     name = serializers.CharField(required=True)
@@ -142,12 +165,42 @@ class PlaceSerializer(serializers.Serializer):
     longitude = serializers.FloatField(required=True)
     date = serializers.Field()
     def restore_object(self, instance=None):
-        try:
-            return models.Place.objects.get(
-                name=name,position = gis_core.ll_to_point(longitude,latitude))
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError(_("Place with name %s, lng %f,\
-                    lat %f is not create in sz"%(name,longitude,latitude)))
+        attr = super(PlaceSerializer, self).validate(attrs) 
+        return get_place(
+            attrs.get('latitude'), attrs.get('longitude'),
+            attrs.get('name'))
+
+def place_detail_serialiser(place, user=False, distance=None):
+    data = PlaceStandartDataSerializer(instance=place).data
+    data['is_owner'] = place.is_owner(user) if user else False
+    data['distance'] = round(distance) if distance else None
+    return data
+
+class PlaceStandartDataSerializer(serializers.Serializer):
+    place_id = serializers.IntegerField(source="id")
+    place_name = serializers.CharField(source="name", required=True)
+    place_city = serializers.Field(source="city_id")
+    place_latitude = serializers.FloatField(source="latitude", required=True)
+    place_longitude = serializers.FloatField(source="longitude", required=True)
+    place_address = serializers.CharField(source="address", required=False)
+    place_gamemap_position = serializers.Field(source="get_gamemap_position", )  # [x, y]
+    place_date = serializers.Field(source="get_string_date")
+    place_role = serializers.Field(source="role.name")
+    place_fsqid = serializers.CharField(source="fsq_id")
+    # place_last_message_date
+    # place_lvl = serializers.Field(source="lvl")
+    #place_owner = serializers.CommaSeparatedIntegerField(source="get_owner_info") # [id, 0]
+    place_owner_race = serializers.CharField(source="get_owner_race")
+    def validate(self, attrs):
+        attrs = super(PlaceStandartDataSerializer, self).validate(attrs) 
+        return get_place(
+            attrs.get('place_latitude'), attrs.get('place_longitude'),
+            attrs.get('place_name'))
+
+
+"""
+Message section
+"""
 
 class MessageBaseSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(required=False)
@@ -184,3 +237,14 @@ class MessagePreviewForPublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MessagePreview
         fields = ('categories',)
+
+
+# class MessageBigLSerializer(serializers.Serializer):
+#     message_id = serializers.IntegerField(source="id")    
+#     message_photo = serializers.BooleanField(source="is_photo")
+#     message_text = serializers.CharField(source="text")
+#     message_categories = serializers.Field(source="categories.all")
+#     message_date = serializers.Field(source="get_string_date")
+#     face_id = serializers.IntegerField(source="face.id")
+#     place_id = serializers.IntegerField(source="place.id")
+#     user_id = serializers.IntegerField(source="user.id")

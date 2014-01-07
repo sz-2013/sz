@@ -52,13 +52,7 @@ class UserSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 _("User with email %s is not create in sz"%attrs['email']))
 
-class UserBigLSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(source="id")    
-    user_email = serializers.EmailField(source="email")
-    user_gender = serializers.IntegerField(source="gender.name")    
-    user_race = serializers.IntegerField(source="race.name")
-    user_role = serializers.IntegerField(source="role.name")
-    user_date_confirm = serializers.Field(source="get_string_date_confirm")        
+      
 
 
 class UserBigLShortSerializer(serializers.Serializer):
@@ -85,20 +79,7 @@ class PlaceSerializer():
         return get_place(
             attrs.get('latitude'), attrs.get('longitude'), attrs.get('name'))
 
-        
 
-class PlaceBigLSerializer(serializers.Serializer):
-    place_id = serializers.IntegerField(source="id")
-    place_name = serializers.CharField(source="name", required=True)
-    place_latitude = serializers.FloatField(source="latitude", required=True)
-    place_longitude = serializers.FloatField(source="longitude", required=True)
-    place_date = serializers.Field(source="get_string_date")     
-    place_role = serializers.Field(source="role.name")
-    def validate(self, attrs):
-        attrs = super(PlaceBigLSerializer, self).validate(attrs) 
-        return get_place(
-            attrs.get('place_latitude'), attrs.get('place_longitude'),
-            attrs.get('place_name'))
 
 class MessageSerializer(serializers.Serializer):
     id = serializers.CharField(required=True)

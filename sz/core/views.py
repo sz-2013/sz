@@ -3,10 +3,8 @@ from django.shortcuts import redirect
 from django.utils import timezone
 
 from .models import RegistrationProfile
-from lebowski.api.views.users import UsersCreate as lebowski_create_user
+from sz.api.views.users import activate_user
 
-def activate_user(user):
-    return lebowski_create_user().create({u'email': user.email})        
 
 def index(request):
     return redirect('/!/index.html')

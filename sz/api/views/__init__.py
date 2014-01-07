@@ -13,6 +13,7 @@ else:
     city_service = gis.GeonamesCityService()
 # city_service = gis.BlagoveshchenskCityService()
 place_service = services.PlaceService(city_service)
+gamemap_service = services.GameMapService(city_service)
 categorization_service = morphology.CategorizationService(
     models.Category.objects.all(), morphology.RussianStemmingService())
 message_service = services.MessageService(city_service, categorization_service)
@@ -82,7 +83,7 @@ class ApiRoot(SzApiView):
                 'message_previews_detail': reverse('message-previews-detail', request=request, kwargs={'pk': 22}),
                 # 'messages-search': reverse('message-search', request=request),
             },
-            'gamemap': reverse('gamemap', request=request),
+            # 'gamemap': reverse('gamemap', request=request),
             # 'city-nearest': reverse('city-nearest', request=request),
         })
 

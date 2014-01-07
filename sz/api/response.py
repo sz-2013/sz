@@ -2,6 +2,7 @@
 from rest_framework.response import Response as RestFrameworkResponse
 from rest_framework.reverse import reverse
 from sz.api import serializers
+from sz.api.serializers import place_detail_serialiser
 
 class Response(RestFrameworkResponse):
     """
@@ -62,16 +63,14 @@ class NewsFeedItemResponseBuilder(FeedServiceResponseBuilder):
 
     def build(self, item):
         serialized_messages = self.messages_response_builder.build(item["place"], item["messages"])
-        place_serializer = serializers.PlaceSerializer(instance=item["place"])
-        placedata = place_serializer.data
+        # place_serializer = serializers.PlaceSerializer(instance=item["place"])
+        placedata = place_detail_serialiser(place=item["place"], distance=round(item["distance"]))
         placedata['category'] = sorted(list(set(map(lambda x:random.randint(1,12),range(1,random.randint(2,10))))))
-        serialized_item = dict(
-            place=placedata, azimuth=int(item["azimuth"]), distance=int(item["distance"]),
-            messages=serialized_messages)
+        placedata['messages_list'] = serialized_messages
         photos = item.get('photos', None)
         if photos is not None:
             serialized_photos = self.messages_response_builder.build(item["place"], photos)
-            serialized_item['photos'] = serialized_photos
+            placedata['photos_list'] = serialized_photos
         return serialized_item
 
 

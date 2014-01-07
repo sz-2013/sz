@@ -283,15 +283,15 @@ class User(AbstractBaseUser):
 
     objects = UserManager()    
     race = models.ForeignKey(
-        Races, verbose_name=_('race'),
-        blank=True, null=True
-    )
+        Races, verbose_name=_('race'), blank=True, null=True)
     gender = models.ForeignKey(
-        Gender, verbose_name=_('gender'), blank=True, null=True
-    )
+        Gender, verbose_name=_('gender'), blank=True, null=True)
     role = models.ForeignKey(
-        RoleUser, verbose_name=_('role'), blank=True, null=True
-    )
+        RoleUser, verbose_name=_('role'), blank=True, null=True)
+    faces = models.ManyToManyField(
+        Face, verbose_name=_('faces'), blank=True, null=True)
+
+
     USERNAME_FIELD = 'email'   
     def get_full_name(self):
     	# Overcode standart django methods
@@ -421,25 +421,24 @@ class RegistrationProfile(models.Model):
         verbose_name = _('registration profile')
         verbose_name_plural = _('registration profiles')
 
+class PlaceManager(models.GeoManager):
+    pass
+
 class Place(models.Model):
 	#BUG - why id is NULL?
     #name&position - уникальный индификатор
     name = models.CharField(max_length=128, verbose_name=u"название")
     position = models.PointField(verbose_name=u"координаты")
-    objects = models.GeoManager()
+    objects = PlaceManager()
 
+    city_id = models.IntegerField(        
+        db_index=True, null=False, blank=False,
+        verbose_name=u"идентификатор в GeoNames",)    
     is_active = models.BooleanField(_('active'), default=False,
         help_text=_(
             'Designates whether this place should be treated as '
             'active. Unselect this instead of place has no owner too long'
             ' (by engine initiate).'
-        )
-    )
-    is_in_engine = models.BooleanField(
-        _('create in engine'), default=False,
-        help_text=_(
-            'After creation place in db, place is created in engine.'
-            'If it be done successfully - tis field will be true'
         )
     )
     role = models.ForeignKey(
@@ -449,15 +448,25 @@ class Place(models.Model):
         default=timezone.now, verbose_name=u"дата создания")
     date_is_active = models.DateTimeField(
         default=timezone.now, verbose_name=u"дата активации")
+
+    # lvl = models.IntegerField(default=None, 
+    #     null=True, blank=True, verbose_name=u"lvl in a engine",)
+    gamemap_position = models.CommaSeparatedIntegerField(
+        max_length=3, default=None, null=True, blank=True, 
+        verbose_name="position 'x,y' in a gamemap")
+    owner = models.ForeignKey(
+        User, verbose_name=_('owner of a place'), blank=True, null=True
+    )
+
     address = models.CharField(
         max_length=128, null=True, blank=True,verbose_name=u"адрес",)
     crossStreet = models.CharField(
         max_length=128, null=True, blank=True, verbose_name=u"пересечение улиц",)
     contact = models.CharField(
         max_length=512, null=True, blank=True, verbose_name=u"контакты",)
-    city_id = models.IntegerField(        
-        db_index=True, null=False, blank=False,
-        verbose_name=u"идентификатор в GeoNames",)    
+    
+
+
 
     fsq_id = models.CharField(
         max_length=24, null=True, blank=True,
@@ -481,11 +490,37 @@ class Place(models.Model):
     def get_string_date(self):
         return get_string_date(self.date_is_active)
 
+    def get_gamemap_position(self):
+        return [int(pos) for pos in self.gamemap_position.split(',')]  if \
+            self.gamemap_position else None
+
+    def get_owner_race(self):
+        return self.owner.race if self.owner else None
+
     def create_in_engine(self):
-        self.is_in_engine = True
         self.is_active = True
         self.date_is_active = timezone.now()
         self.save()
+
+    def update_gamemap(self, x, y):
+        self.gamemap_position = "%s,%s"%(x, y)
+        self.save()
+
+
+    # def get_owner_info(self):
+    #     owner_id = 
+    #     return 
+
+    def is_owner(self, user):
+        if not user: return False
+        if not self.user: return False
+        if type(user) is int:
+            user_id = user
+        elif type(user) is object:
+            user_id = user.id
+        else:
+            return False
+        return user.id==self.owner.id
 
     def __unicode__(self):
         return u"%s" % self.name + (self.address and (u", %s" % self.address) or u"")

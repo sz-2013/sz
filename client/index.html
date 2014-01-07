@@ -31,6 +31,7 @@
 </head>
 
 <body  ng-controller="MasterPageController" mobile-check >
+    <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
     <div id="st-container" class="st-container">
         <!-- content push wrapper -->
         <div class="st-pusher">
@@ -72,7 +73,7 @@
                         <i class="fa fa-reorder fa-lg"></i>
                     </button>
                     <a href={{url.brand}} class="navbar-brand">ShmotZhmot</a>
-                    <a class="btn btn-primary pull-right" href={{url.placeSelect}}>
+                    <a class="btn btn-primary pull-right" href={{url.mapSelect}}>
                         <i class="fa fa-map-marker fa-lg"></i>
                     </a>
                 </div>
@@ -115,7 +116,6 @@
     <script src="../static/sz/js/sidebar-directive.js"></script>
     <script src="../static/sz/js/slidesubpage-directive.js"></script>
     <script src="../static/sz/js/gamemap-directive.js"></script>
-    <script src="../static/sz/js/selectplace-directive.js"></script>
     
     
 </body>

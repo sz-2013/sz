@@ -27,7 +27,7 @@ class PlacesCreate(ProjectApiView):
             bl_data['user_longitude'] = user_longitude
             bl_data['user_latitude'] = user_latitude
             bl_data['places'] = map(
-                lambda p: serializers.PlaceBigLSerializer(instance=p).data, 
+                lambda p: serializers.PlaceDetailSerializer(p, user), 
                 places_list)
             engine_data = posts.places_create(bl_data)
 

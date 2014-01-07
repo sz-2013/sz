@@ -1,5 +1,6 @@
 function MasterPageController($scope,$cookies, $http, $location, session, staticValueService) { 
     $scope.geoAccur = 4
+    $scope.$on("setShowLoader", function(e, val){$scope.showLoader=val});
     var races = staticValueService.races({}, function(r) { 
         $scope.races = []; 
         $.each(r.data,function(key, race){            
@@ -87,6 +88,7 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
         'newsfeed':'#/feed',
         'search':'#/',
         'placeSelect':'#/places/select',
+        'mapSelect':'#/map?message=true',
         'messageEdit':function(id){
             var url = '#/messages/' + id.toString() + '/edit'
             return url
@@ -332,9 +334,7 @@ function PlaceSelectionController($scope, placeService, gameMap){
     var params = {};    
     $scope.inProgress = false    
 
-    $scope.$on("selectItem", function(i, item){
-        $scope.selected_place = item;
-    });
+    
     
     $scope.$watch('coordinates',function(){     
         if($scope.coordinates){                        
@@ -598,3 +598,39 @@ function NewsFeedController($routeParams, $location, $scope, placeService){
 
 function RaphaelController($scope){}
 
+function GameMapController($scope, placeService, $routeParams, $location){
+    $scope.$emit("setShowLoader", true)
+    $scope.isMessage = $routeParams.message
+    $scope.messagePlace = $routeParams.place
+    $scope.$on("selectItem", function(i, item){
+        $scope.messagePlace = item;
+        $scope.showPlaceSelect = false;
+    });
+    $scope.showPlaceSelect = false;
+    var params =new Object;    
+    $scope.inProgress = false    
+    $scope.$watch('coordinates',function(){     
+        if($scope.coordinates){                        
+            /*params.latitude = $scope.coordinates.latitude 
+            params.longitude = $scope.coordinates.longitude*/
+            params.latitude = 50.2616113
+            params.longitude = 127.5266082
+            /*params.latitude = 0
+            params.longitude = 0*/
+            params.radius = 1000    
+            /*var new_places = placeService.exploreInVenues(params, function(r) { 
+                $scope.explored_val = r.places_explored*/
+                var places_list = placeService.searchInVenues(params, function(r) { 
+                    $scope.places_list = r.places
+                    $scope.current_box = r.map.current_box
+                    $scope.old_box = r.map.old_box
+                    $scope.map_width = r.map.map_width
+                    $scope.map_height = r.map.map_height
+                    $scope.radius = params.radius
+                    $scope.$emit("setShowLoader", false)
+                    /*if(!$scope.messagePlace) $scope.showPlaceSelect = true;*/
+                });
+           /* });*/
+        }        
+    })   
+}

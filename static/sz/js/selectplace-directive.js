@@ -6,7 +6,8 @@ raphaelDirective.directive('szSelectPlace', [ '$rootScope', function ( $rootScop
         replace: true,
         transclude: true,
         scope: {      
-            placeslist:  '=placeslist',
+            placeslist : '=placeslist',
+            show : '=show',
         },
         template:'<div class="modal fade" id="selectPlace" tabindex="-1" role="dialog" aria-labelledby="selectAPlace" aria-hidden="true">'+
                     '<div class="modal-dialog">'+
@@ -20,19 +21,19 @@ raphaelDirective.directive('szSelectPlace', [ '$rootScope', function ( $rootScop
                                 '</div>'+*/
                             '</div>'+
                             '<ul>'+
-                                '<li ng-repeat="item in placeslist" data-placeitem="{{item.place.id}}">'+
+                                '<li ng-repeat="place in placeslist" data-placeitem="{{place.place_id}}">'+
                                     '<span>'+
                                         '<div class="item-main">'+
-                                            '<button type="button" class="btn btn-link pull-right btn-dark" ng-click="showDetail(item.place.id)">'+
+                                            '<button type="button" class="btn btn-link pull-right btn-dark" ng-click="showDetail(place.place_id)">'+
                                                 '<i class="fa fa-arrow-right fa-2x"></i>'+
                                             '</button>'+
                                             '<div ng-click="selectThis(item)">'+
-                                                '<div class="item-name">{{item.place.name}}</div>'+
-                                                '<div class="item-address">{{item.place.address}}</div>'+
+                                                '<div class="item-name">{{place.place_name}}</div>'+
+                                                '<div class="item-address">{{place.place_address}}</div>'+
                                             '</div>'+
                                         '</div>'+
                                         '<div class="item-detail">'+
-                                            '<button type="button" class="btn btn-link pull-left btn-dark" ng-click="hideDetail(item.place.id)">'+
+                                            '<button type="button" class="btn btn-link pull-left btn-dark" ng-click="hideDetail(place.place_id)">'+
                                                 '<i class="fa fa-arrow-left fa-2x"></i>'+
                                             '</button>'+
                                             '<div>detail stuff</div>'+
@@ -44,7 +45,6 @@ raphaelDirective.directive('szSelectPlace', [ '$rootScope', function ( $rootScop
                     '</div>'+
                  '</div>',
         link: function ($scope, element, attrs) {
-            $scope.fade_cls = "fade"
             /*function setModalHeight(){
                 element.find(".modal-body").height( $(window).height() - 140 )
             }*/            
@@ -56,29 +56,16 @@ raphaelDirective.directive('szSelectPlace', [ '$rootScope', function ( $rootScop
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
                 li.animate({marginLeft: 0}, w*2)
             }
-
             $scope.selectThis = function(item){
-                element.find("[data-dismiss=modal]").click()
                 $scope.$emit("selectItem", item)
             }
-            
-                /**/
-                /*element.modal({show:false});*/
-            
 
-            function init(){                                
-                element.modal({show:true});
-            }
-        /*    $scope.selectThis = function(item){
-                $scope.$emit("choosePlace", item)
-            }
-
-            $scope.$on("choosePlace", function(e, item){
-                console.log(item)
-            });*/
-
-            $scope.$watch("placeslist", function(){
-                if($scope.placeslist) init()
+            /*$scope.$watch("placeslist", function(){
+                if($scope.placeslist&&$scope.show) element.modal({show:true});
+            })*/
+            $scope.$watch("show", function(newval){
+                if(newval) element.modal({show: $scope.show});
+                else element.find("[data-dismiss=modal]").click() //както это неправильно
             })
         }
     }

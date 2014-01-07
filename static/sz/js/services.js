@@ -25,7 +25,7 @@ szServices.factory('placeService', function($resource){
       /*  $newsfeed: { method:'GET', params:{docCtrl: 'newsfeed' }, isArray:false },*/
         newsfeed: { method:'GET', params:{listCtrl: 'newsfeed', placeId: '' }, isArray:false },
     /*    search: { method:'GET', params:{listCtrl: 'search' }, isArray:true },*/
-        searchInVenues: { method:'GET', params:{listCtrl: 'search-in-venues' }, isArray:true },
+        searchInVenues: { method:'GET', params:{listCtrl: 'search-in-venues' }, isArray:false },
         exploreInVenues:{ method:'GET', params:{listCtrl: 'explore-in-venues' }, isArray:false },
     });
 });
