@@ -1,10 +1,10 @@
 <div ng-controller="RegistrationConfirmation">
-	<h2 class="text-right">{{tmlText.header.main}}</h2>		
-	<p>{{tmlText.el.instruction}}</p>
+	<h2 class="text-right">Confirmation</h2>		
+	<p>We sent a letter with key on your email. Please, check your inbox and visit the link from our email for confirmation your registration</p>
 	<div>		
 		<button type="button" ng-class="myClasses.btn.second" data-loading-text={{tmlText.btn.loading}}
-		 ng-click="confirmation(user.email)" ng-disabled="inProgress">{{tmlText.btn.resend}}</button>			
-		<a class="pull-right" ng-class="myClasses.btn.main" ng-disabled="inProgress" href={{url.homePathAnon}}>{{tmlText.btn.return}}</a>	
+		 ng-click="confirmation(user.email)" ng-disabled="inProgress">Resend a key</button>			
+		<!-- <a class="pull-right" ng-class="myClasses.btn.main" ng-disabled="inProgress" href={{url.homePathAnon}}>Back to site</a>	 -->
 	 </div>
 	 <br>
 	<p>{{confirmationResponse}}</p>

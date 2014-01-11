@@ -5,6 +5,7 @@ import json
 from rest_framework import renderers as rest_framework_renderers
 from rest_framework.utils import encoders
 
+
 class UnicodeJSONRenderer(rest_framework_renderers.BaseRenderer):
     """
     Renderer which serializes to json.
@@ -36,7 +37,9 @@ class UnicodeJSONRenderer(rest_framework_renderers.BaseRenderer):
             except (ValueError, TypeError):
                 indent = None
 
-        return json.dumps(data, cls=self.encoder_class, indent=indent, ensure_ascii=False)
+        return json.dumps(
+            data, cls=self.encoder_class, indent=indent, ensure_ascii=False)
+
 
 class BrowsableAPIRenderer(rest_framework_renderers.BrowsableAPIRenderer):
     """

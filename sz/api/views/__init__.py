@@ -16,8 +16,10 @@ place_service = services.PlaceService(city_service)
 gamemap_service = services.GameMapService(city_service)
 categorization_service = morphology.CategorizationService(
     models.Category.objects.all(), morphology.RussianStemmingService())
-message_service = services.MessageService(city_service, categorization_service)
+message_service = services.MessageService(
+    city_service, categorization_service)
 news_feed_service = services.NewsFeedService(message_service)
+
 
 class InvalidRequestException(Exception):
 
@@ -32,9 +34,11 @@ class SzApiView(APIView):
 
     def handle_exception(self, exc):
         if isinstance(exc, InvalidRequestException):
-            return sz_api_response.Response(self.request_form_errors, status=status.HTTP_400_BAD_REQUEST)
+            return sz_api_response.Response(
+                self.request_form_errors, status=status.HTTP_400_BAD_REQUEST)
         base_response = APIView.handle_exception(self, exc)
-        return sz_api_response.Response(base_response.data, status=base_response.status_code)
+        return sz_api_response.Response(
+            base_response.data, status=base_response.status_code)
 
     def validate_and_get_params(self, form_class, data=None, files=None):
         request_form = form_class(data=data, files=files)
@@ -48,42 +52,55 @@ class SzApiView(APIView):
 class ApiRoot(SzApiView):
     def get(self, request, format=None):
         return sz_api_response.Response({
-            'static':{
-                'static_categories': reverse('static-categories', request=request),
+            'static': {
+                'static_categories': reverse(
+                    'static-categories', request=request),
                 'static_races': reverse('static-races', request=request),
                 'static_genders': reverse('static-genders', request=request),
                 'static_faces': reverse('static-faces', request=request),
-                'static_rolesuser': reverse('static-roles-user', request=request),
+                'static_rolesuser': reverse(
+                    'static-roles-user', request=request),
                 # 'categories': reverse('category-list', request=request),
             },
-            'test_mode':{
+            'test_mode': {
                 'generate_places': reverse('generate-places', request=request),
                 'testmode_places': reverse('testmode-places', request=request),
             },
-            'place':{
+            'place': {
                 'places_news': reverse('place-news', request=request),
-                'places_search_in_venues': reverse('place-search-in-venues', request=request),
-                'places_explore_in_venues': reverse('place-explore-in-venues', request=request),            
-                'place_detail_messages': reverse('place-detail-messages', request=request, kwargs={'pk': 22}),
+                'places_search_in_venues': reverse(
+                    'place-search-in-venues', request=request),
+                'places_explore_in_venues': reverse(
+                    'place-explore-in-venues', request=request),
+                'place_detail_messages': reverse(
+                    'place-detail-messages',
+                    request=request, kwargs={'pk': 22}),
                 # 'places-search': reverse('place-search', request=request),
             },
-            'auth':{
+            'auth': {
                 'login': reverse('auth-login', request=request),
                 'logout': reverse('auth-logout', request=request),
                 'current_user': reverse('auth-user', request=request),
             },
-            'user':{
-                'users_registration': reverse('users-registration', request=request),            
-                'users_profile': reverse('users-profile', request=request),            
-                'users_resending_activation_key': reverse('users-resending-activation-key', request=request),                
+            'user': {
+                'users_registration': reverse(
+                    'users-registration', request=request),
+                'users_profile': reverse('users-profile', request=request),
+                'users_resending_activation_key': reverse(
+                    'users-resending-activation-key', request=request),
             },
-            'message':{
-                'messages_previews_list': reverse('message-preview-list', request=request),            
-                'message_preview_publish': reverse('message-preview-publish', request=request, kwargs={'pk': 22}),
-                'message_previews_detail': reverse('message-previews-detail', request=request, kwargs={'pk': 22}),
-                # 'messages-search': reverse('message-search', request=request),
+            'message': {
+                'messages_previews_list': reverse(
+                    'message-preview-list', request=request),
+                'message_preview_publish': reverse(
+                    'message-preview-publish',
+                    request=request, kwargs={'pk': 22}),
+                'message_previews_detail': reverse(
+                    'message-previews-detail',
+                    request=request, kwargs={'pk': 22}),
+                # 'messages-search': reverse(
+                #    'message-search', request=request),
             },
             # 'gamemap': reverse('gamemap', request=request),
             # 'city-nearest': reverse('city-nearest', request=request),
         })
-

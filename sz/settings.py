@@ -15,18 +15,7 @@ AUTH_USER_MODEL = 'core.User'
 
 MANAGERS = ADMINS
 
-# DATABASES = {
-#     'default': {
-#         #'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-#         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'test',#SZ_ROOT + 'data/sz.db3', # Or path to database file if using sqlite3.
-#         'USER': 'test', # Not used with sqlite3.
-#         'PASSWORD': '123', # Not used with sqlite3.
-#         'HOST': '1.1.1.1', # Set to empty string for localhost. Not used with sqlite3.
-#         'PORT': '', # Set to empty string for default. Not used with sqlite3.
-#     }
-# }
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -86,14 +75,14 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -113,7 +102,8 @@ WSGI_APPLICATION = 'sz.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(SZ_ROOT, 'templates'),
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates" or
+    #"C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
@@ -211,17 +201,14 @@ GEONAMES_API_CONFIG = {
 
 #radius for newsfeed
 DEFAULT_RADIUS = 300
-#radius for explore 
+#radius for explore
 BLOCKS_RADIUS = 250
 DEFAULT_PAGINATE_BY = 7
 
 ACCOUNT_CONFIRMATION_DAYS = 7
 
 
-
-
 try:
     from passwords import *
 except ImportError:
     pass
-

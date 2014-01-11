@@ -1,19 +1,25 @@
-function MasterPageController($scope,$cookies, $http, $location, session, staticValueService) { 
+function randomSets(r){
+    function random(){
+        return Math.floor(4 + Math.random() * 5)
+    }
+    r['fortune'] = random() 
+    r['agillity'] = random()
+    r['strength'] = random()
+    r['intellect'] = random()
+    return r
+}
+
+function MasterPageController($scope, $cookies, $http, $location, session, staticValueService) { 
     $scope.geoAccur = 4
     $scope.$on("setShowLoader", function(e, val){$scope.showLoader=val});
-    var races = staticValueService.races({}, function(r) { 
-        $scope.races = []; 
-        $.each(r.data,function(key, race){            
-            race['fortune'] = Math.floor(4 + Math.random() * 5)
-            race['agillity'] = Math.floor(4 + Math.random() * 5)
-            race['strength'] = Math.floor(4 + Math.random() * 5)
-            race['intellect'] = Math.floor(4 + Math.random() * 5)            
-            $scope.races.push(race)
-        })
+    var races = staticValueService.races({}, function(r) {
+        $scope.races = r.data.map(function(race){return randomSets(race) }); 
     });
     var categories = staticValueService.categories({}, function(r) { $scope.categories = r.data; });
     var genders = staticValueService.genders({}, function(r) { $scope.genders = r.data; });
-
+    var faces = staticValueService.faces({}, function(r) { 
+        $scope.faces = r.data; 
+    }); 
     $scope.myClasses = {
         'btn': {
             'main':'btn btn-primary btn-lg',
@@ -22,17 +28,10 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
             'radio':'btn btn-default',
         },
     }
-    $scope.mainNav = {
-        newsfeed:'',
-        search:'',
-        post:''
-    }
     $scope.$watch('session.email', function(newValue, oldValue) {
         $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
         $http.defaults.headers.put['X-CSRFToken'] = $cookies.csrftoken;
     });
-
-
     var getCurrentPosition = function (onSuccess, onError, options) {
         navigator.geolocation.getCurrentPosition(function () {
                 var that = this,
@@ -59,71 +58,50 @@ function MasterPageController($scope,$cookies, $http, $location, session, static
         function (position) { $scope.coordinates = position.coords; },
         function (error) { $scope.coordinates = { longitude: 128, latitude: 56 };}
     )
-
     session.current({}, function(session){$scope.session = session });
     /*$scope.$watch('session.is_authenticated', function(){
         if($scope.session.is_authenticated){
             $scope.session.radius = 250
         }
     })*/
-    $scope.redirectAuth = function(){
-        /*if($scope.session.is_authenticated){
-            var path = $scope.url.homePathAuth
-            $location.path(path.slice(1,path.length))
-        }        */
-    }    
-    $scope.redirectAnon = function(){
-        /*if($scope.session.is_anonimous){
-            var path = $scope.url.homePathAuth
-            $location.path(path.slice(1,path.length))
-        }        */
-    }
-    $scope.showContent = true;
-    $scope.partials = {
-        'regConfirm':'partials/registration-confirmation.html',
-        'messageEdit':'partials/message-edit-sub.html',
-    }
-    //and Place url
-    $scope.url = {
-        'newsfeed':'#/feed',
-        'search':'#/',
-        'placeSelect':'#/places/select',
-        'mapSelect':'#/map?message=true',
-        'messageEdit':function(id){
-            var url = '#/messages/' + id.toString() + '/edit'
-            return url
-        },
-        'messagePub':function(id){
-            var url = '#/messages/' + id.toString() + '/publish'
-            return url
-        },
-        'place':function(id){
-            var url = '#/places/' + id
-            return url
-        },
-        'user':'#',
-        'login':'#/login',
-        'passRecovery':'#',
-        'signinNext':'#/feed',
-        'registration':'#',
-        'homePathAnon':'#',
-        'homePathAuth':'#/feed',
-        'brand':'#',
-        'registration':'#/registration',
-        'wiki':'#'
-    }    
+    $scope.showContent = true;     
     $scope.headersIncude = {
-        'main':'partials/headers/main.html'
+        'main':'partials/headers/main.html',
+        'message':'partials/headers/message.html',
     }
     $scope.headerCurrent = $scope.headersIncude.main
     $scope.setHeader = function(value){
         $scope.headerCurrent = $scope.headersIncude[value]
-    }
-    $scope.isTopMenuCollapsed = true;
-    $scope.toggleTopMenu = function(){
-        $scope.isTopMenuCollapsed = !$scope.isTopMenuCollapsed;
-    }
-    
+    }   
+
+
+    $scope.urls = {
+        newsfeed :'#/feed',
+        search :'#/',
+        placeSelect :'#/places/select',
+        mapSelect :'#/map?message=true',
+        messageEdit :function(id){
+            var id = id || ''
+            return '#/messages/edit/' + id.toString()
+        },
+        messagePub :function(id){
+            return '#/messages/' + id.toString() + '/publish'
+        },
+        place :function(id){
+            var url = '#/places/' + id
+            return url
+        },
+        user :'#',
+        login :'#/login',
+        passRecovery :'#',
+        signinNext :'#/feed',
+        registration :'#',
+        homePathAnon :'#',
+        homePathAuth :'#/feed',
+        brand :'#',
+        registration :'#/registration',
+        wiki :'#'
+    } 
 }
 
 var events = {}
@@ -137,26 +115,7 @@ function LoginController($scope, $location){
         if($scope.session){            
             $scope.redirectAuth()
         }
-    }) 
-    $scope.tmlText = {
-        'header':{
-            'main':'Sign In'
-        },
-        'btn':{
-            'signin':'Sign In',
-            'reg':'Registration'    
-        },
-        'lbl':{
-            'inputPassword':'Password',
-            'inputEmail':'Email',
-        },
-        'cb':{
-            'remember':'Remember me'
-        },
-        'el':{
-            'forgotpass':'Forgot your password?'    
-        }        
-    }
+    });
     $scope.inProgress = false;
     $scope.loginAlert = new Object;
     $scope.showResendBut = false;
@@ -184,52 +143,25 @@ function LoginController($scope, $location){
 
     }
 }
-function RigistrationController($scope, userService){    
-    //Dont forget uncoment this
-  /*  $scope.$watch('session',function(){
-        if($scope.session){$scope.redirectAuth()}
-    }) */
+function RigistrationController($scope, userService){
     $scope.user = {'gender':'u'};
-    $scope.tmlText = {
-        'header': {
-            'main':'Registration',
-        },
-        'hint':{
-            'gender': 'If it is a secret or if you are not sure - choose "Smile".',
-            'race':'A race will determine your characteristics and talents. Be attentively, because you will can not change it in the future.',
-            'wiki':'See more about it on wiki.'
-        },
-        'lbl':{
-            'inputEmail':'Email',
-            'inputPassword1':'Password',
-            'inputPassword2':'Password again',
-            'gender':'Choose your gender',
-            'race':'Choose your race',
-            'fortune':'Fortune: ',
-            'agillity':'Agillity: ',
-            'strength':'Strength: ',
-            'intellect':'Intellect: ',
-        },
-        'btn':{
-            'registration':'Do it!'
-        },
-    }
     var errorsText = {
-        'email':{
+        email:{
             'nullvalue':'You must give a some email to us',
             'short':'Your email is to short for email',
             'long':'Your email is to long for email'
         },
-        'password':{
+        password:{
             'nullvalue':'You need a password',
             'short':'Your password is to short',
             'long':'Your password is to long, crazy criptomaniac',
             'notmatch':'Passwords are not match'
         },      
-        'race':{
+        race:{
             'nullvalue':'You must choose a race',
         },
     }
+    $scope.tmlText = {}
     $scope.tmlText.errorsText = errorsText
 
     $scope.inProgress = false;
@@ -274,25 +206,10 @@ function RigistrationController($scope, userService){
             if(!$scope.user.password1){$scope.loginAlert.password1.push($scope.tmlText.errorsText.password.nullvalue)} 
         }
     }
-
-
 }
 
 function RegistrationConfirmation($scope, userService){
     $scope.inProgress = false;
-    $scope.tmlText = {
-        'header':{'main':'Confirmation'},
-        'el':{
-            'response':'We did it again',
-            'instruction':'We sent a letter with key on your email. Please, check your inbox and visit the link from our email for confirmation your registration'
-        },
-        'btn':{
-            'resend':'Resend a key',
-            'return':'Back to site',
-            'loading':'Sending'
-        }
-
-    }
     $scope.confirmation = function(email){
         delete $scope.confirmationResponse
         delete $scope.confirmationError
@@ -300,7 +217,7 @@ function RegistrationConfirmation($scope, userService){
         userService.resend_activation_key({'email': email},
         function(response){
             $scope.inProgress = false;
-            $scope.confirmationResponse = $scope.tmlText.el.response;
+            $scope.confirmationResponse = 'We did it again';
         },
         function(error){
             $scope.inProgress = false;
@@ -308,116 +225,89 @@ function RegistrationConfirmation($scope, userService){
     }
 }
 
-function PlaceSelectionController($scope, placeService, gameMap){
-    //@TODO:половина мест определяется как китай-не знаю даже что с этим делать  
-    /*$scope.center = {zoom:1, lat: 0, lng: 0}*/
-    $scope.tmlText = {
-        header:{
-            main:'New post'
-        },
-        hint:{
-            main:'Choose a place for new post',            
-            search:'Search',
-            explore:'Explore'
-        },
-        btn:{
-            search:''
-        },
-        el:{
-            distancev:'m',
-            searchtips:{
-                searchLimit:4
-            }
-        }
-    }
-    $scope.tmlText.btn.search = $scope.tmlText.hint.search
-    var params = {};    
-    $scope.inProgress = false    
 
-    
-    
-    $scope.$watch('coordinates',function(){     
-        if($scope.coordinates){                        
-            /*params.latitude = $scope.coordinates.latitude 
-            params.longitude = $scope.coordinates.longitude*/
-            params.latitude = 50.2616113
-            params.longitude = 127.5266082
-            /*params.latitude = 0
-            params.longitude = 0*/
-            params.radius = params.radius || 250          
-            /*var new_places = placeService.exploreInVenues(params, function(r) { 
-                $scope.explored_val = r.places_explored*/
-                var places_list = placeService.searchInVenues(params, function(r) { 
-                    $scope.places_list = r
-                    var gamemap = gameMap.getMap(params, function(r){
-                        $scope.gamemap = r.map
-                        $scope.current_box = r.current_box
-                        $scope.old_box = r.old_box
-                        $scope.map_width = r.map_width
-                        $scope.map_height = r.map_height
-                        $scope.radius = params.radius
-                    });
-                })
-           /* });*/
-        }        
+function MessageEditorController($scope, messagePreviewService, $routeParams, $location, placeService){  
+    $scope.setHeader("message")  
+    if ($routeParams.placeId){
+        placeService.get({placeId: $routeParams.placeId}, function(r){ $scope.messagePlace = r; })  
+    }
+    else{
+        /*$scope.$emit("setShowLoader", true)*/
+        var params = {}
+        $scope.$watch('coordinates',function(){     
+            if($scope.coordinates){                        
+                /*params.latitude = $scope.coordinates.latitude 
+                params.longitude = $scope.coordinates.longitude*/
+                params.latitude = 50.2616113
+                params.longitude = 127.5266082
+                /*params.latitude = 0
+                params.longitude = 0*/
+                params.radius = 250
+              /*  var places_list = placeService.searchInVenues(params, function(r) { 
+                    $scope.places_list = r.places
+                    $scope.showPlaceSelect = true;
+                    $scope.$emit("setShowLoader", false)
+                }); */   
+            }        
+        })   
+    }    
+    $scope.$on("selectItem", function(i, item){
+        $scope.messagePlace = item;
+        $scope.showPlaceSelect = false;
+    });    
+    $scope.showPlaceSelect = false;
+    $scope.$on("setShowPlaceSelect",function(i ,val){
+        $scope.showPlaceSelect = val
     })
-}
-function MessageEditorController($scope){}
-function MessageEditorControllerSub($scope, messagePreviewService, $routeParams, $location){    
-    if (angular.isDefined($routeParams.placeId))
-        placeService.get({placeId: $routeParams.placeId}, function(resp){ $scope.placeHeader = resp; })  
-    if (angular.isDefined($routeParams.previewId))
+    $scope.messageCategoriesList = new Array;
+    $scope.$on("addCategory", function(i, newcat){
+        
+        if($scope.messageCategoriesList.filter(function(cat){return cat.id==newcat.id}).length){
+            //remove cat
+        }
+        else{
+            //add cat
+            $scope.messageCategoriesList.push(newcat)
+        }
+    });
+    $scope.$on("setShowEditPhoto", function(i, val){
+        $scope.showEditPhoto = val
+    })
+
+/*    if (angular.isDefined($routeParams.previewId))
         messagePreviewService.get({previewId: $routeParams.previewId}, function(response){
             $scope.text = response.text || '';            
-            $scope.photoUrl = response.photo && response.photo.thumbnail || '';
-            $scope.placeHeader = response.place;
-        });
-    $scope.tmlText ={        
-        btn:{submit:'Send'},
-        hint:{
-            message: 'You should write some text or pick photo for post or set your emotion. Or all.',            
-        },
-    }
- 
+            $scope.photoUrl = response.photo && response.photo.thumbnail || '';            
+        });  */  
     $scope.photo = {'name':''};
 
-    $scope.remove = function(){
-        $scope.photo = $scope.photo
-    }    
+    $scope.remove = function(){$scope.photo = $scope.photo }
     $scope.send = function() {    
-        $scope.inProgress = true;
-        var message = new FormData();
-        
-        message.append( 'place', /*$routeParams.placeId*/150);
+        console.log($scope.text)
+        /*$scope.inProgress = true;
+        var message = new FormData();        
+        message.append( 'place', 150); //$routeParams.placeId
         if($scope.text){message.append( 'text', $scope.text);}
         if($scope.photo.name){
             message.append( 'photo', $scope.photo);}
 
         var redirectToPublish = function(previewId){
-            var url = $scope.url.messagePub(previewId);
+            var url = $scope.urls.messagePub(previewId);
             var pub_page_url = url.slice(1,url.length);
             $location.path(pub_page_url);
         }
 
-        if (angular.isUndefined($routeParams.previewId))
-            messagePreviewService.create(message,
-                function(response){
-                    $scope.inProgress = false;
-                    $scope.response = response;
-                    var url = $scope.url.messageEdit(response.id);
-                    var edit_page_url = url.slice(1,url.length);
-                    history.replaceState(null, "SZ - Edit message", '#' + edit_page_url);
-                    redirectToPublish(response.id);
-                },
-                function(error){alert(angular.toJson(error, true));});
-        else
-            messagePreviewService.update($routeParams.previewId, message,
-                function(response){
-                    $scope.inProgress = false;
-                    $scope.response = response;
-                    redirectToPublish(response.id);
-                },
-                function(error){alert(angular.toJson(error, true));});
+        messagePreviewService.create(
+            message,
+            function(response){
+                $scope.inProgress = false;
+                $scope.response = response;
+                var url = $scope.urls.messageEdit(response.id);
+                var edit_page_url = url.slice(1,url.length);
+                history.replaceState(null, "SZ - Edit message", '#' + edit_page_url);
+                redirectToPublish(response.id);
+            },
+            function(error){alert(angular.toJson(error, true));});*/
     }
 
 
@@ -442,10 +332,8 @@ function MessagePublisherController($scope, messagePreviewService,staticValueSer
     }
     
 
-    var faces = staticValueService.faces({}, function(r) { 
-        $scope.faces = r.data; 
-        $scope.faceId = $scope.faces[0].id
-    }); 
+    $scope.faceId = $scope.faces[0].id
+    
     $scope.emt='indifferent' 
     $scope.$on('updateFace', function(event, face){
         $scope.face = face
@@ -512,7 +400,8 @@ function MessagePublisherController($scope, messagePreviewService,staticValueSer
         $scope.new_message_categories.splice(index, 1);
         $scope.add_categories.push(messageCat)
     }
-    $scope.send = function(){
+    
+    function send(){
         $scope.preview.latitude = $scope.coordinates.latitude
         $scope.preview.longitude = $scope.coordinates.longitude
         $scope.$broadcast('raphaelDirectiveFaces.getBBox')
@@ -598,14 +487,10 @@ function NewsFeedController($routeParams, $location, $scope, placeService){
 
 function RaphaelController($scope){}
 
-function GameMapController($scope, placeService, $routeParams, $location){
+function GameMapController($scope, placeService, gameMapService, $routeParams, $location){
     $scope.isMessage = $routeParams.message
     $scope.messagePlace = $routeParams.place
-    $scope.$on("selectItem", function(i, item){
-        $scope.messagePlace = item;
-        $scope.showPlaceSelect = false;
-    });
-    $scope.showPlaceSelect = false;
+    
     var params =new Object;    
     $scope.inProgress = false    
     /*$scope.$emit("setShowLoader", true)*/
@@ -621,16 +506,24 @@ function GameMapController($scope, placeService, $routeParams, $location){
             /*var new_places = placeService.exploreInVenues(params, function(r) { 
                 $scope.explored_val = r.places_explored
                 $scope.zp_add_val = 10*/
-                /*var places_list = placeService.searchInVenues(params, function(r) { 
-                    $scope.places_list = r.places
-                    $scope.current_box = r.map.current_box
-                    $scope.old_box = r.map.old_box
-                    $scope.map_width = r.map.map_width
-                    $scope.map_height = r.map.map_height
+                $scope.explored_val = 0
+                var gamemap = gameMapService.getMap(params, function(r){
+                    $scope.gamemap = r.gamemap
+                    $scope.current_box = r.current_box
+                    $scope.showMap = $scope.current_box ? $scope.current_box.id : false
+                    $scope.last_box = r.last_box
+                    $scope.map_width = r.map_width
+                    $scope.map_height = r.map_height
                     $scope.radius = params.radius
-                    $scope.$emit("setShowLoader", false)
-                    if(!$scope.messagePlace) $scope.showPlaceSelect = true;
-                });*/
+                    if(!$scope.messagePlace){
+                        var places_list = placeService.searchInVenues(params, function(r) { 
+                            $scope.places_list = r.places
+                            $scope.showPlaceSelect = true;
+                            $scope.$emit("setShowLoader", false)
+                        });    
+                    }
+                    else $scope.$emit("setShowLoader", false)
+                });
            /* });*/
         }        
     })   

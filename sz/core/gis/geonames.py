@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import urllib
 import simplejson as json
+from sz.settings import GEONAMES_API_CONFIG
+
 
 class GeoNamesApi(object):
     """GeoNames API wrapper"""
@@ -8,7 +10,7 @@ class GeoNamesApi(object):
         self.geonames_api_uri = config['API_URI']
         self.username = config['USERNAME']
 
-    def get_uri(self, resource, get_params = {}, json = True):
+    def get_uri(self, resource, get_params={}, json=True):
         if json:
             json_postfix = "JSON"
         else:
@@ -16,10 +18,10 @@ class GeoNamesApi(object):
         get_params["username"] = self.username
         get_params_str = urllib.urlencode(get_params)
         uri = "{API_URI}{RESOURCE}{JSON_POSTFIX}?{GET_PARAMS}".format(
-            API_URI = self.geonames_api_uri,
-            RESOURCE = resource,
-            JSON_POSTFIX = json_postfix,
-            GET_PARAMS = get_params_str
+            API_URI=self.geonames_api_uri,
+            RESOURCE=resource,
+            JSON_POSTFIX=json_postfix,
+            GET_PARAMS=get_params_str
         )
         return uri
 
@@ -42,8 +44,6 @@ class GeoNamesApi(object):
         return self.__get_json_result('search', params)
 
 
-from sz.settings import GEONAMES_API_CONFIG
-
 def search(query):
     params = {
         'name_startsWith': query.encode('utf8'),
@@ -53,6 +53,7 @@ def search(query):
     geoNamesApi = GeoNamesApi(GEONAMES_API_CONFIG)
     r = geoNamesApi.search_json(params)
     return r
+
 
 def nearby(position):
     params = {

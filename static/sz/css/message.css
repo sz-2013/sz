@@ -1,0 +1,50 @@
+#messageMain{
+    margin-bottom: 0;
+}
+#messageMain .big-bordered-box-inner{
+    height: 100%;
+}
+#messageMain textarea, #messageMain textarea:focus{
+    border: none;    
+    box-shadow: none;
+}
+#messagePlace h2{
+    font-size: 0.9em;
+    line-height: normal;
+    margin: 0;
+}
+#messagePlace p{
+    font-size: 0.7em;
+}
+
+
+
+.photo-container img{
+    max-height: 65%;
+    margin-bottom: 2px;
+    /*margin-top: -10%;*/   
+    display: inline-block;
+}
+
+.photo-menu{
+    padding: 0.4em 0;
+    z-index: 2;
+    position: relative;
+}
+
+.photo-menu-sub{
+    max-width: 100%;
+    overflow-x: scroll;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 41px;
+    left:0;
+    right: 0;
+    z-index: 1;
+}
+
+.photo-menu-sub img{
+    margin: 0.3em;
+    max-height: 28px;
+    display: inline-block;
+}

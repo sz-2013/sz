@@ -11,7 +11,7 @@ raphaelDirective.directive('gamemap', [ '$rootScope', function ( $rootScope ) {
             height:  '=height',   
             boxes: '=boxes',
             currentbox:'=currentbox',
-            oldbox : '=oldbox',
+            lastbox : '=lastbox',
             eventBroadcast: '=eventBroadcast'   //?
         },
         template: '<table class="table table-bordered"><tbody></tbody></table>',

@@ -7,11 +7,12 @@ from lebowski.api.views import ProjectApiView
 # from lebowski.api.posts import users_create as engine_create_user
 from lebowski.api import posts
 
+
 class UsersCreate(ProjectApiView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, data):
-    	serializer = serializers.UserSerializer(data=data)
+        serializer = serializers.UserSerializer(data=data)
         if serializer.is_valid():
             user = serializer.object
             user_data = serializers.UserBigLSerializer(instance=user).data
@@ -19,7 +20,8 @@ class UsersCreate(ProjectApiView):
             if engine_data['status'] == 201:
                 user.create_in_engine()
             return engine_data
-        return {"data":serializer.errors, "status": status.HTTP_400_BAD_REQUEST}
+        return {"data": serializer.errors,
+                "status": status.HTTP_400_BAD_REQUEST}
 
     def post(self, request):
-        return root_api_response(create(request.DATA))
+        return root_api_response(self.create(request.DATA))

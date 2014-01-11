@@ -20,7 +20,10 @@ raphaelDirective.directive('szSideBar', [ function ( ) {
             container_class = params.container_class || 'st-container',
             open_class = params.open_class || 'st-menu-open',
             menu_class = params.menu_class || 'st-menu',
-            effect = attrs.szSideBarEffect || 'st-effect-8';       
+            effect = attrs.stEffect || 'st-effect-8',
+            $content = $('.'+attrs.stContent),
+            contTime = 500;
+
 
         function init(){
             function hasParentClass( e, classname ) {
@@ -34,22 +37,30 @@ raphaelDirective.directive('szSideBar', [ function ( ) {
             var eventtype = scope.is_mobile ? 'touchstart' : 'click',
                 container = document.getElementById( container_id ),            
                 resetMenu = function() {
-                    $(container).removeClass(open_class)                
+                    $(container).removeClass(open_class)
+                    //if($content.length) $content.animate({marginLeft: 'auto'}, contTime)
+                    window.setTimeout( function() {
+                        $("#wrap").css('zIndex','auto')
+                        $(container).hide()
+                    }, 500);
                 },
                 bodyClickFn = function(evt) {
                     // event type (if mobile use touch events)
-                    /*if( !hasParentClass( evt.target, menu_class ) ) {*/
+                    if( !hasParentClass( evt.target, menu_class ) ) {
                         resetMenu();
                         document.removeEventListener( eventtype, bodyClickFn );
-                    /*}*/
+                    }
                 };
 
             function bind_function(){                
                 container.className = container_class; // clear
+                $("#wrap").css('zIndex','1')
+                $(container).show()
                 $(container).addClass(effect);
-                setTimeout( function() {                        
-                    $( "." + menu_class ).scrollTop(0)
-                    $(container).addClass(open_class);
+                $( "." + menu_class ).scrollTop(0)
+                setTimeout( function() {
+                    $(container).addClass(open_class)
+                    //if($content.length) $content.animate({marginLeft: $( "." + menu_class ).width() +'px'}, contTime)
                 }, 25 );
                 document.addEventListener( eventtype, bodyClickFn );
             }

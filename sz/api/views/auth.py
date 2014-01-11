@@ -3,12 +3,12 @@ from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.middleware import csrf
 from rest_framework import permissions, status
-
 from sz.api.serializers import AuthRequestSerializer, AuthUserSerializer
 from sz.api.response import Response
 from sz.api.views import SzApiView
 # from sz.api.status import HTTP_423_LOCKED
 HTTP_423_LOCKED = 423
+
 
 class AuthLogin(SzApiView):
     """ Log a user in """

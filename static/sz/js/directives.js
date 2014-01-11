@@ -21,56 +21,64 @@ angular.module('sz.client.directives', [])
             scope.is_mobile = mobilecheck();
         };
     })
-    .directive('szColorizeMenu', function(){
-        return function(scope, element, attrs){
-            var colors = ['turquoise', 'greensea', 'emerald', 'nephritis', 'peterriver', 'belizehole', 'amethyst', 'wisteria', 'wetasphalt', 'midnightblue', 'sunflower', 'orange', 'carrot', 'pumpkin', 'alizarin', 'pomegranate', 'clouds', 'silver', 'concrete', 'asbestos'];
-            //var colors = ['greensea', 'nephritis', 'belizehole', 'wisteria', 'midnightblue', 'orange', 'pumpkin', 'pomegranate',  'asbestos'];
-            //var colors = ['turquoise', 'emerald', 'peterriver', 'amethyst', 'wetasphalt', 'sunflower', 'carrot', 'alizarin', 'concrete'] ;
-           /* var colors_list = shuffle(colors);
-            $.each(element.children(), function(i, li){
-                var color = 'bg-' + colors_list[ Math.floor(Math.random()*colors_list.length)  ];
-                $(li).addClass( color )
-            });*/
-        }
-    })
     .directive('szScrollDetect', function($window) {
         return function(scope, element, attrs) {
             var cl = "header-shadow", header = $("header") 
-            angular.element(element).bind("scroll", function() {
+            angular.element($window).bind("scroll", function() {
                 if(element.scrollTop()) header.addClass(cl)
                 else header.removeClass(cl)
             })
         }
     })
-    .directive('szFileModel', function() {
+    .directive('szMessageBox', function() {
+        return function(scope, element, attrs) {
+            var min = 200, keybowrdWidth = 500;
+            var h = $(window).height()-keybowrdWidth;
+            element.height( (h>min) ? h : min )
+            scope.$watch('messagePlace', function(val){
+                if(val) $("textarea").focus();
+            });
+        }
+    })
+    .directive('szFileModel', function($rootScope) {
         return function(scope, element, attrs) {
             var $photoNameCont = $("#photoPrevName");
             var $photoCont = document.getElementById('photoPrev');
             var $photoBigCont = $('#photoBigCont')
+            scope.$on("setTest", function(){
+                scope.test = 1
+            })
+            scope.uploadFile = function(){
+                console.log(element[0].files)
+            }
             scope.$watch(attrs.szFileModel, function() {
-                angular.element(element[0]).bind('change', function(){                  
+                angular.element(element[0]).bind('change', function(){                    
                     if (angular.isUndefined(element[0].files))
                     {throw new Error("This browser does not support HTML5 File API.");}
-                    if (element[0].files.length == 1){                      
-                        scope[attrs.szFileModel] = element[0].files[0]
+                    if (element[0].files.length == 1){
+                        
                         var photo = element[0].files[0];
                         var photoName = photo.name;
-                        $photoNameCont.text(photoName)
+                        /*$photoNameCont.text(photoName)*/
                         if (photo.type.match('image.*')) {
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {
                                 return function(e) {
-                                    $photoCont.innerHTML = ['<img  src="', e.target.result,
+                                    $photoCont.innerHTML = ['<img src="', e.target.result,
                                                         '" title="', escape(photoName), '" style="width:100%"/>'].join('');
-                                };                                
-                            })(photo);      
-                            reader.readAsDataURL(photo);
-                            $photoBigCont.show()
+                                };
+                            })(photo);
+                            reader.readAsDataURL(photo);                            
+                            /*$photoBigCont.show()*/
+                            scope.$apply(function(){
+                                scope[attrs.szFileModel] = element[0].files[0]
+                                scope.showEditPhoto = !scope.showEditPhoto;
+                            });
 
                         }
                         else{photoNameCont.innerHTML = ['Недопустимый формат'].join('');}
                     }
-                });            
+                });
             });
 
             scope.$watch('photo.name',function(){
@@ -83,6 +91,14 @@ angular.module('sz.client.directives', [])
             })
         }
     })
+    .directive('szEditPhoto', function() {
+        return function(scope, element, attrs) {            
+            scope.$watch(attrs.show, function(newval, oldval){  
+                if(newval!=undefined) element.modal({show: true});
+                /*else element.find("[data-dismiss=modal]").click()*/ //както это неправильно
+            })
+        };
+    })
     .directive('szAutoResizeTextArea', function() {
         return function(scope, element, attrs) {
             element.autoResize();
@@ -92,6 +108,7 @@ angular.module('sz.client.directives', [])
         return function(scope, element, attrs) {
             scope.$watch('photoSrc', function(val){
             	if(val){
+                    console.log(1)
             		element.attr('src',val)
             		element.ready(function(){
             			scope.photoBox = {
@@ -123,6 +140,19 @@ angular.module('sz.client.directives', [])
             scope.$watch(attrs.show, function(newval){                
                 if(newval) element.modal({show: true});
                 else element.find("[data-dismiss=modal]").click() //както это неправильно
+            })
+        };
+    })
+    .directive('szSelectTags', function() {
+        return function(scope, element, attrs) {
+            scope.activateCat = function(cat){
+                var li = element.find("[data-catitem="+cat.id+"]");
+                li.toggleClass('active')
+                scope.$emit('addCategory', cat)
+            }
+            scope.$watch(attrs.show, function(newval, oldval){                
+                if(newval!=undefined) element.modal({show: true});
+                /*else element.find("[data-dismiss=modal]").click()*/ //както это неправильно
             })
         };
     })

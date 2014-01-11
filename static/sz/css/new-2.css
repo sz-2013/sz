@@ -21,6 +21,14 @@ h2{
     margin-top: 5px;
     margin-bottom: 10px;
 }
+
+#wrap{
+    position: relative;
+    /*z-index: 1;*/
+    /*top:0;
+    left:0;*/
+}
+
 footer{
     font-weight: bold;
     color: #bdc3c7;
@@ -80,6 +88,7 @@ header{
 .achivment i{
     color:#f1c40f;
 }
+
 
 .big-bordered-box{  
     background-color: white;
@@ -168,4 +177,32 @@ header{
 }
 .box-item-controls .controls-right{
     right:1.7em;
+}
+
+.box-inner-bottom{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left:0;
+    padding: 0 1.1em;
+}
+
+
+
+/*Helpers-class*/
+.overflow-hidden{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow:ellipsis;
+}
+
+.help-block{
+    text-align: justify;
+}
+
+.margin-left-sm{
+    margin-left: 5px;
+}
+.margin-top-sm{
+    margin-top: 5px;   
 }

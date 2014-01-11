@@ -6,7 +6,8 @@ from sz import settings
 # from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     # Examples:
     # url(r'^$', 'sz.views.home', name='home'),
     # url(r'^sz/', include('sz.foo.urls')),
@@ -24,9 +25,9 @@ urlpatterns = patterns('',
         }),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('sz.api.urls'), name='api'),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-auth/',
+        include('rest_framework.urls', namespace='rest_framework')),
     url(r'^activate/(?P<activation_key>.*)/?$', 'sz.core.views.activate',
         name='registration-confirm'),
     url(r'^lebowski/', include('lebowski.urls'), name='lebowski'),
-    
 )

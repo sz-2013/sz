@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="../static/sz/css/buttons.css">
     <link rel="stylesheet" href="../static/sz/css/selectplace.css">
     <link rel="stylesheet" href="../static/sz/css/nganimate.css">
+    <link rel="stylesheet" href="../static/sz/css/message.css">
 
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
@@ -33,71 +34,60 @@
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 </head>
 
-<body  ng-controller="MasterPageController" mobile-check >
+<body  ng-controller="MasterPageController" mobile-check sz-scroll-detect>
     <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
+        <div id="wrap" >                    
+        <header class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container" ng-include src="headerCurrent">                    
+            </div>
+        </header>
+        <div  ng-view class="clearfix container" id="main" ng-show="showContent"></div>
+        <footer class="navbar navbar-inverse navbar-static-bottom">
+            <div class="container">       
+                <span class="pull-left">ShmotZhmot 2013</span>     
+                <span class="pull-right">
+                    We &lt;3 
+                    <a href="">Bootstrap</a>,
+                    <a href="">Font Awesome</a>,
+                    <a href="">Raphael</a> and
+                    <a href="">Leafletjs</a>
+                </span>
+            </div>
+        </footer>
+    </div>
     <div id="st-container" class="st-container">
         <!-- content push wrapper -->
         <div class="st-pusher">
             <nav class="st-menu st-effect-8 dark-nav" id="mainnav">
-                <!-- <div class="scrollbar" ><div class="track" ><div class="thumb"><div class="end"></div></div></div></div>
-                <div class="viewport"> <div class="overview" > -->
-                    <div class="dark-nav-header">
-                        <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
-                    </div>
-                    <ul>
-                        <li><a href="">
-                            World</a>
-                        <li><a href={{url.newsfeed}}>
-                            News Feed <span class="badge pull-right">42</span>
-                        </a></li>
-                        <li><a href={{url.search}}>
-                            Search
-                        </a></li>
-                        <li><a href="">
-                            Events
-                        </a><li>
-                        <a href="">
-                            Map
-                        </a></li>
-                        <li><a href="">
-                            Your places <span class="badge pull-right">42</span>
-                        </a></li>
-                        <li><a href="">
-                            Your messages <span class="badge pull-right">42</span>
-                        </a></li>
-                        <li><a>Blagoweschensk</a></li>
-                        <li><a ng-click="session.$logout()">Exit</a></li>
-                    </ul>                    
-                <!-- </div></div> -->
+                <div class="dark-nav-header">
+                    <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
+                </div>
+                <ul>
+                    <li><a href="">
+                        World</a>
+                    <li><a href={{url.newsfeed}}>
+                        News Feed <span class="badge pull-right">42</span>
+                    </a></li>
+                    <li><a href={{url.search}}>
+                        Search
+                    </a></li>
+                    <li><a href="">
+                        Events
+                    </a><li>
+                    <a href="">
+                        Map
+                    </a></li>
+                    <li><a href="">
+                        Your places <span class="badge pull-right">42</span>
+                    </a></li>
+                    <li><a href="">
+                        Your messages <span class="badge pull-right">42</span>
+                    </a></li>
+                    <li><a>Blagoweschensk</a></li>
+                    <li><a ng-click="session.$logout()">Exit</a></li>
+                </ul>                    
             </nav>
-            <header class="navbar navbar-inverse navbar-fixed-top">
-                <div class="container">
-                    <button sz-side-bar sz-side-bar-effect="st-effect-8" class="btn btn-primary pull-left">
-                        <i class="fa fa-reorder fa-lg"></i>
-                    </button>
-                    <a href={{url.brand}} class="navbar-brand">ShmotZhmot</a>
-                    <a class="btn btn-primary pull-right" href={{url.mapSelect}}>
-                        <i class="fa fa-map-marker fa-lg"></i>
-                    </a>
-                </div>
-            </header>
-            <div class="st-content" sz-scroll-detect><!-- this is the wrapper for the content -->  
-                <div id="wrap" >                    
-                    <div  ng-view class="clearfix container" id="main" ng-show="showContent"></div>
-                    <footer class="navbar navbar-inverse navbar-static-bottom">
-                    <div class="container">       
-                        <span class="pull-left">ShmotZhmot 2013</span>     
-                        <span class="pull-right">
-                            We &lt;3 
-                            <a href="">Bootstrap</a>,
-                            <a href="">Font Awesome</a>,
-                            <a href="">Raphael</a> and
-                            <a href="">Leafletjs</a>
-                        </span>
-                    </div>
-                </footer>
-                </div>
-            </div><!-- /st-content -->            
+        <div class="st-content" > </div>
         </div><!-- /st-pusher -->
     </div><!-- /st-container -->
 

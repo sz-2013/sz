@@ -12,10 +12,10 @@ def get_paging_from_dict(args):
     return limit, offset, max_id
 
 
-def get_position_from_dict(args):    
+def get_position_from_dict(args):
     latitude = args.get(params_names.LATITUDE, None)
     longitude = args.get(params_names.LONGITUDE, None)
-    assert latitude and longitude, 'latitude and longitude are required'        
+    assert latitude and longitude, 'latitude and longitude are required'
     return latitude, longitude
 
 
@@ -75,13 +75,15 @@ class LocationDecoratorBase(PositionDecorator):
     def __init__(self, params, city_service, component=None):
         PositionDecorator.__init__(self, params, component)
         self.__city_service = city_service
-        self._radius = utils.safe_cast(params.get(params_names.RADIUS, None), int, None)
+        self._radius = utils.safe_cast(
+            params.get(params_names.RADIUS, None), int, None)
         if self._radius is not None:
             if self._radius <= 0:
                 self._radius = None
 
     def _get_city(self):
-        city = self.__city_service.get_city_by_position(self._longitude, self._latitude)
+        city = self.__city_service.get_city_by_position(
+            self._longitude, self._latitude)
         return city
 
     def get_api_params(self):
@@ -116,7 +118,8 @@ class PagingDecorator(ParametersGroupDecorator):
 
     def __init__(self, params, current_max_id, default_limit, component=None):
         ParametersGroupDecorator.__init__(self, params, component)
-        self.__limit, self.__offset, self.__max_id = get_paging_from_dict(self.params)
+        self.__limit, self.__offset, self.__max_id = \
+            get_paging_from_dict(self.params)
         self.__current_max_id = current_max_id
         self.__default_limit = default_limit
 
@@ -149,7 +152,8 @@ class ContentDecorator(ParametersGroupDecorator):
         params[params_names.STEMS] = []
         if self.__query:
             if self.__query.strip != '':
-                params[params_names.STEMS] = self.__categorization_service.detect_stems(self.__query)
+                params[params_names.STEMS] = \
+                    self.__categorization_service.detect_stems(self.__query)
         if isinstance(self.__category, models.Category):
             params[params_names.CATEGORY] = self.__category
         else:
@@ -194,29 +198,38 @@ class PlaceNameDecorator(ParametersGroupDecorator):
 class PlaceMessagesParametersFactory:
 
     @classmethod
-    def create(cls, params, categorization_service, current_max_id, default_limit):
+    def create(
+            cls, params, categorization_service,
+            current_max_id, default_limit):
         content_group = ContentDecorator(params, categorization_service)
-        paging_group = PagingDecorator(params, current_max_id, default_limit, content_group)
+        paging_group = PagingDecorator(
+            params, current_max_id, default_limit, content_group)
         return paging_group
 
 
 class PlaceNewsParametersFactory:
 
     @classmethod
-    def create(cls, params, categorization_service, current_max_id, default_limit):
+    def create(
+            cls, params, categorization_service,
+            current_max_id, default_limit):
         content_group = ContentDecorator(params, categorization_service)
         position_group = PositionDecorator(params, content_group)
-        paging_group = PagingDecorator(params, current_max_id, default_limit, position_group)
+        paging_group = PagingDecorator(
+            params, current_max_id, default_limit, position_group)
         return paging_group
 
 
 class NewsParametersFactory:
 
     @classmethod
-    def create(cls, params, categorization_service, city_service, current_max_id, default_limit):
+    def create(
+            cls, params, categorization_service,
+            city_service, current_max_id, default_limit):
         content_group = ContentDecorator(params, categorization_service)
         location_group = LocationDecorator(params, city_service, content_group)
-        paging_group = PagingDecorator(params, current_max_id, default_limit, location_group)
+        paging_group = PagingDecorator(
+            params, current_max_id, default_limit, location_group)
         return paging_group
 
 
@@ -227,5 +240,3 @@ class PlaceSearchParametersFactory:
         location_group = LocationAlwaysWithCityDecorator(params, city_service)
         place_name_group = PlaceNameDecorator(params, location_group)
         return place_name_group
-
-        

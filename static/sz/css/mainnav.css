@@ -4,7 +4,7 @@
 
 .dark-nav .dark-nav-header h2{
     margin: 0;
-    color: #fff;
+    color: #95a5a6;
     
     /*font-size: 25px;*/
 }
@@ -18,7 +18,8 @@
     overflow-x: hidden;
 }
 
-.dark-nav ul>li>a, .dark-nav ul>li>span{
+.dark-nav ul>li>a,
+.dark-nav ul>li>span{
     display: block;    
     outline: none;
     box-shadow: inset 0 -1px rgba(0,0,0,0.2);
@@ -39,7 +40,7 @@
     box-shadow: inset 0 -2px rgba(0,0,0,0.3);
 }
 
-.dark-nav ul>li>a:hover, .dark-nav ul>li>span:hover{
+.dark-nav ul>li>a:hover, .dark-nav ul>li>span:hover, .dark-nav ul>li.active{
     background: rgba(0,0,0,0.2);
     color: #fff;
 }
@@ -54,8 +55,14 @@
     text-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
-.st-pusher::after, #selectPlace {
-    background: rgba(250,250,250,0.9);
+.dark-nav .btn-link:hover,
+.dark-nav .btn-link:focus,
+.dark-nav .btn-link.active{
+    color:#ecf0f1;
+}
+
+.st-pusher::after, .modal {
+    background: rgba(255,255,255,0.9);
 }
 
 #mainnav{
@@ -76,8 +83,12 @@
     padding: 0.9em 0.9em 0.9em 1.1em;    
 }
 
-#selectPlace .dark-nav-header{
+.modal .dark-nav-header{
     padding: 10px 10px;
+}
+
+.modal .dark-nav-header .close-modal{
+    margin-top: -4px;
 }
 
 #selectPlace ul>li{
@@ -99,4 +110,17 @@
 
 #selectPlace .item-name{
     text-transform: uppercase;
+}
+
+#selectTags ul>li>span{
+    padding: 5px;
+    text-transform: uppercase; 
+}
+
+.photo-menu, .photo-menu-sub{
+    background-color: #23313f;       
+}
+
+.photo-menu-sub{
+    box-shadow: inset 0 2px rgba(0,0,0,0.3);
 }

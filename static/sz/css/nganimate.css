@@ -1,5 +1,5 @@
      
-.animate.ng-hide-add, .animate.ng-hide-remove {
+.animate-fall-down.ng-hide-add, .animate-fall-down.ng-hide-remove {
     /*-webkit-transition:all linear 0.5s;
     -moz-transition:all linear 0.5s;
     -o-transition:all linear 0.5s;
@@ -9,14 +9,14 @@
     display:block!important;
     }
      
-.animate.ng-hide-add.ng-hide-add-active,
-.animate.ng-hide-remove {
+.animate-fall-down.ng-hide-add.ng-hide-add-active,
+.animate-fall-down.ng-hide-remove {
     -webkit-transform: translate3d(0, 100%, 0);
     transform: translate3d(0, 100%, 0);
 }
      
-.animate.ng-hide-add,
-.animate.ng-hide-remove.ng-hide-remove-active {
+.animate-fall-down.ng-hide-add,
+.animate-fall-down.ng-hide-remove.ng-hide-remove-active {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
 }

@@ -4,6 +4,8 @@
     margin-top: 6px;
     padding: 0;
 }
+
+
 .btn-primary{
     background-color: transparent;
     border: none;
@@ -26,6 +28,34 @@
 .btn-link:hover{
     color:#2c3e50;
 }
+.btn-link.active{
+    box-shadow: none;
+    color:#2c3e50;   
+}
 .main-btn-group{
     padding: 0 1em;
+}
+
+.photo-btn{    
+    position: relative;
+    display: inline-block;
+}
+.photo-btn input{    
+    opacity: 0;
+}
+.photo-btn input,
+.photo-btn i{    
+    position: absolute; /*30x28*/
+    top: 0;
+    left: 0;
+    display: inline-block;
+}
+.photo-btn,
+.photo-btn input,
+.photo-btn i{
+    width: 30px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
 }

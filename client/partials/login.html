@@ -1,7 +1,7 @@
 <div class="big-bordered-box">	
 	<div class="big-bordered-box-inner">
 		<form class="form-group" role="form" name="general" ng-show="!showResendBut">
-			<h2 class="text-right">{{tmlText.header.main}}</h2>		
+			<h2 class="text-right">Sign In</h2>		
 			<div class="form-group" ng-show="loginAlert.non_field_errors">
 				<p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
 			</div>	       			
@@ -27,8 +27,8 @@
 			<div class="form-group">
 				<div class="checkbox">
 				    <label>
-				      <input type="checkbox" ng-disabled="inProgress">{{tmlText.cb.remember}}
-				      <a class="pull-right" href={{url.passRecovery}}>{{tmlText.el.forgotpass}}</a>
+				      <input type="checkbox" ng-disabled="inProgress">Remember me
+				      <a class="pull-right" href={{url.passRecovery}}>Forgot your password?</a>
 				    </label>
 				</div>				
 			</div>
@@ -41,6 +41,5 @@
  	<button type="submit" class="btn btn-link" ng-click="login(email, password)" ng-disabled="inProgress">
  		<i class="fa fa-sign-in fa-3x"></i>
  	</button>
- 	<a type="submit" class="pull-right" ng-class="myClasses.btn.main" href={{url.registration}} ng-disabled="inProgress">
- 		{{tmlText.btn.reg}}</a>
+ 	<a type="submit" class="pull-right" ng-class="myClasses.btn.main" href={{url.registration}} ng-disabled="inProgress">Registration</a>
 </div>

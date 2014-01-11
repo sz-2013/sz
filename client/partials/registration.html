@@ -1,7 +1,7 @@
 <div class="big-bordered-box">	
 	<div class="big-bordered-box-inner">
 		<form class="form-group" role="form" name="general" ng-show="regStage1">
-			<h2 class="text-right">{{tmlText.header.main}}</h2>
+			<h2 class="text-right">Registration</h2>
 			<div class="form-group" ng-show="loginAlert.non_field_errors">
 				<p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
 			</div>
@@ -48,8 +48,8 @@
 			</div>
 			<div class="form-group" 
 				ng-class="{'has-error':loginAlert.gender}">	
-				<label for="radioGender" class="control-label">{{tmlText.lbl.gender}}</label>		
-				<p class="help-block">{{tmlText.hint.gender}}</p>
+				<label for="radioGender" class="control-label">Choose your gender</label>		
+				<p class="help-block">If it is a secret or if you are not sure - choose "Smile".</p>
 				<div id="genderAlert" class="text-danger">
 					<span ng-repeat="alert in loginAlert.gender">{{alert}}<br></span>
 				</div>
@@ -70,10 +70,10 @@
 			</div>
 			<div class="form-group"
 				ng-class="{'has-error':loginAlert.race}">	
-				<label for="radioRace" class="control-label">{{tmlText.lbl.race}}</label>		
+				<label for="radioRace" class="control-label">Choose your race</label>		
 				<p class="help-block">
-					{{tmlText.hint.race}}
-					<a href="url.wiki">{{tmlText.hint.wiki}}</a>
+					A race will determine your characteristics and talents. Be attentively, because you will can not change it in the future.
+					<a href="urls.wiki"> See more about it on wiki.</a>
 				</p>
 				<div id="raceAlert" class="text-danger">
 					<span ng-repeat="alert in loginAlert.race">{{alert}}</span>
@@ -87,10 +87,10 @@
 					<img ng-src={{user.race.blazon}} style="width-max:100%;margin:15px 0; width:100px; ">	
 					<div>
 						<div class="pull-left" id="skillsDescr">
-							<span>{{tmlText.lbl.fortune}}</span>
-							<span>{{tmlText.lbl.agillity}}</span>
-							<span>{{tmlText.lbl.strength}}</span>
-							<span>{{tmlText.lbl.intellect}}</span>						
+							<span>Fortune: </span>
+							<span>Agillity: </span>
+							<span>Strength: </span>
+							<span>Intellect: </span>						
 						</div>			
 						<div class="progress">
 							<div class="progress-bar progress-bar-success" 
@@ -124,6 +124,5 @@
 	</div>
 </div>
 <div class="main-btn-group">
-	<button type="submit" class="btn" ng-class="myClasses.btn.mainBig" ng-click="registration()" ng-disabled="inProgress" >
-			 		{{tmlText.btn.registration}}</button>
+	<button type="submit" class="btn" ng-class="myClasses.btn.mainBig" ng-click="registration()" ng-disabled="inProgress" >Do it!</button>
 </div>

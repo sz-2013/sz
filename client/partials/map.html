@@ -1,42 +1,13 @@
 
-<div class="modal fade" id="selectPlace" tabindex="-1" role="dialog" aria-labelledby="selectAPlace" aria-hidden="true" sz-select-place show="showPlaceSelect">
-    <div class="modal-dialog">
-        <div class="modal-content dark-nav">
-            <div class="dark-nav-header">
-                <button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h2 class="navbar-brand"><a>Select a place</a></h2>
-                <!-- <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-search fa-fw"></i></span>
-                    <input type="text" class="form-control input-sm" placeholder="Search a place..">
-                </div>'+ -->
-            </div>
-            <ul>
-                <li ng-repeat="place in places_list" data-placeitem="{{place.place_id}}">
-                    <span>
-                        <div class="item-main">
-                            <button type="button" class="btn btn-link pull-right btn-dark" ng-click="showDetail(place.place_id)">
-                                <i class="fa fa-arrow-right fa-2x"></i>
-                            </button>
-                            <div ng-click="$emit('selectItem', place)">
-                                <div class="item-name">{{place.place_name}}</div>
-                                <div class="item-address">{{place.place_address}}</div>
-                            </div>
-                        </div>
-                        <div class="item-detail">
-                            <button type="button" class="btn btn-link pull-left btn-dark" ng-click="hideDetail(place.place_id)">
-                                <i class="fa fa-arrow-left fa-2x"></i>
-                            </button>
-                            <div>detail stuff</div>
-                        </div>
-                    </span>
-                </li>
-            </ul>
-        </div>
-    </div>
- </div>
 
 
-<div class="achivment animate" ng-show="showAchive" ng-init="showAchive=explored_val" ng-click="showAchive=false" sz-achivment timeout="3000">
+<gamemap width="map_width" height="map_height" radius="radius"
+    boxes="gamemap" currentbox="current_box" lastbox="last_box" ng-show="showMap"></gamemap>
+
+<div ng-show="messagePlace" ng-include src='"partials/message-edit-sub.html"'></div>
+
+
+<div class="achivment animate-fall-down" ng-show="showAchive" ng-init="showAchive=explored_val" ng-click="showAchive=false" sz-achivment timeout="3000">
     <div class="media">
       <div class="pull-left">
         <i class="fa fa-star fa-5x"></i> 
@@ -47,4 +18,3 @@
       </div>
     </div>
 </div>
-{{messagePlace}}

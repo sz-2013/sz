@@ -5,7 +5,6 @@ from sz.settings import LEBOWSKI_MODE_TEST
 import shelve
 
 
-
 def search(position, query, radius):
     if not LEBOWSKI_MODE_TEST:
         client = Foursquare(
@@ -28,5 +27,5 @@ def search(position, query, radius):
         response = client.venues.search(params)
     else:
 
-        response = {'venues':shelve.open('generated_place.shelve')['venues']}
+        response = {'venues': shelve.open('generated_place.shelve')['venues']}
     return response

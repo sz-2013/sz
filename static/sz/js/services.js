@@ -13,7 +13,7 @@ szServices.factory('staticValueService', function($resource){
     });
 });
 
-szServices.factory('gameMap', function($resource){
+szServices.factory('gameMapService', function($resource){
     return $resource('../../api/gamemap/', {}, {
         getMap: { method:'GET' , isArray:false },
     });

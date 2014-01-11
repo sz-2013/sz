@@ -10,33 +10,37 @@ from sz.core.services.parameters import names as params_names
 from sz.settings import LEBOWSKI_MODE_TEST
 from sz import mode_test
 
+
 def search_places(**kwargs):
     if not LEBOWSKI_MODE_TEST:
         latitude = kwargs.get(params_names.LATITUDE)
-        longitude = kwargs.get(params_names.LONGITUDE)    
+        longitude = kwargs.get(params_names.LONGITUDE)
     else:
         latitude = mode_test.STEP*mode_test.COUNT/2
-        longitude = mode_test.STEP*mode_test.COUNT/2        
+        longitude = mode_test.STEP*mode_test.COUNT/2
     query = kwargs.get(params_names.QUERY)
     limit = kwargs.get(params_names.LIMIT)
     current_position = fromstr("POINT(%s %s)" % (longitude, latitude))
-    radius = kwargs.get(params_names.RADIUS)    
-    # filtered_places = models.Place.objects.annotate(messages_count=dj_models.Count('message__id'))\
+    radius = kwargs.get(params_names.RADIUS)
+    # filtered_places = models.Place.objects.annotate(
+    #    messages_count=dj_models.Count('message__id'))\
     #     .order_by('-messages_count')
-    filtered_places = models.Place.objects.all()#filter(is_active=True)
+    # filtered_places = models.Place.objects.filter(is_active=True)
+    filtered_places = models.Place.objects.all()
     if radius == 0 or radius is None:
-        # TODO: определять город по координатам
-        city_id = kwargs.get(params_names.CITY_ID)  
+        city_id = kwargs.get(params_names.CITY_ID)
         if not LEBOWSKI_MODE_TEST:
             assert city_id, 'city_id is required'
         filtered_places = filtered_places.filter(city_id=city_id)
     else:
         distance_kwargs = {'m': '%i' % radius}
-        filtered_places = filtered_places.filter(position__distance_lte=(current_position, D(**distance_kwargs)))        
+        filtered_places = filtered_places.filter(
+            position__distance_lte=(current_position, D(**distance_kwargs)))
     if query:
         filtered_places = filtered_places.filter(name__icontains=query)
-    filtered_places = filtered_places.distance(current_position).order_by('distance')
-    if limit:        
+    filtered_places = filtered_places.distance(
+        current_position).order_by('distance')
+    if limit:
         filtered_places = filtered_places[:limit]
     return filtered_places
 
@@ -59,27 +63,34 @@ def places_news_feed(**kwargs):
     photo = kwargs.get(params_names.PHOTO)
     # creating the query
     if photo:
-        filtered_places = models.Place.objects.filter(message__id__isnull=False, message__photo__istartswith='photo')
+        filtered_places = models.Place.objects.filter(
+            message__id__isnull=False, message__photo__istartswith='photo')
     else:
-        filtered_places = models.Place.objects.filter(message__id__isnull=False)
-    filtered_places = filtered_places.annotate(last_message=dj_models.Max('message__id'))
+        filtered_places = models.Place.objects.filter(
+            message__id__isnull=False)
+    filtered_places = filtered_places.annotate(
+        last_message=dj_models.Max('message__id'))
     if max_id is not None:
         filtered_places = filtered_places.filter(message__id__lte=max_id)
     if radius == 0 or radius is None:
         # TODO: определять город по координатам
-        #^вроде сделала(ну я просто взяла уже готовый сервис. Почему дима это не сделал-не понятно)
+        #^вроде сделала(ну я просто взяла уже готовый сервис.
+        #Почему дима это не сделал-не понятно)
         city_id = kwargs.get(params_names.CITY_ID)
         if not LEBOWSKI_MODE_TEST:
             assert city_id, 'city_id is required'
         filtered_places = filtered_places.filter(city_id=city_id)
     else:
         distance_kwargs = {'m': '%i' % radius}
-        filtered_places = filtered_places.filter(position__distance_lte=(current_position, D(**distance_kwargs)))\
-            .distance(current_position).order_by('distance')
+        filtered_places = filtered_places.filter(
+            position__distance_lte=(current_position, D(**distance_kwargs))
+        ).distance(current_position).order_by('distance')
     if len(stems) > 0:
-        filtered_places = filtered_places.filter(message__stems__stem__in=[stem[0] for stem in stems])
+        filtered_places = filtered_places.filter(
+            message__stems__stem__in=[stem[0] for stem in stems])
     if category is not None:
-        filtered_places = filtered_places.filter(message__categories__in=[category,])
+        filtered_places = filtered_places.filter(
+            message__categories__in=[category, ])
     count = filtered_places.aggregate(count=dj_models.Count('id'))['count']
     query = filtered_places.order_by('-last_message')[offset:offset + limit]
     return query, count
@@ -95,7 +106,8 @@ def filter_messages(filtered_messages, **kwargs):
             q = q | Q(stems__stem__startswith=stem[0])
         filtered_messages = filtered_messages.filter(q)
     if category is not None:
-        filtered_messages = filtered_messages.filter(categories__in=[category, ])
+        filtered_messages = filtered_messages.filter(
+            categories__in=[category, ])
     if photo:
         filtered_messages = filtered_messages.exclude(photo='')
     return filtered_messages
@@ -133,11 +145,13 @@ def search_messages(**kwargs):
         city_id = kwargs.get(params_names.CITY_ID)
         if not LEBOWSKI_MODE_TEST:
             assert city_id, 'city_id is required'
-        filtered_messages = models.Message.objects.filter(place__city_id=city_id)
+        filtered_messages = models.Message.objects.filter(
+            place__city_id=city_id)
     else:
         current_position = fromstr("POINT(%s %s)" % (longitude, latitude))
         distance_kwargs = {'m': '%i' % radius}
-        places = models.Place.objects.filter(position__distance_lte=(current_position, D(**distance_kwargs)))
+        places = models.Place.objects.filter(
+            position__distance_lte=(current_position, D(**distance_kwargs)))
         filtered_messages = models.Message.objects.filter(place__in=places)
     if max_id is not None:
         filtered_messages = filtered_messages.filter(id__lte=max_id)
@@ -150,9 +164,11 @@ def search_messages(**kwargs):
 
 def categories(place):
     last_day = timezone.now() - datetime.timedelta(days=56)
-    query = models.Category.objects.filter(thing__message__place_id=place.id, thing__message__date__gte=last_day)\
-    .values('name').annotate(
+    query = models.Category.objects.filter(
+        thing__message__place_id=place.id,
+        thing__message__date__gte=last_day
+    ).values('name').annotate(
         count=dj_models.Count('thing__message'),
-        last=dj_models.Max('thing__message__date'))\
-    .order_by('-count', '-last')
+        last=dj_models.Max('thing__message__date')
+    ).order_by('-count', '-last')
     return query
