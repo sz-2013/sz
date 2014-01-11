@@ -21,8 +21,12 @@ CITY_ID = 1
 POSITION = gis_core.ll_to_point(PLACE_LON, PLACE_LAT)
 
 
+def generate_stuff():
+    return str(uuid.uuid4()).split('-')[0]
+
+
 def generate_email():
-    return "%s@sz.com" % uuid.uuid4()
+    return "%s@sz.com" % generate_stuff()
 
 
 def get_race():
@@ -38,10 +42,16 @@ def get_normal_user_data():
                 gender=get_gender().id, password1=PSWD, password2=PSWD, )
 
 
+def get_full_user_data():
+    return dict(email=generate_email(), race=get_race(), gender=get_gender(),
+                role=models.RoleUser.objects.get_or_create(
+                    name=models.STANDART_ROLE_USER_NAME)[0])
+
+
 def get_nornal_place_data():
     return dict(
-        name=uuid.uuid4(), city_id=CITY_ID, position=POSITION,
-        address=uuid.uuid4(), fsq_id=uuid.uuid4())
+        name=generate_stuff(), city_id=CITY_ID, position=POSITION,
+        address=generate_stuff(), fsq_id=generate_stuff())
 
 
 def get_place_query(**kwargs):
@@ -153,17 +163,19 @@ class BLStandartDataTest(unittest.TestCase):
         self.check_val_type(data, 'user_radius', int)
 
 
-class UserStandartDataSerializerTest(BLStandartDataTest):
+class StandartDataSerializerTest(BLStandartDataTest):
     def setUp(self):
-        data = get_normal_user_data()
-        data.update(
-            race=models.Races.objects.get(id=data['race']),
-            gener=models.Gender.objects.get(id=data['gener'])
-        )
-        self.user = models.User.objects.get_or_create(**data)
+        data_user = get_full_user_data()
+        self.user = models.User.objects.get_or_create(**data_user)[0]
 
+        data_place = get_nornal_place_data()
+        self.place = models.Place.objects.get_or_create(**data_place)[0]
+
+
+class UserStandartDataSerializerTest(StandartDataSerializerTest):
     def test_data(self):
-        data = serializers.UserStandartDataSerializer(instance=self.user)
+        data = serializers.UserStandartDataSerializer(
+            instance=self.user).data
 
         self.assertEqual(data.get('user_id'), self.user.id)
         self.assertEqual(data.get('user_email'), self.user.email)
@@ -171,24 +183,14 @@ class UserStandartDataSerializerTest(BLStandartDataTest):
         self.assertEqual(data.get('user_race'), self.user.race.name)
         self.assertEqual(data.get('user_role'), self.user.role.name)
         self.assertEqual(
-            data.get('user_user_date_confirm'),
+            data.get('user_date_confirm'),
             self.user.get_string_date_confirm())
 
 
-class PlaceDetailSerialiserTest(BLStandartDataTest):
-    def setUp(self):
-        data_user = get_normal_user_data()
-        data_user.update(
-            race=models.Races.objects.get(id=data_user['race']),
-            gener=models.Gender.objects.get(id=data_user['gener'])
-        )
-        self.user = models.User.objects.get_or_create(**data_user)
-
-        data_place = get_nornal_place_data()
-        self.place = models.Place.objects.get_or_create(data_place)
-
+class PlaceDetailSerialiserTest(StandartDataSerializerTest):
     def check_standart_data(self):
-        data = serializers.PlaceStandartDataSerializer(instance=self.place)
+        data = serializers.PlaceStandartDataSerializer(
+            instance=self.place).data
 
         self.assertEqual(data.get('place_id'), self.place.id)
         self.assertEqual(data.get('place_name'), self.place.name)

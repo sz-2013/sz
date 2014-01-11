@@ -22,6 +22,7 @@ angular.module('sz.client.directives', [])
         };
     })
     .directive('szScrollDetect', function($window) {
+        //Show bottom shadow to header when check scroll in window
         return function(scope, element, attrs) {
             var cl = "header-shadow", header = $("header") 
             angular.element($window).bind("scroll", function() {
@@ -30,7 +31,15 @@ angular.module('sz.client.directives', [])
             })
         }
     })
+    .directive('szAutoResizeTextArea', function() {
+        //enable autoresize for textarea
+        return function(scope, element, attrs) {
+            element.autoResize();
+        };
+    })
     .directive('szMessageBox', function() {
+        //Set optimal  heigth for message box and set 
+        //focus to textarea when place was selected
         return function(scope, element, attrs) {
             var min = 200, keybowrdWidth = 500;
             var h = $(window).height()-keybowrdWidth;
@@ -41,25 +50,16 @@ angular.module('sz.client.directives', [])
         }
     })
     .directive('szFileModel', function($rootScope) {
+        //show preview for uploaded photo
+        //and show photo modal window
         return function(scope, element, attrs) {
-            var $photoNameCont = $("#photoPrevName");
-            var $photoCont = document.getElementById('photoPrev');
-            var $photoBigCont = $('#photoBigCont')
-            scope.$on("setTest", function(){
-                scope.test = 1
-            })
-            scope.uploadFile = function(){
-                console.log(element[0].files)
-            }
+            var $photoCont = document.getElementById('photoPrev');            
             scope.$watch(attrs.szFileModel, function() {
                 angular.element(element[0]).bind('change', function(){                    
                     if (angular.isUndefined(element[0].files))
                     {throw new Error("This browser does not support HTML5 File API.");}
-                    if (element[0].files.length == 1){
-                        
+                    if (element[0].files.length == 1){                        
                         var photo = element[0].files[0];
-                        var photoName = photo.name;
-                        /*$photoNameCont.text(photoName)*/
                         if (photo.type.match('image.*')) {
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {
@@ -69,46 +69,30 @@ angular.module('sz.client.directives', [])
                                 };
                             })(photo);
                             reader.readAsDataURL(photo);                            
-                            /*$photoBigCont.show()*/
                             scope.$apply(function(){
                                 scope[attrs.szFileModel] = element[0].files[0]
                                 scope.showEditPhoto = !scope.showEditPhoto;
                             });
-
                         }
-                        else{photoNameCont.innerHTML = ['Недопустимый формат'].join('');}
+                        else{photoNameCont.innerHTML = 'Недопустимый формат'}
                     }
                 });
             });
-
-            scope.$watch('photo.name',function(){
-                if(scope.photo.name){
-                    $photoNameCont.text('')
-                    $photoCont.innerHTML = [].join('');
-                    scope.photo = {'name':''}
-                    $photoBigCont.hide()
-                }
-            })
         }
     })
     .directive('szEditPhoto', function() {
+        //
         return function(scope, element, attrs) {            
             scope.$watch(attrs.show, function(newval, oldval){  
                 if(newval!=undefined) element.modal({show: true});
-                /*else element.find("[data-dismiss=modal]").click()*/ //както это неправильно
             })
         };
     })
-    .directive('szAutoResizeTextArea', function() {
-        return function(scope, element, attrs) {
-            element.autoResize();
-        };
-    })
-    .directive('szMessagePhotoLoad', function() {
+    
+    /*.directive('szMessagePhotoLoad', function() {
         return function(scope, element, attrs) {
             scope.$watch('photoSrc', function(val){
             	if(val){
-                    console.log(1)
             		element.attr('src',val)
             		element.ready(function(){
             			scope.photoBox = {
@@ -123,8 +107,9 @@ angular.module('sz.client.directives', [])
             	}
             })
         };
-    })
+    })*/
     .directive('szSelectPlace', function() {
+        //the directive for a selected place modal window
         return function(scope, element, attrs) {
             scope.showDetail = function(id){
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
@@ -134,29 +119,14 @@ angular.module('sz.client.directives', [])
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
                 li.animate({marginLeft: 0}, w*2)
             }
-            /*$scope.$watch("placeslist", function(){
-                if($scope.placeslist&&$scope.show) element.modal({show:true});
-            })*/
             scope.$watch(attrs.show, function(newval){                
                 if(newval) element.modal({show: true});
-                else element.find("[data-dismiss=modal]").click() //както это неправильно
-            })
-        };
-    })
-    .directive('szSelectTags', function() {
-        return function(scope, element, attrs) {
-            scope.activateCat = function(cat){
-                var li = element.find("[data-catitem="+cat.id+"]");
-                li.toggleClass('active')
-                scope.$emit('addCategory', cat)
-            }
-            scope.$watch(attrs.show, function(newval, oldval){                
-                if(newval!=undefined) element.modal({show: true});
-                /*else element.find("[data-dismiss=modal]").click()*/ //както это неправильно
             })
         };
     })
     .directive('szAchivment', function($timeout) {
+        //directive for achivment or informational pop windows
+        //hide this windows after sets time (attrs.timeout)
         return function(scope, element, attrs) {          
             function hideAchive(){
                 scope.showAchive = false
@@ -166,7 +136,7 @@ angular.module('sz.client.directives', [])
             });
         };
     })
-    .directive('szNewsFeedFilter', function () {
+    /*.directive('szNewsFeedFilter', function () {
         return {
             restrict: 'EA',
             replace: true,
@@ -314,5 +284,5 @@ angular.module('sz.client.directives', [])
                     })
                 }
             };
-        })
+        })*/
 	

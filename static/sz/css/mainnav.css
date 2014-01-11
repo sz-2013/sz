@@ -50,10 +50,7 @@
     box-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
-.dark-nav .btn-dark{
-    color: #34495e;
-    text-shadow: 0 0 1px rgba(0,0,0,0.3);
-}
+
 
 .dark-nav .btn-link:hover,
 .dark-nav .btn-link:focus,

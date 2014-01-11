@@ -6,43 +6,81 @@
 }
 
 
-.btn-primary{
-    background-color: transparent;
-    border: none;
-    color: #7f8c8d;
+.btn-lg{
     font-size: 1.8em;
-    padding: 0;
-    text-decoration: none solid rgb(127, 140, 141);
 }
-.btn-primary:hover, .btn-primary:active, .btn-primary:focus, .btn-primary.active{
+
+.btn-primary,
+.btn-primary:hover, .btn-primary:active, .btn-primary.active,
+.btn-primary:focus, .btn-primary.active,
+.btn-success,
+.btn-success:hover, .btn-success:active, .btn-success.active,
+.btn-success:focus, .btn-success.active,
+.btn-link,
+.btn-link:hover, .btn-link:active, .btn-link.active,
+.btn-link:focus, .btn-link.active{
     background-color: transparent;
     border: none;
-    color:#2c3e50;
+    padding: 0;
     box-shadow: none;
 }
+
+
+.btn-primary{
+    /*color: #7f8c8d;*/
+    font-size: 1.8em;
+    color:#485a6b;    
+    text-decoration: none solid rgb(127, 140, 141);
+}
+.btn-primary:hover, .btn-primary:active, .btn-primary.active,
+.btn-primary:focus, .btn-primary.active{
+    /*color:#2c3e50;*/
+    color: #263545;
+}
+
+
+.btn-success{
+    color:#12856e;
+}
+.btn-success:hover, .btn-success:active, .btn-success.active,
+.btn-success:focus, .btn-success.active{
+    color:#485a6b;
+}
+
 .btn-link{
-    padding: 0;
     color: #7f8c8d;
     margin-bottom: 0;
 }
-.btn-link:hover{
+.btn-link:hover, .btn-link:active, .btn-link.active,
+.btn-link:focus, .btn-link.active{
     color:#2c3e50;
 }
-.btn-link.active{
-    box-shadow: none;
-    color:#2c3e50;   
+
+
+/*header .btn{
+    color:#485a6b;
 }
-.main-btn-group{
-    padding: 0 1em;
+header .btn:hover, header .btn:active, header .btn.active,
+header .btn:focus, header .btn.active{
+    color: #263545;
+}*/
+
+
+.dark-nav .btn-dark{
+    color: #34495e;
+    text-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
+
+
+/*.main-btn-group{padding: 0 1em;}*/
+
 
 .photo-btn{    
     position: relative;
     display: inline-block;
 }
-.photo-btn input{    
-    opacity: 0;
-}
+.photo-btn input{
+    opacity: 0;}
 .photo-btn input,
 .photo-btn i{    
     position: absolute; /*30x28*/

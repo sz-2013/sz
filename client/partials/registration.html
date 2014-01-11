@@ -1,6 +1,6 @@
 <div class="big-bordered-box">	
 	<div class="big-bordered-box-inner">
-		<form class="form-group" role="form" name="general" ng-show="regStage1">
+		<form class="form-group no-margin-bottom" role="form" name="general" ng-show="regStage1">
 			<h2 class="text-right">Registration</h2>
 			<div class="form-group" ng-show="loginAlert.non_field_errors">
 				<p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
@@ -54,15 +54,15 @@
 					<span ng-repeat="alert in loginAlert.gender">{{alert}}<br></span>
 				</div>
 				<div class="btn-group  btn-group-justified " data-toggle="buttons">
-					<label class="btn" ng-class="myClasses.btn.radio" ng-click="user.gender=f" ng-disabled="inProgress" >
+					<label class="btn btn-default" ng-click="user.gender=f" ng-disabled="inProgress" >
 						<input type="radio" name="options" id="f">
 							<i class="fa fa-female"></i>
 					</label>
-					<label class="btn" ng-class="myClasses.btn.radio" ng-click="user.gender=m" ng-disabled="inProgress" >
+					<label class="btn btn-default" ng-click="user.gender=m" ng-disabled="inProgress" >
 						<input type="radio" name="options" id="m">
 							<i class="fa fa-male"></i>
 					</label>
-					<label class="btn active" ng-class="myClasses.btn.radio" ng-click="user.gender=u" ng-disabled="inProgress" >
+					<label class="btn btn-default active" ng-click="user.gender=u" ng-disabled="inProgress" >
 						<input type="radio" name="options" id="u" >
 							<i class="fa fa-smile-o"></i>
 					</label>
@@ -79,7 +79,7 @@
 					<span ng-repeat="alert in loginAlert.race">{{alert}}</span>
 				</div>
 				<div class="btn-group  btn-group-justified " data-toggle="buttons">
-					<label class="btn" ng-class="myClasses.btn.radio" ng-repeat="r in races" ng-click="user.race=r" ng-disabled="inProgress" >
+					<label class="btn btn-default" ng-repeat="r in races" ng-click="user.race=r" ng-disabled="inProgress" >
 						<input type="radio" name="options">{{r.name}}
 					</label>				
 				</div>			
@@ -123,6 +123,6 @@
 		<div ng-show="!regStage1" ng-include src='partials.regConfirm' class="col-lg-10 col-lg-push-1"></div>
 	</div>
 </div>
-<div class="main-btn-group">
-	<button type="submit" class="btn" ng-class="myClasses.btn.mainBig" ng-click="registration()" ng-disabled="inProgress" >Do it!</button>
+<div class="margin-top-sm">
+	<button type="submit" class="btn btn-primary btn-block" ng-click="registration()" ng-disabled="inProgress" >Do it!</button>
 </div>

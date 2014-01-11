@@ -15,7 +15,6 @@ function MasterPageController($scope, $cookies, $http, $location, session, stati
     var races = staticValueService.races({}, function(r) {
         $scope.races = r.data.map(function(race){return randomSets(race) }); 
     });
-    var categories = staticValueService.categories({}, function(r) { $scope.categories = r.data; });
     var genders = staticValueService.genders({}, function(r) { $scope.genders = r.data; });
     var faces = staticValueService.faces({}, function(r) { 
         $scope.faces = r.data; 
@@ -226,13 +225,13 @@ function RegistrationConfirmation($scope, userService){
 }
 
 
-function MessageEditorController($scope, messagePreviewService, $routeParams, $location, placeService){  
+function MessageAddController($scope, messagePreviewService, $routeParams, $location, placeService){  
     $scope.setHeader("message")  
     if ($routeParams.placeId){
         placeService.get({placeId: $routeParams.placeId}, function(r){ $scope.messagePlace = r; })  
     }
     else{
-        /*$scope.$emit("setShowLoader", true)*/
+        $scope.$emit("setShowLoader", true)
         var params = {}
         $scope.$watch('coordinates',function(){     
             if($scope.coordinates){                        
@@ -243,11 +242,11 @@ function MessageEditorController($scope, messagePreviewService, $routeParams, $l
                 /*params.latitude = 0
                 params.longitude = 0*/
                 params.radius = 250
-              /*  var places_list = placeService.searchInVenues(params, function(r) { 
+                var places_list = placeService.searchInVenues(params, function(r) { 
                     $scope.places_list = r.places
                     $scope.showPlaceSelect = true;
                     $scope.$emit("setShowLoader", false)
-                }); */   
+                });    
             }        
         })   
     }    

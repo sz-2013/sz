@@ -1,20 +1,26 @@
-body.modal-open{
-    margin-right: 0
-}
+body.modal-open{margin-right: 0}
+
 
 html{font-size: 100% }
-body{text-align: center}
+
+
 a{color:#7f8c8d; }
 a:hover{color:#34495e; }
+
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
 body {
     font-family: 'Lato', sans-serif;    
 }
+
+
 body{
+    text-align: center;
     background-color: #FBFBFB;
     border:none;
 }
+
+
 h2{
     font-size: 20px;
     line-height: 20px;    
@@ -22,27 +28,30 @@ h2{
     margin-bottom: 10px;
 }
 
+/*
 #wrap{
     position: relative;
-    /*z-index: 1;*/
-    /*top:0;
-    left:0;*/
-}
+}*/
+
 
 footer{
     font-weight: bold;
     color: #bdc3c7;
 }
+
+
 header{
-   /* margin-right: 15px;
-    padding-left: 7px;   */ 
-    /**/
     padding-bottom: 5px;
 }
-
 .header-shadow{
-    box-shadow: 0 4px 2px -2px #ecf0f1;
+    /*box-shadow: 0 4px 2px -2px #ecf0f1;*/
+    /*border-bottom: 1px solid #485a6b;
+    box-shadow: 0 4px 2px -2px rgba(72,90,107,0.5)*/
+    /*border-bottom: 1px solid #CCC;*/
+    box-shadow: 0 4px 2px -2px #CCC;
 }
+
+
 #loader{
     position: absolute;
     background: rgba(250,250,250,0.9);
@@ -58,13 +67,19 @@ header{
     position: absolute;
     top:50%;    
 }
+
+
 #main{
     padding-top: 60px;    
 }
+
+
 .container {
     background-color: transparent;
     max-width: 800px;
 }
+
+
 .achivment{
     position: fixed;
     z-index: 1040;
@@ -92,7 +107,6 @@ header{
 
 .big-bordered-box{  
     background-color: white;
-    margin-bottom: 1.5em;
     padding: 0.5em;
     border:1px solid #CCC;
     box-shadow:0 0 4px #AAA;
@@ -185,6 +199,7 @@ header{
     right: 0;
     left:0;
     padding: 0 1.1em;
+    padding-bottom: 0.8em;
 }
 
 
@@ -196,13 +211,25 @@ header{
     text-overflow:ellipsis;
 }
 
+
 .help-block{
     text-align: justify;
 }
 
-.margin-left-sm{
-    margin-left: 5px;
-}
-.margin-top-sm{
-    margin-top: 5px;   
+
+.no-margin-bottom{margin-bottom: 0;}
+
+
+.margin-top-sm{margin-top: 0.5em;}
+.margin-left-sm{margin-left: 0.5em;}
+.margin-bottom-sm{margin-bottom: 0.5em;}
+
+
+.margin-left-n{margin-left: 1.5em;}
+.margin-bottom-n{margin-bottom: 1.5em;}
+
+
+.paddin-X-normal{
+    padding-left: 1.5em;
+    padding-right: 1.5em;
 }
