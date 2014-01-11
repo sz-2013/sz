@@ -308,6 +308,19 @@ class UserCreatePostTest(unittest.TestCase):
         pass
 
 
+########## PLACE
+
+
+class PlaceCreateTest(unittest.TestCase):
+    pass
+
+
+########## Message
+
+class MessageCreateTest(unittest.TestCase):
+    pass
+
+
 """Views"""
 
 ########## USERS
