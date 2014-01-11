@@ -21,10 +21,8 @@
     <link rel="stylesheet" href="../static/sz/css/colors.css">
     <link rel="stylesheet" href="../static/sz/css/new-2.css">
     <link rel="stylesheet" href="../static/sz/css/mainnav.css">
-    <link rel="stylesheet" href="../static/sz/css/new-fonts.css">
     <link rel="stylesheet" href="../static/sz/css/footer-to-down.css">
     <link rel="stylesheet" href="../static/sz/css/buttons.css">
-    <link rel="stylesheet" href="../static/sz/css/selectplace.css">
     <link rel="stylesheet" href="../static/sz/css/nganimate.css">
     <link rel="stylesheet" href="../static/sz/css/message.css">
 
@@ -38,8 +36,7 @@
     <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
         <div id="wrap" >                    
         <header class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container" ng-include src="headerCurrent">                    
-            </div>
+            <div class="container" ng-include src="headerCurrent"></div>
         </header>
         <div  ng-view class="clearfix container" id="main" ng-show="showContent"></div>
         <footer class="navbar navbar-inverse navbar-static-bottom">
@@ -93,23 +90,28 @@
 
     <script src="../static/libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
     <script src="../static/libs/jquery/jquery.tinyscrollbar.min.js"></script>
+
     <script src="../static/libs/bootstrap-3.0.0/bootstrap/js/bootstrap.min.js"></script>        
     <script src="../static/libs/bootstrap-3.0.0/js/carousel.js"></script>        
+
     <script src="../static/sz/js/services.js"></script>
+
     <script src="../static/sz/js/directives.js"></script>
+    <script src="../static/sz/js/sidebar-directive.js"></script>
+    <script src="../static/sz/js/slidesubpage-directive.js"></script>
+    <script src="../static/sz/js/gamemap-directive.js"></script>
+    
     <script src="../static/sz/js/controllers.js"></script>
+    <script src="../static/sz/js/auth-controllers.js"></script>
+    <script src="../static/sz/js/message-controllers.js"></script>
+
     <script src="../static/sz/js/app.js"></script>
 
     <script src="../static/libs/leafletjs/0.5.1/leaflet.js"></script>
     <script src="../static/sz/js/leaflet-directive.js"></script>
 
     <script src="../static/libs/raphael/2.1.2/raphael-min.js"></script>
-    <script src="../static/sz/js/raphael-directive.js"></script>    
-
-    <script src="../static/sz/js/sidebar-directive.js"></script>
-    <script src="../static/sz/js/slidesubpage-directive.js"></script>
-    <script src="../static/sz/js/gamemap-directive.js"></script>
-    
+    <script src="../static/sz/js/raphael-directive.js"></script>       
     
 </body>
 

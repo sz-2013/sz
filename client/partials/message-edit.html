@@ -1,121 +1,134 @@
-<div class="modal fade" id="selectPlace" tabindex="-1" role="dialog" aria-labelledby="selectAPlace" aria-hidden="true" sz-select-place show="showPlaceSelect">
+<div aria-hidden="true" aria-labelledby="selectAPlace" class="modal fade"
+    id="messageAdd-selectPlace" role="dialog" show="showPlaceSelect"
+    sz-select-place tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content dark-nav">
             <div class="dark-nav-header">
-                <button type="button" class="btn btn-link pull-left close-modal" data-dismiss="modal" aria-hidden="true">
+                <button aria-hidden="true" data-dismiss="modal"
+                    class="btn btn-link pull-left close-modal" type="button">
                     <i class="fa fa-times fa-2x"></i>
                 </button>
+
                 <h2>Select a place</h2>
+
                 <!-- <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-search fa-fw"></i></span>
                     <input type="text" class="form-control input-sm" placeholder="Search a place..">
                 </div>'+ -->
-            </div>
+            </div><!-- /.dark-nav .dark-nav-header -->
+
             <ul>
-                <li ng-repeat="place in places_list" data-placeitem="{{place.place_id}}">
+                <li data-placeitem="{{place.place_id}}" ng-repeat="place in places_list">
                     <span>
                         <div class="item-main">
-                            <button type="button" class="btn btn-link pull-right btn-dark" ng-click="showDetail(place.place_id)">
+                            <button class="btn btn-link pull-right"
+                                ng-click="showDetail(place.place_id)" type="button">
                                 <i class="fa fa-arrow-right fa-2x"></i>
                             </button>
-                            <div ng-click="$emit('selectItem', place)" data-dismiss="modal">
+
+                            <div data-dismiss="modal" ng-click="$emit('selectItem', place)">
                                 <div class="item-name">{{place.place_name}}</div>
                                 <div class="item-address">{{place.place_address}}</div>
                             </div>
-                        </div>
+                        </div><!-- /.item-main -->
+
                         <div class="item-detail">
-                            <button type="button" class="btn btn-link pull-left btn-dark" ng-click="hideDetail(place.place_id)">
+                            <button class="btn btn-link pull-left"
+                                ng-click="hideDetail(place.place_id)" type="button">
                                 <i class="fa fa-arrow-left fa-2x"></i>
                             </button>
                             <div>detail stuff</div>
-                        </div>
+                        </div><!-- /.item-detail -->
                     </span>
                 </li>
-            </ul>
-        </div>
+            </ul><!-- /.dark-nav ul -->
+        </div><!-- /.dark-nav -->
     </div>
-</div>
+</div><!-- /#messageAdd-selectPlace -->
 
-<div class="modal fade " id="editPhoto" tabindex="-1" role="dialog" aria-hidden="true" sz-edit-photo show="showEditPhoto">
+
+<div aria-hidden="true" aria-labelledby="selectAPlace" class="modal fade"
+    id="messageAdd-editPhoto" role="dialog" show="showEditPhoto"
+    sz-edit-photo tabindex="-1" >
     <div class="modal-dialog">
         <div class="modal-content dark-nav ">
             <div class="dark-nav-header">
-                <button type="button" class="btn btn-link pull-left close-modal"
-                    data-dismiss="modal" aria-hidden="true">
+                <button aria-hidden="true" data-dismiss="modal"
+                    class="btn btn-link pull-left close-modal" type="button">
                     <i class="fa fa-times fa-2x"></i>
                 </button>
-                <h2>Edit a photo</h2>
-            </div>
-            <ul><li><span class="photo-container text-center">
-                <div id="photoPrev"></div>
-            </span></li></ul>
-            <div class="photo-menu-sub animate-fall-down"
-                ng-show="showPhotoMenuSub" ng-init="showPhotoMenuSub=false">
-                <a class="btn btn-link" ng-repeat="f in faces"><img src={{f.face}}></a>
-            </div>
-            <div class="btn-group btn-group-justified photo-menu">
-                <a class="btn btn-link" ng-click="showPhotoMenuSub=!showPhotoMenuSub" ng-class="{'active' : showPhotoMenuSub}">
-                    <i class="fa fa-smile-o fa-2x"></i>
-                </a>
-                <a class="btn btn-link">
-                    <i class="fa fa-plus fa-2x"></i>
-                </a>
-                <a class="btn btn-link">
-                    <i class="fa fa-minus fa-2x"></i>
-                </a>
-            </div>
-            <div class="dark-nav-footer">
-                <button type="button" class="btn btn-primary btn-block"
-                    data-dismiss="modal">
-                    <i class="fa fa-check fa-2x"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="big-bordered-box" id="messageMain" sz-message-box>  
+                <h2>Edit a photo</h2>
+            </div><!-- /.dark-nav .dark-nav-header -->
+
+            <ul><li><span class="text-center">
+                <div class="photo-container"></div>
+            </span></li></ul><!-- /.dark-nav ul -->
+
+            <div class="photo-menu-sub animate-fall-down"
+                ng-show="showPhotoMenuSub">
+                <i class="face-preview" ng-repeat="f in faces">
+                    <img ng-src={{f.face}}></i>
+            </div> <!-- ./photo-menu-sub -->
+
+            <div class="dark-nav-footer" >
+                <div class="btn-group btn-group-justified photo-menu">
+                    <a class="btn btn-link" ng-class="{'active' : showPhotoMenuSub}"
+                        ng-click="showPhotoMenuSub=!showPhotoMenuSub">
+                        <i class="fa fa-smile-o fa-2x"></i>
+                    </a>
+
+                    <a class="btn btn-link">
+                        <i class="fa fa-plus fa-2x"></i>
+                    </a>
+
+                    <a class="btn btn-link">
+                        <i class="fa fa-minus fa-2x"></i>
+                    </a>
+                </div><!-- /.dark-nav .photo-menu -->
+
+                <button data-dismiss="modal" class="btn btn-primary btn-block"
+                    id="messageAdd-editPhoto-submit" type="button">
+                    <i class="fa fa-check fa-2x"></i>
+                </button><!-- /#messageAdd-editPhoto-submit -->
+            </div><!-- /.dark-nav .dark-nav-footer -->
+        </div><!-- /.dark-nav -->
+    </div>
+</div><!-- /#messageAdd-editPhoto -->
+
+
+<div class="big-bordered-box" id="messageAdd" sz-message-box>  
     <div class="big-bordered-box-inner" >        
         <form role="form">            
-            <div class="form-group">
-                <textarea class="form-control" rows="2" placeholder="Write some text or pick photo for post or set your emotion. Or all." ng-model="text" sz-auto-resize-text-area="text" ></textarea>
-            </div> 
+            <div class="form-group" id="messageAdd-textarea">
+                <textarea class="form-control" rows="2"
+                    placeholder="Write some text or pick photo for post or set your emotion. Or all."
+                    ng-model="text" sz-auto-resize-text-area="text" ></textarea>
+            </div> <!-- /#messageAdd-textarea -->
+
             <div class="box-inner-bottom">
-                <div class="text-right">
+                <div class="text-right" id="messageAdd-nav">
                     <div class="photo-btn btn btn-link pull-left">
                         <i class="fa fa-camera fa-2x"></i>
                         <input type="file" name="photo" sz-file-model="photo">
                     </div>
-                    <a class="btn btn-link" ng-click="showPlaceSelect=true" ng-class="{'active':messagePlace}">
+                    <a class="btn btn-link" ng-click="showPlaceSelect=true"
+                        ng-class="{'active':messagePlace}">
                         <i class="fa fa-map-marker fa-2x"></i>
                     </a>
-                </div>
-                <div id="messageTags" ng-show="messageCategoriesList.length" class="text-left">
-                    <div ng-repeat="cat in messageCategoriesList" class="catDiv cat-{{cat.name}}"><i class="catDivI"></i><span></span></div>
-                </div>
-                <div ng-show="messagePlace" id="messagePlace" class="text-right">
-                    <h2 class="overflow-hidden">{{messagePlace.place_name}}</h2>
-                    <p ng-show="messagePlace.place_address" class="overflow-hidden">{{messagePlace.place_address}}</p>
-                </div>
-            </div>
+                </div> <!-- /#messageAdd-nav -->
 
-            <!-- <div class="form-group">
-                <input type="file" name="photo" sz-file-model="photo">                    
-            </div>   -->
-            <!-- <div class="form-group" style="text-align:center;display:none" id="photoBigCont">
-                <div  style="max-width:300px;max-height:300px;display:inline-block" class="overflow-hidden">
-                    </div>
-                        <button type="button" class="btn btn-link pull-left" ng-click="remove()">
-                            <i class="fa fa-times"></i>
-                        </button>
-                        <p style="padding-top:3px;font-weight:bold" class="overflow-hidden">
-                            <span id="photoPrevName"></span>
-                        </p>
-                    </div>
-                    <div  id="photoPrev"> </div>
-                </div>      
-            </div> -->
+                <div class="text-right" id="messageAdd-messagePlace" ng-show="messagePlace">
+                    <h2 class="overflow-hidden">{{messagePlace.place_name}}</h2>
+                    <p class="overflow-hidden" ng-show="messagePlace.place_address">
+                        {{messagePlace.place_address}}</p>
+                </div> <!-- /#messageAdd-messagePlace -->
+
+                <div id="messageAdd-photoPrev">
+                    <!-- <img src="http://192.168.0.101:8080/media/photos/2013/10/10/1.jpg" class="img-responsive" > -->
+                </div>
+            </div><!-- /.box-inner-bottom -->
         </form>
-    </div>
-</div>
+    </div><!-- /.big-bordered-box-inner -->
+</div><!-- /#messageAdd.big-bordered-box -->
 

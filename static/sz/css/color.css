@@ -83,37 +83,6 @@ textarea:focus{
     background: transparent;
 }
 
-/*collapseMenu*/
-#collapseMenu{
-    top:56px;
-    z-index: 1500;
-    position: fixed;
-    width: 100%;
-    text-align:left;
-    overflow:hidden;
-    max-height:0;
- /*   box-shadow:0 0 4px #AAA;
-    background:#333;*/
-    padding:0 5px;
-    margin-bottom:0;
-/*     margin-top:-20px; */
-}
-
-#collapseMenu>ul{
-    margin-top:5px;
-    margin-bottom:5px;
-}
-#collapseMenu>ul>li{border-bottom:1px solid #1A1A1A}
-#collapseMenu>ul>li:last-child{border:none}
-#collapseMenu>ul>li>a{color:#999;cursor:pointer;}
-#collapseMenu>ul>li>a:hover{color:white;text-shadow:none;background-color: #202020;}
-
-#collapseMenu>ul>li>a>div{
-    padding:2px 0;
-    padding-left:5px
-}
-
-
 /*Main elements*/
 .content{
     width:800px;
@@ -159,22 +128,10 @@ textarea:focus{
 
 
 
-@media screen and (max-width: 1000px) {
-   /*#navSearch{
-        display:block;
-        width:auto;
-        margin-left:60px;
-        margin-right:25px;
-    }*/
-}
 @media screen and (max-width: 799px) and (min-width: 767px) {
     .content{width:90%;}
 
 }
 @media screen and (max-width:766px) {
     .content{width:90%;}
-    #collapseMenu{
-        margin-right:-20px;
-        margin-left:-20px;
-    }
 }

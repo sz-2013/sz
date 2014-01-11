@@ -167,24 +167,6 @@ label{
 	background-color:transparent;
 	box-shadow: none;
 }
-#skillsDescr{
-	float: left;
-	width: 5em;	
-}
-#skillsDescr span{
-	display: block;
-	float:left;
-	text-align: left;
-}
-.progress-bar{
-	text-align: left;
-	box-shadow: none;
-	border-radius: 0 5px 5px 0;
-}
-.progress-bar>span{
-	display: inline-block;
-	margin-left: 1.5em;
-}
 
 form{
 	text-align: justify;

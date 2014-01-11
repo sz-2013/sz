@@ -53,19 +53,29 @@ angular.module('sz.client.directives', [])
         //show preview for uploaded photo
         //and show photo modal window
         return function(scope, element, attrs) {
-            var $photoCont = document.getElementById('photoPrev');            
+            function setImgMaxH(){
+                var photoH = $(window).height() - 190;
+                var h = (photoH > 200) ? photoH : 200
+                $photoCont.children('img').css('maxHeight', h + 'px')
+                return h + 'px'
+            }
+            var $photoCont = $('.photo-container');
+            $(window).resize(function(){setImgMaxH});
             scope.$watch(attrs.szFileModel, function() {
                 angular.element(element[0]).bind('change', function(){                    
                     if (angular.isUndefined(element[0].files))
                     {throw new Error("This browser does not support HTML5 File API.");}
                     if (element[0].files.length == 1){                        
+                        scope[attrs.szFileModel] = element[0].files[0]
                         var photo = element[0].files[0];
                         if (photo.type.match('image.*')) {
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {
                                 return function(e) {
-                                    $photoCont.innerHTML = ['<img src="', e.target.result,
-                                                        '" title="', escape(photoName), '" style="width:100%"/>'].join('');
+                                    $photoCont.html(
+                                        ['<img src="', e.target.result, '" title="',
+                                          escape(photo.name), '"/>'].join(''));
+                                    setImgMaxH()
                                 };
                             })(photo);
                             reader.readAsDataURL(photo);                            

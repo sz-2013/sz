@@ -24,7 +24,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})
         /*.when('/places/select/:placeId', {templateUrl: 'partials/place-select.html', controller: PlaceSelectionController})*/
         .when('/messages/edit/', {templateUrl: 'partials/message-edit.html', controller: MessageAddController})
-        .when('/messages/:previewId/publish', {templateUrl: 'partials/message-pub.html', controller: MessagePublisherController})
+        /*.when('/messages/:previewId/publish', {templateUrl: 'partials/message-pub.html', controller: MessagePublisherController})*/
         .when('/feed', {templateUrl: 'partials/news-feed.html', controller: NewsFeedController})
 
         .when('/raphael', {templateUrl: 'raphael.html', controller: RaphaelController})

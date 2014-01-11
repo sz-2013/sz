@@ -11,14 +11,11 @@
 }
 
 .btn-primary,
-.btn-primary:hover, .btn-primary:active, .btn-primary.active,
-.btn-primary:focus, .btn-primary.active,
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus, .btn-primary.active,
 .btn-success,
-.btn-success:hover, .btn-success:active, .btn-success.active,
-.btn-success:focus, .btn-success.active,
+.btn-success:hover, .btn-success:active, .btn-success:focus, .btn-success.active,
 .btn-link,
-.btn-link:hover, .btn-link:active, .btn-link.active,
-.btn-link:focus, .btn-link.active{
+.btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link.active{
     background-color: transparent;
     border: none;
     padding: 0;
@@ -32,8 +29,7 @@
     color:#485a6b;    
     text-decoration: none solid rgb(127, 140, 141);
 }
-.btn-primary:hover, .btn-primary:active, .btn-primary.active,
-.btn-primary:focus, .btn-primary.active{
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus, .btn-primary.active{
     /*color:#2c3e50;*/
     color: #263545;
 }
@@ -42,8 +38,7 @@
 .btn-success{
     color:#12856e;
 }
-.btn-success:hover, .btn-success:active, .btn-success.active,
-.btn-success:focus, .btn-success.active{
+.btn-success:hover, .btn-success:active, .btn-success:focus, .btn-success.active{
     color:#485a6b;
 }
 
@@ -51,8 +46,7 @@
     color: #7f8c8d;
     margin-bottom: 0;
 }
-.btn-link:hover, .btn-link:active, .btn-link.active,
-.btn-link:focus, .btn-link.active{
+.btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link.active{
     color:#2c3e50;
 }
 
@@ -66,11 +60,21 @@ header .btn:focus, header .btn.active{
 }*/
 
 
-.dark-nav .btn-dark{
-    color: #34495e;
+.dark-nav .btn-link{
+    color: #485a6b;
     text-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
+.dark-nav .btn-link:hover, .dark-nav .btn-link:active, .dark-nav .btn-link:focus, .dark-nav .btn-link.active{
+    color: #bdc3c7;
+}
 
+
+.dark-nav .btn-primary{
+    color:#ccc;
+}
+.dark-nav .btn-primary:hover, .dark-nav .btn-primary:active, .dark-nav .btn-primary:focus, .dark-nav .btn-primary.active{
+    color:#fff;
+}
 
 /*.main-btn-group{padding: 0 1em;}*/
 

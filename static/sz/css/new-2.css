@@ -28,10 +28,10 @@ h2{
     margin-bottom: 10px;
 }
 
-/*
+
 #wrap{
     position: relative;
-}*/
+}
 
 
 footer{
@@ -44,10 +44,6 @@ header{
     padding-bottom: 5px;
 }
 .header-shadow{
-    /*box-shadow: 0 4px 2px -2px #ecf0f1;*/
-    /*border-bottom: 1px solid #485a6b;
-    box-shadow: 0 4px 2px -2px rgba(72,90,107,0.5)*/
-    /*border-bottom: 1px solid #CCC;*/
     box-shadow: 0 4px 2px -2px #CCC;
 }
 
@@ -100,8 +96,19 @@ header{
     border:1px solid #CCC;
     background-color: #fff;
 }
-.achivment i{
-    color:#f1c40f;
+.achivment i{color:#f1c40f;}
+
+
+.face-preview{
+    display: inline-block;
+    -webkit-transition: all 0.1s linear;
+}
+.face-preview:hover,.face-preview.active{box-shadow: 0 -4px 2px -2px #ccc;}
+.face-preview img{
+    max-height: 100%;
+    margin-top: 0.3em;
+    display: inline-block;
+    cursor: pointer;
 }
 
 
@@ -200,6 +207,31 @@ header{
     left:0;
     padding: 0 1.1em;
     padding-bottom: 0.8em;
+}
+
+/*Registration*/
+#registration-raceDescription-blazon{
+    max-width:100%;
+    margin:15px 0;
+    width:100px; 
+}
+#registration-raceDescription-stats-names{
+    float: left;
+    width: 5em; 
+}
+#registration-raceDescription-stats-names span{
+    display: block;
+    float:left;
+    text-align: left;
+}
+.registration-raceDescription-stats-value .progress-bar{
+    text-align: left;
+    box-shadow: none;
+    border-radius: 0 5px 5px 0;
+}
+.registration-raceDescription-stats-value .progress-bar>span{
+    display: inline-block;
+    margin-left: 1.5em;
 }
 
 
