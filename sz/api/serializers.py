@@ -123,6 +123,12 @@ class RegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password1 = serializers.CharField(required=True)
     password2 = serializers.CharField(required=True)
+    # race = serializers.ChoiceField(required=True, choices=[
+    #     (race.pk, race.name) for race in models.Races.objects.all()
+    # ])
+    # gender = serializers.ChoiceField(required=True, choices=[
+    #     (gender.pk, gender.name) for gender in models.Gender.objects.all()
+    # ])
     race = serializers.IntegerField(required=True)
     gender = serializers.IntegerField(required=True)
 

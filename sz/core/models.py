@@ -487,13 +487,15 @@ class Place(models.Model):
     def get_string_date(self):
         return get_string_date(self.date_is_active)
 
+    def get_last_message_date(self):
+        date = self.message_set.all() and \
+            self.message_set.order_by('-date')[0].date
+        return get_string_date(date)
+
     def get_gamemap_position(self):
         if not self.gamemap_position:
             return None
         return map(lambda pos: int(pos), self.gamemap_position.split(','))
-
-    def get_owner_race(self):
-        return self.owner.race if self.owner else None
 
     def create_in_engine(self):
         self.is_active = True
@@ -508,8 +510,11 @@ class Place(models.Model):
     #     owner_id =
     #     return
 
+    def get_owner_race(self):
+        return self.owner.race if self.owner else None
+
     def is_owner(self, user):
-        if not user or not self.user:
+        if not user or not self.owner:
             return False
         if isinstance(user, int):
             user_id = user
@@ -517,7 +522,7 @@ class Place(models.Model):
             user_id = user.id
         else:
             return False
-        return user.id == self.owner.id
+        return user_id == self.owner.id
 
     def __unicode__(self):
         return u"%s" % self.name + (
@@ -546,9 +551,11 @@ class MessageBase(models.Model):
         max_length=1024, null=False,
         blank=True, verbose_name=u"сообщение")
 
-    user = models.ForeignKey(User, verbose_name=_('user'))
+    user = models.ForeignKey(
+        User, verbose_name=_('user'))
 
-    place = models.ForeignKey(Place, verbose_name=u"место")
+    place = models.ForeignKey(
+        Place, verbose_name=u"место")
 
     def get_photo_path(self, filename):
         ext = filename.split('.')[-1]

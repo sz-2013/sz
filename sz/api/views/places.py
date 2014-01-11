@@ -7,6 +7,7 @@ from sz.api import serializers, forms, posts
 from sz.api.response import Response as sz_api_response
 from sz.api.views import SzApiView, news_feed_service,\
     place_service, gamemap_service
+from sz.core import models
 
 
 class PlaceRoot(SzApiView):
@@ -21,13 +22,13 @@ class PlaceRoot(SzApiView):
             place=item['place'], distance=item['distance'], user=user)
         return serializers.place_detail_serialiser(**params)
 
-    def validate_req_params(self, request, format=None):
+    def validate_req_params(self, query, email=None):
         params = self.validate_and_get_params(
-            self.form, request.QUERY_PARAMS)
+            self.form, query)
         if not settings.LEBOWSKI_MODE_TEST:
-            params['user'] = request.user.email
+            params['user'] = email   # @TODO(kunla): validate emil here?
         else:
-            params['user'] = request.QUERY_PARAMS.get('email')
+            params['user'] = query.get('email')
         params['limit'] = self.LIMIT
         s = serializers.UserSerializer(data={"email": params['user']})
         user = s.object if s.is_valid() else None
@@ -62,8 +63,8 @@ class PlaceVenueExplore(PlaceRoot):
     """
     form = forms.PlaceExploreRequestForm
 
-    def get(self, request, format=None):
-        params, creator = self.validate_req_params(request)
+    def explore(self, **kwargs):
+        params, creator = self.validate_req_params(**kwargs)
         places_list = place_service.explore_in_venues(**params)
         if places_list:
             bl_data = serializers.UserStandartDataSerializer(
@@ -74,16 +75,16 @@ class PlaceVenueExplore(PlaceRoot):
                 lambda p: serializers.place_detail_serialiser(
                     place=p, user=creator),
                 places_list)
-            engine_data = posts.places_create(bl_data)
+            # engine_data = posts.places_create(bl_data)
 
             data = {}
             data['data'] = dict(user=creator, places_explored=len(places_list))
-            data['status'] = 201
+            data['status'] = status.HTTP_201_CREATED
             gamemap_service.update_gamemap(params)
 
             # data['data'] = dict(user=engine_data["data"].get("user", {}))
             # data['status'] = engine_data.get("status")
-            # if engine_data['status'] == 201:
+            # if engine_data['status'] == status.HTTP_201_CREATED:
             #     for p_data in engine_data['data'].get('places', []):
             #         s = serializers.PlaceStandartDataSerializer(data=p_data)
             #         if s.is_valid():
@@ -94,9 +95,15 @@ class PlaceVenueExplore(PlaceRoot):
             # data['places_explored'] = val
             # if settings.LEBOWSKI_MODE_TEST:
             #     data['bl'] = engine_data
-            #     data['status'] = 201
-            return sz_api_response(**data)
-        return sz_api_response({})
+            #     data['status'] = status.HTTP_201_CREATED
+            return data
+        return {}
+
+    def get(self, request, format=None):
+        response = self.explore(
+            query=request.QUERY_PARAMS,
+            email=request.QUERY_PARAMS.get('email'))
+        return sz_api_response(**response)
 
 
 class PlaceVenueSearch(PlaceRoot):
@@ -109,9 +116,11 @@ class PlaceVenueSearch(PlaceRoot):
     form = forms.PlaceSearchRequestForm
 
     def get(self, request, format=None):
-        params, user = self.validate_req_params(request)
+        kwargs = dict(
+            query=request.QUERY_PARAMS,
+            email=request.QUERY_PARAMS.get('email'))
+        params, user = self.validate_req_params(**kwargs)
         places_list = place_service.search_in_venue(**params)
-        print len(places_list)
         place_response = map(
             lambda item: self._serialize_item(item, user), places_list)
         data = dict(places=place_response)
