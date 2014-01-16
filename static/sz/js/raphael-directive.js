@@ -1,46 +1,231 @@
-var raphaelDirective = angular.module("raphael-directive", []);
-
-raphaelDirective.directive('raphael', [
-    '$http', '$log', '$parse', '$rootScope', function ($http, $log, $parse, $rootScope) {
-    var defaults = { 
-    	images:{
-    		src: 'img/photo.jpg',
-            x:0,
-            y:0,
-            width:10,
-            height:10,
-            t:300
-    	},
-    	faces:{
-    		src:'img/face.png',
-    		x:0,
-            y:0,
-            width:50,
-            height:50,
-            minh:50,
-            minw:50,
-            step:15
-    	},
-    	circles:{
-    		x:0,
-            y:0,
-            opacity: 1,
-            fill:'#f00',
-            stroke:'#fff',
-            width:10,
-            height:10,
-    	},
-        canvas: {
-            x: 0,
-            y: 0,
-            width: 1,
-            height:1,
-            center:true
+var paperHelper = function($scope){
+    $scope.$on('$routeChangeStart', function(event, routeData){if($scope.paper)$scope.paper.remove();});
+    function _isSafeToApply() {
+        var phase = $scope.$root.$$phase;
+        return !(phase === '$apply' || phase === '$digest');
+    }
+    return {
+        position:function(elem){
+            //get absolute position elem in window
+            //box - position relatively browser
+            var box = elem.getBoundingClientRect(),
+                body = document.body
+                docElem = document.documentElement,
+                scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
+                scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+                clientTop = docElem.clientTop || body.clientTop || 0,
+                clientLeft = docElem.clientLeft || body.clientLeft || 0,
+                y = box.top +  scrollTop - clientTop,
+                x = box.left + scrollLeft - clientLeft;
+            return { y: Math.round(y), x: Math.round(x), width:box.width, height: box.height}
+        },
+        mouse:function(e){            
+            var documentScroll = document.documentElement && document.documentElement.scrollTop;
+            var top =  (documentScroll!==undefined) ? documentScroll : document.body.scrollTop;
+            if($scope.ismobile) var e = e.touches.item(0);
+            var position = this.position($scope.svg)
+            var mouse = {
+                x: e.clientX - position.x,
+                y: e.clientY - position.y + top 
+            }
+            return mouse
+        },
+        safeApply: function(fn) {
+            if (!_isSafeToApply()) {
+                $scope.$eval(fn);
+            } else {
+                $scope.$apply(fn);
+            }
         }
-    };
+    }    
+}
 
-    
-    var str_inspect_hint = 'Add testing="testing" to <raphael> tag to inspect this object';
+
+
+angular.module('sz.raphael.directives', [])
+    .directive('szRaphaelModal', function(){
+        return function(scope, element, attrs){
+            console.log(element[0].getBoundingClientRect())
+            var helper = paperHelper(scope)
+            function setModal(val){
+                console.log(element[0].getBoundingClientRect())
+                helper.safeApply(function(){
+                    scope[attrs.szRaphaelModal] = val;
+                });
+            }
+            element
+                .on('shown.bs.modal', function (e) {setModal(true); })
+                .on('hidden.bs.modal', function (e) {setModal(false); })
+        }
+    })
+    .directive('raphaelAddFace', function($interval){
+        // Runs during compile
+        return {
+            // name: '',
+            // priority: 1,
+            // terminal: true,
+            scope: {
+                src:'=src',
+                target:'=target',
+                action:'=action',
+                ismobile:'=ismobile',
+                parent:'=parent',
+                start:'=start'
+            }, // {} = isolate, true = child, false/undefined = no change
+            // controller: function($scope, $element, $attrs, $transclude) {},
+            // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
+            restrict: "E", // E = Element, A = Attribute, C = Class, M = Comment
+            /*template: '<div class="angular-raphael-canvas"></div>',*/
+            // templateUrl: '',
+            replace: true,
+            transclude: true,
+            // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, elm, attrs){}})),
+            link: function($scope, element, attrs, controller) {
+                var helper = paperHelper($scope);
+                var facesList = new Array;
+                var parent = document.getElementById($scope.parent)
+                var targetElement = document.getElementById($scope.target);                  
+                $scope.paper = Raphael(parent, $(parent).width(), $(parent).height());
+                $("svg").attr("id","raphaelAddFace-Svg").css({position:'absolute'});
+                $scope.svg = document.getElementById('raphaelAddFace-Svg')
+                var eventstart = $scope.ismobile ? 'touchstart' : 'mousedown';
+                $scope.svg.addEventListener(eventstart, function(e){
+                    var mouse = helper.mouse(e);
+                    /*if(mouse.x===NaN||mouse.y===NaN) return*/
+                    /*setPaper()  */
+                    var elements = $scope.paper.getElementsByPoint(mouse.x, mouse.y);
+                    if(elements.length) return
+                    var f = photoFace(mouse.x, mouse.y, $scope.src)
+                    facesList.push(f)                        
+                    /*f.doAction()*/
+                  /*  e.stopPropagation();                        
+                    e.preventDefault();*/
+                });                      
+
+                function setPaper(){                    
+                    var box = helper.position(targetElement)
+                    console.log(targetElement.getBoundingClientRect())
+                    if(box.y<0)return
+                    $scope.paper.setSize(box.width, box.height)
+                    var targetPos = $(targetElement).position()
+                    $($scope.svg).css({left: targetPos.left + 'px', top: targetPos.top + 'px'})                    
+                }
+                $(window).resize(function(){setPaper();})
+
+                /*box.addEventListener( 'webkitTransitionEnd', 
+                    function( event ) { alert( targetElement.getBoundingClientRect().top ); }, false );*/
+
+
+                function clearPaper(){
+                    facesList.forEach(function(f){f.remove()});
+                    facesList.length = 0;
+                }
+
+                $scope.$watch('start', function(val){
+                    if(val===true) setPaper();
+                    if(val===false) clearPaper();
+                })
+
+                $scope.$watch('src', function(val){
+                    if(val!=undefined&&facesList.length)
+                        facesList.forEach(function(f){f.attr('src', val)})                
+                }, true);               
+
+                function photoFace(x, y, src){
+                    var width = 70, height  = 70, x = x - width/2, y = y - height/2;
+                    var minw = 50, minh = 50;
+                    var step = width/5, time = 700;
+                    var face = $scope.paper.image(src, x, y, width, height)
+                    face.t = time;
+                    face.step = step;
+
+                    function changeVal(dir){
+                        var dir = dir || 1;
+                        var step = face.step*dir,
+                            oldX = face.attr('x'), oldY = face.attr('y'),
+                            newW = face.attr('width') + step, newH = face.attr('height') + step,
+                            newX = oldX - step/2, newY = oldY - step/2;
+                        face.animate({width:newW, height:newH, x:newX, y:newY}, face.t, "backIn");
+                    };  
+
+                    function canEnlarge(){
+                        var left = face.attr('x'), right = face.attr('x') + face.attr('width'),
+                            top = face.attr('y'), bottom = face.attr('y') + face.attr('height');
+                        return left>0 && right<$scope.paper.width && top>0 && bottom<$scope.paper.height;
+                    }
+
+                    function canReduce(){return face.attr('height')>minh && face.attr('width')>minw}
+
+                    function removeFace(){
+                        for (var i = facesList.length - 1; i >= 0; i--) {
+                            if(facesList[i]==face){
+                                facesList.slice(i, 1)
+                                break
+                            }
+                        };                                                
+                        face.remove()
+                    }
+
+                    function moveFace(dx, dy, e){
+                        if(dx===0||dy===0)return
+                        face.stopAction()
+                        var mouse = helper.mouse(e),
+                            newX = mouse.x - face.attr('width')/2,
+                            newY = mouse.y - face.attr('height')/2;
+                        face.animate({x:newX, y:newY});
+                    }
+
+                    face.stopAction = function(e){                        
+                        //e.stopPropagation()
+                        if (face.action!==undefined) {
+                            $interval.cancel(face.action);
+                            face.action = undefined;
+                        }
+                    }
+
+                    face.doAction = function(e){
+                        //e.stopPropagation()
+                        if($scope.action===1){
+                            var can = canEnlarge;
+                            var dir = 1;
+                        }
+                        else if($scope.action===0){
+                            var can = canReduce;
+                            var dir = -1;
+                        }
+                        else{return}
+
+                        face.action = $interval(function() {
+                            if(can()) changeVal(dir);
+                            else{
+                                face.stopAction()
+                                if(dir===-1) removeFace();
+                            }
+                        }, face.t)
+                    }
+
+                    face.drag(function(dx,dy,x,y,e){moveFace(dx, dy, e)});
+                    
+
+                    if($scope.ismobile){
+                        face.touchstart(function(e){face.doAction(e)});
+                        face.touchend(function(e){face.stopAction(e)});
+                    }
+                    else{                        
+                        face.mousedown(function(e){face.doAction(e)});
+                        face.mouseup(function(e){face.stopAction(e)});
+                    }                    
+                    return face
+                }
+
+                
+            }
+        };
+    })
+
+
+    .directive('raphael', [
+    '$http', '$log', '$parse', '$rootScope', function ($http, $log, $parse, $rootScope) {
     return {
         restrict: "E",
         replace: true,
@@ -57,92 +242,6 @@ raphaelDirective.directive('raphael', [
         },
         template: '<div class="angular-raphael-canvas"></div>',
         link: function ($scope, element, attrs /*, ctrl */) {
-        	var Helpers = {
-		    	position:function(elem){    		
-		    		//box - position relatively browser
-		    		var box = elem[0].getBoundingClientRect(),
-				    	body = document.body
-				    	docElem = document.documentElement,
-				    	scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
-				    	scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
-				    	clientTop = docElem.clientTop || body.clientTop || 0,
-				    	clientLeft = docElem.clientLeft || body.clientLeft || 0,
-				    	y = box.top +  scrollTop - clientTop,
-				    	x = box.left + scrollLeft - clientLeft;
-				    return { y: Math.round(y), x: Math.round(x)}
-		    	},
-		    	mouse:function(e){
-		    		var bodyScroll = document.body.scrollTop;
-					var top =  (bodyScroll) ? bodyScroll : document.documentElement.scrollTop;					
-		        	var mouse = {
-		        		x: e.clientX - $scope.paper.x,
-		        		y: e.clientY - $scope.paper.y + top
-		        	}
-		        	return mouse
-		    	}
-		    }
-        	//функция удаления канваса при смене адреса страницы
-        	$scope.$on('$routeChangeStart', function(event, routeData){if($scope.paper)$scope.paper.remove();});
-        	var elwidthStart = attrs.width || defaults.canvas.width,
-        		elheightStart = attrs.height || defaults.canvas.height,        		
-        		parent = element.parent();
-
-            function setPapper(){
-            	if(!$scope.paper)$scope.paper = Raphael(0, 0, 0, 0);
-            	var parent_width = parent.width(),
-            		parent_height = parent.height(),
-            		positionStart = Helpers.position(element);
-        		/*Если параметры в процентах и нет канвас параметров - пересчитываем от родительсокой*/
-        		if(!$scope.canvas.width && !$scope.canvas.height){
-        			if(elwidthStart.toString().indexOf('%')>=0){
-        			var elwidth = Math.round(parent_width*parseInt(elwidthStart,10)/100)		
-	        		}
-	        		if(elheightStart.toString().indexOf('%')>=0){
-		        		var elheight = Math.round(parent_height*parseInt(elheightStart,10)/100)
-		    		}	
-        		}
-        		else if($scope.canvas.width===1 || $scope.canvas.height===1){
-        			$scope.paper.remove();
-        			element.hide()
-        			return false
-        		}
-        		/*Иначе - считаем, что канвас параметры как параметры paper*/
-        		else{
-        			/*Проверяем, что canvas.width не больше родительской ширины*/
-        			if($scope.canvas.width<parent_width){
-        				var elwidth = $scope.canvas.width
-        				var elheight = $scope.canvas.height
-        			}
-        			else{
-        				/*Иначе уменьшаем изображение пропорционально*/
-        				var elwidth = parent_width
-        				var elheight = Math.round($scope.canvas.height*parent_width/$scope.canvas.width)
-        			}
-        		}
-        		element.width(elwidth)
-            	element.height(elheight)
-            	$scope.paper.setSize(elwidth,elheight)
-            	
-    			var ely = positionStart.y;    			
-        		/*Если не указано другого - устанавливаем элемент в центр*/
-        		if(!$scope.canvas || ($scope.canvas && $scope.canvas.center===undefined) ||
-        			($scope.canvas && $scope.canvas.center==true)){
-        			var margin = Math.round((parent_width - elwidth)/2)
-    				var elx = positionStart.x + margin;
-        		}
-        		/*Иначе оставляем где есть*/
-    			else{
-    				var elx = positionStart.x;
-    			}
-        		$("svg").css({top:ely+'px',left:elx+'px'})
-        		$scope.paper.x = elx
-        		$scope.paper.y = ely     
-            }                     
-            setPapper()
-            $(window).resize(function () {setPapper()}); 
-           	$scope.$watch("canvas", function(canvas, old_canvas) {
-				if(old_canvas!=canvas){setPapper()}
-			}, true)
 
 			$scope.$on('raphaelDirectiveCanvas.getBBox', function(e){
 				var box = {
@@ -169,18 +268,6 @@ raphaelDirective.directive('raphael', [
                     $scope.$apply(fn);
                 }
             }
-            /*Функция изменения источника картинки на всех лицах, ранееотмеченных пользователем*/
-            $scope.$watch('userface', function(val){
-            	if(val && $scope.faces){
-            		for(var n in $scope.faces){
-            			if ($scope.faces.hasOwnProperty(n)){
-            				$scope.faces[n].attr('src', val.face)
-            				$scope.faces[n].face = val.id
-            			}
-            		}
-            	}
-            }, true)
-
             function setupImages(){
             	var images = setupElems($scope.images,'images')            	
             	return images

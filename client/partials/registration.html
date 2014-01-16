@@ -3,10 +3,10 @@
 		<form class="form-group no-margin-bottom" name="general" ng-show="regStage1" role="form">
 			<h2 class="text-right">Registration</h2>
 
-			<div class="form-group" id="registration-fg-nonFieldErrors"
+			<div class="form-group" id="registration-nonFieldErrors"
 				ng-show="loginAlert.non_field_errors">
 				<p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
-			</div><!-- #registration-fg-nonFieldErrors -->
+			</div><!-- #registration-nonFieldErrors -->
 
 			<div class="form-group" id="registration-email"
 				ng-class="{'has-error':(loginAlert.email && loginAlert.email.length!=0) || general.email.$error.maxlength}">
@@ -166,9 +166,9 @@
 			</div><!-- /#registration-races -->
 		</form>
 
-		<div class="col-lg-10 col-lg-push-1" id="registration-regConfirm"
-			ng-include ng-show="!regStage1" src='partials.regConfirm'>
-		</div> <!-- /#registration-regConfirm -->
+		<div class="col-lg-10 col-lg-push-1" ng-include
+			ng-show="!regStage1" src='partials.regConfirm'>
+		</div> <!-- /ng-include regConfirm -->
 	</div><!-- /.big-bordered-box-inner -->
 </div><!-- /.big-bordered-box -->
 

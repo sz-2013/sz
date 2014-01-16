@@ -8,7 +8,7 @@ var szApp = angular.module(
     'ngCookies', 
     'ngAnimate', 
     'leaflet-directive', 
-    'raphael-directive',
+    'sz.raphael.directives',
     'sidebar-directive',
 //    'slidesubpage-directive',
     'gamemap-directive',

@@ -1,41 +1,61 @@
 
 function MessageAddController($scope, messagePreviewService, $routeParams, $location, placeService){  
-    /*$scope.setHeader("message")*/
-    if ($routeParams.placeId){
-        placeService.get({placeId: $routeParams.placeId}, function(r){ $scope.messagePlace = r; })  
-    }
-    else{
+    function _getPlacesList(){
         /*$scope.$emit("setShowLoader", true)*/
         var params = {}
-        $scope.$watch('coordinates',function(){     
-            if($scope.coordinates){                        
-                /*params.latitude = $scope.coordinates.latitude 
+        /*params.latitude = $scope.coordinates.latitude 
                 params.longitude = $scope.coordinates.longitude*/
-                params.latitude = 50.2616113
-                params.longitude = 127.5266082
-                /*params.latitude = 0
-                params.longitude = 0*/
-                params.radius = 250
-                var places_list = placeService.searchInVenues(params, function(r) { 
-                    $scope.places_list = r.places
-                    $scope.showPlaceSelect = true;
-                    $scope.$emit("setShowLoader", false)
-                });    
-            }        
-        })   
-    }    
-    $scope.$on("selectItem", function(i, item){
+        params.latitude = 50.2616113
+        params.longitude = 127.5266082
+        /*params.latitude = 0
+        params.longitude = 0*/
+        params.radius = 250
+        var places_list = placeService.searchInVenues(params, function(r) { 
+            $scope.places_list = r.places
+            $scope.showPlaceSelect = true;
+            $scope.$emit("setShowLoader", false)
+        });    
+    }
+
+    /*$scope.setHeader("message")*/
+
+    if ($routeParams.placeId){
+        placeService.get(
+            {placeId: $routeParams.placeId},
+            function(r){ $scope.messagePlace = r;
+        })
+    }
+    else{
+        /*$scope.$watch(
+            'coordinates',
+            function(){if($scope.coordinates) _getPlacesList()}
+        )*/
+    }
+
+    $scope.$on("selectItem", function(e, item){
         $scope.messagePlace = item;
-        $scope.showPlaceSelect = false;
     });    
-    $scope.showPlaceSelect = false;
-    $scope.$on("setShowPlaceSelect",function(i ,val){
+
+    $scope.$on("setShowPlaceSelect",function(e ,val){
         $scope.showPlaceSelect = val
     })
 
     $scope.photo = {'name':''};
+    $scope.removePhoto = function(){$scope.photo = $scope.photo }
 
-    $scope.remove = function(){$scope.photo = $scope.photo }
+    $scope.$watch('faces', function(val){
+        if(val!=undefined&&val.length) $scope.messageFace = $scope.faces[0]
+    })
+    $scope.isFaceActive = function(f){
+        is_face = $scope.messageFace&&$scope.messageFace.id==f.id
+        return is_face ? 'active' : ''
+    }    
+    $scope.$on('selectFace', function(e, face){
+        $scope.messageFace = face
+    })
+    $scope.getActiveFace = function(){
+        return $scope.messageFace && $scope.messageFace.face
+    }
 
     $scope.send = function() {    
         console.log($scope.text)

@@ -1,6 +1,6 @@
 <div aria-hidden="true" aria-labelledby="selectAPlace" class="modal fade"
-    id="messageAdd-selectPlace" role="dialog" show="showPlaceSelect"
-    sz-select-place tabindex="-1">
+    id="messageAdd-selectPlace" role="dialog"
+    sz-modal="showPlaceSelect" sz-select-place tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content dark-nav">
             <div class="dark-nav-header">
@@ -47,9 +47,13 @@
 </div><!-- /#messageAdd-selectPlace -->
 
 
-<div aria-hidden="true" aria-labelledby="selectAPlace" class="modal fade"
-    id="messageAdd-editPhoto" role="dialog" show="showEditPhoto"
-    sz-edit-photo tabindex="-1" >
+<raphael-add-face action="faceAction" ismobile="is_mobile" ng-init="faceAction=1"
+    parent="'raphaelParent'" src="getActiveFace()" target="'messageAdd-messagePhoto'" start="showRaphaelAddFace"> </raphael-add-face>
+
+
+<div aria-hidden="true" aria-labelledby="editPhoto" class="modal fade"
+    id="messageAdd-editPhoto" role="dialog" sz-raphael-modal="showRaphaelAddFace"
+    sz-modal="showEditPhoto" tabindex="-1" >
     <div class="modal-dialog">
         <div class="modal-content dark-nav ">
             <div class="dark-nav-header">
@@ -58,18 +62,23 @@
                     <i class="fa fa-times fa-2x"></i>
                 </button>
 
-                <h2>Edit a photo</h2>
+                <h2>Edit a photo {{isParentShow()}}</h2>
             </div><!-- /.dark-nav .dark-nav-header -->
 
             <ul><li><span class="text-center">
-                <div class="photo-container"></div>
+                <div class="photo-container" id="raphaelParent">                    
+                    <img id="messageAdd-messagePhoto">
+                        <!-- src="http://91.142.158.33:8080/media/photos/2013/10/10/1.jpg" -->
+                </div>
             </span></li></ul><!-- /.dark-nav ul -->
 
             <div class="photo-menu-sub animate-fall-down"
                 ng-show="showPhotoMenuSub">
-                <i class="face-preview" ng-repeat="f in faces">
-                    <img ng-src={{f.face}}></i>
-            </div> <!-- ./photo-menu-sub -->
+                <i class="face-preview" ng-class="isFaceActive(f)"
+                    ng-click="$emit('selectFace', f)" ng-repeat="f in faces">
+                    <img ng-src={{f.face}}>
+                </i><!-- /.face-preview -->
+            </div> <!-- /.photo-menu-sub -->
 
             <div class="dark-nav-footer" >
                 <div class="btn-group btn-group-justified photo-menu">
@@ -78,17 +87,17 @@
                         <i class="fa fa-smile-o fa-2x"></i>
                     </a>
 
-                    <a class="btn btn-link">
+                    <a class="btn btn-link" ng-class="{'active':faceAction===1}" ng-click="faceAction=1">
                         <i class="fa fa-plus fa-2x"></i>
                     </a>
 
-                    <a class="btn btn-link">
+                    <a class="btn btn-link" ng-class="{'active':faceAction===0}" ng-click="faceAction=0">
                         <i class="fa fa-minus fa-2x"></i>
                     </a>
                 </div><!-- /.dark-nav .photo-menu -->
 
                 <button data-dismiss="modal" class="btn btn-primary btn-block"
-                    id="messageAdd-editPhoto-submit" type="button">
+                    id="messageAdd-editPhoto-submit" ng-click="messagePhotoId=undefined" type="button">
                     <i class="fa fa-check fa-2x"></i>
                 </button><!-- /#messageAdd-editPhoto-submit -->
             </div><!-- /.dark-nav .dark-nav-footer -->
@@ -112,8 +121,8 @@
                         <i class="fa fa-camera fa-2x"></i>
                         <input type="file" name="photo" sz-file-model="photo">
                     </div>
-                    <a class="btn btn-link" ng-click="showPlaceSelect=true"
-                        ng-class="{'active':messagePlace}">
+                    <a class="btn btn-link" ng-class="{'active':messagePlace}"
+                        ng-click="showPlaceSelect=!showPlaceSelect">
                         <i class="fa fa-map-marker fa-2x"></i>
                     </a>
                 </div> <!-- /#messageAdd-nav -->

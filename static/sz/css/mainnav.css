@@ -45,14 +45,27 @@
     color: #fff;
 }
 
+#messageAdd-editPhoto ul>li>span:hover, #messageAdd-editPhoto ul>li.active{
+    color: #f3efe0;
+    background-color: transparent;
+}
+
 .dark-nav .badge{
     background-color: #34495e;
     box-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
 .dark-nav .dark-nav-footer{
-    z-index: 2;
+    z-index: 3;
     position: relative;
+}
+
+#raphaelAddFace-Svg{
+    z-index: 1;
+}
+
+.photo-menu-sub{
+    z-index:2;
 }
 
 .st-pusher::after, .modal {

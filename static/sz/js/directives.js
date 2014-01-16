@@ -1,10 +1,3 @@
-//+ Jonas Raoni Soares Silva
-//@ http://jsfromhell.com/array/shuffle [v1.0]
-function shuffle(o){ //v1.0
-    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-    return o;
-};
-
 'use strict';
 
 /* Directives */
@@ -37,6 +30,14 @@ angular.module('sz.client.directives', [])
             element.autoResize();
         };
     })
+    .directive('szModal', function() {
+        //enable autoresize for textarea
+        return function(scope, element, attrs) {
+            scope.$watch(attrs.szModal, function(val){
+               if(val!=undefined) element.modal({show: true}); 
+            })
+        };
+    })
     .directive('szMessageBox', function() {
         //Set optimal  heigth for message box and set 
         //focus to textarea when place was selected
@@ -54,13 +55,16 @@ angular.module('sz.client.directives', [])
         //and show photo modal window
         return function(scope, element, attrs) {
             function setImgMaxH(){
+                var min = 150;
                 var photoH = $(window).height() - 190;
-                var h = (photoH > 200) ? photoH : 200
-                $photoCont.children('img').css('maxHeight', h + 'px')
+                var h = (photoH > min) ? photoH : min;
+                $img.css('maxHeight', h + 'px')
                 return h + 'px'
             }
             var $photoCont = $('.photo-container');
-            $(window).resize(function(){setImgMaxH});
+            var $img = $photoCont.children('img')
+            setImgMaxH();
+            $(window).resize(function(){setImgMaxH();});
             scope.$watch(attrs.szFileModel, function() {
                 angular.element(element[0]).bind('change', function(){                    
                     if (angular.isUndefined(element[0].files))
@@ -72,10 +76,8 @@ angular.module('sz.client.directives', [])
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {
                                 return function(e) {
-                                    $photoCont.html(
-                                        ['<img src="', e.target.result, '" title="',
-                                          escape(photo.name), '"/>'].join(''));
-                                    setImgMaxH()
+                                    $img.attr('src', e.target.result);
+                                    $img.attr('title', escape(photo.name));
                                 };
                             })(photo);
                             reader.readAsDataURL(photo);                            
@@ -83,6 +85,7 @@ angular.module('sz.client.directives', [])
                                 scope[attrs.szFileModel] = element[0].files[0]
                                 scope.showEditPhoto = !scope.showEditPhoto;
                             });
+                            
                         }
                         else{photoNameCont.innerHTML = 'Недопустимый формат'}
                     }
@@ -90,15 +93,6 @@ angular.module('sz.client.directives', [])
             });
         }
     })
-    .directive('szEditPhoto', function() {
-        //
-        return function(scope, element, attrs) {            
-            scope.$watch(attrs.show, function(newval, oldval){  
-                if(newval!=undefined) element.modal({show: true});
-            })
-        };
-    })
-    
     /*.directive('szMessagePhotoLoad', function() {
         return function(scope, element, attrs) {
             scope.$watch('photoSrc', function(val){
@@ -129,9 +123,6 @@ angular.module('sz.client.directives', [])
                 var li = element.find("[data-placeitem="+id+"]"), w = li.width()/2;
                 li.animate({marginLeft: 0}, w*2)
             }
-            scope.$watch(attrs.show, function(newval){                
-                if(newval) element.modal({show: true});
-            })
         };
     })
     .directive('szAchivment', function($timeout) {
