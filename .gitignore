@@ -1,6 +1,7 @@
 *.[oa]
 *~
 *.pyc
+*.zip
 generated_place.*
 *Font-Awesome*
 *font-awesome*
@@ -12,3 +13,8 @@ static/*
 sz/passwords.py
 sz-app
 szApp/www/libs
+szApp/.cordova
+szApp/merges
+szApp/plugins
+szApp/platforms
+node_modules

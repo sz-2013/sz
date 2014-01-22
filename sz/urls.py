@@ -23,6 +23,15 @@ urlpatterns = patterns(
     url(r'^!/(?P<path>.*)$', 'django.views.static.serve', {
         'document_root': settings.CLIENT_ROOT,
         }),
+    url(r'^!/js/(?P<path>.*)$', 'django.views.static.serve', {
+        'document_root': settings.CLIENT_JS,
+        }),
+    url(r'^!/css/(?P<path>.*)$', 'django.views.static.serve', {
+        'document_root': settings.CLIENT_CSS,
+        }),
+    url(r'^!/libs/(?P<path>.*)$', 'django.views.static.serve', {
+        'document_root': settings.CLIENT_LIBS,
+        }),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('sz.api.urls'), name='api'),
     url(r'^api-auth/',

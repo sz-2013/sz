@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html ng-app="sz.client">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+
+        <script type="text/javascript" src="libs/jquery/jquery-1.9.1.min.js"></script>
+        <script src="libs/angularjs/1.2.7/angular.min.js"></script>
+        <script src="libs/angularjs/1.2.7/angular-resource.min.js"></script>
+        <script src="libs/angularjs/1.2.7/angular-route.min.js"></script>
+        <script src="libs/angularjs/1.2.7/angular-cookies.min.js"></script>
+        <script src="libs/angularjs/1.2.7/angular-animate.min.js"></script>
+
+        <link rel="stylesheet" href="libs/font-awesome-4.0.1/css/font-awesome.css" >
+        <link rel="stylesheet" href="libs/sidebar/sideBarComponents.css">    
+
+        <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.css">
+
+        <link rel="stylesheet" href="css/footer-to-down.css">
+        <link rel="stylesheet" href="css/nganimate.css">
+        <link rel="stylesheet" href="css/buttons.css">
+        <link rel="stylesheet" href="css/mainnav.css">
+        <link rel="stylesheet" href="css/app.css">
+        <title>ShmotZhmot</title>
+    </head>
+    <body ng-controller="MasterPageController" mobile-check>
+        <div id="mainPage" class="st-container animate-fall-left" ng-show="showMainPage">
+            <!-- content push wrapper -->
+            <div class="st-pusher"> 
+                <nav class="st-menu st-effect-8 dark-nav" id="mainnav">
+                <!-- ng-include src="'partials/navs/mainnav/mainnav.html'" -->
+                    <div class="dark-nav-header">
+                        <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
+                    </div>
+                    <ul>
+                        <li><a href="">
+                            World</a>
+                        <li><a href={{url.newsfeed}}>
+                            News Feed <span class="badge pull-right">42</span>
+                        </a></li>
+                        <li><a href={{url.search}}>
+                            Search
+                        </a></li>
+                        <li><a href="">
+                            Events
+                        </a><li>
+                        <a href="">
+                            Map
+                        </a></li>
+                        <li><a href="">
+                            Your places <span class="badge pull-right">42</span>
+                        </a></li>
+                        <li><a href="">
+                            Your messages <span class="badge pull-right">42</span>
+                        </a></li>
+                        <li><a>Blagoweschensk</a></li>
+                        <li><a ng-click="logout()">Exit</a></li>
+                    </ul>                                       
+                </nav>
+
+                <div class="st-content">
+                    <div id="wrap">
+                        <header class="container-inn text-center" ng-include ng-show="showHeder"
+                            src="'partials/navs/headers/mainheader.html'">                            
+                        </header><!-- /header -->
+
+                        <div class="clearfix container-inn" id="main" 
+                            ng-show="showContent" ng-view sz-scroll-detect> </div><!-- /ng-view -->
+                    </div><!-- /#wrap -->
+
+                    <footer class="container-inn" ng-show="showFooter">
+                        <h3>Footer</h3>
+                    </footer><!-- footer -->
+                </div><!-- /.st-content -->
+            </div><!-- /.st-pusher -->
+        </div><!-- /.st-container -->
+ <!--        <div id="subPage">
+            <h1>Sub Page</h1>
+            <button ng-click="showMainPage=true">{- - -Back</button>
+        </div> -->
+
+        <!-- <script type="text/javascript" src="cordova.js"></script> -->
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+
+
+
+        <script src="libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
+
+        <script src="libs/raphael/2.1.2/raphael-min.js"></script>
+    
+        <script src="libs/bootstrap/js/bootstrap.min.js"></script>        
+
+        <script src="js/services.js"></script>
+        <script src="js/phonegap-servive.js"></script>
+
+        <script src="js/directives.js"></script>
+        <script src="js/navs-directive.js"></script>
+        <script src="js/raphael-directive.js"></script>
+        
+        <script src="js/controllers.js"></script>
+        <script src="js/auth-controllers.js"></script>
+        <script src="js/message-controllers.js"></script>
+
+        <script src="js/app.js"></script>
+        <!-- <script type="text/javascript">
+            function onBackKeyDown(){
+                alert("Back!")
+            }
+            $(document).ready(function(){
+                $("#notnormal").click(function(){
+                    document.addEventListener("backbutton", onBackKeyDown, false);
+                });
+                $("#normal").click(function(){
+                    document.removeEventListener("backbutton", onBackKeyDown, false);
+                })
+            });
+        </script>         -->
+    </body>
+</html>

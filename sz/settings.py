@@ -191,7 +191,10 @@ TEMPLATE_CONTEXT_PROCESSORS += (
     'django.core.context_processors.request',
 )
 
-CLIENT_ROOT = os.path.join(SZ_ROOT, 'client')
+CLIENT_ROOT = os.path.join(SZ_ROOT, 'szApp/www')
+CLIENT_JS = os.path.join(CLIENT_ROOT, 'js')
+CLIENT_CSS = os.path.join(CLIENT_ROOT, 'css')
+CLIENT_LIBS = os.path.join(CLIENT_ROOT, 'libs')
 
 SOUTH_TESTS_MIGRATE = False
 GEONAMES_API_CONFIG = {

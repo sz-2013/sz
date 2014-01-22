@@ -1,0 +1,21 @@
+<div ng-controller="RegistrationConfirmation" class="ng-scope">
+    <div class="big-bordered-box">  
+        <div class="big-bordered-box-inner">
+            <h2 class="text-right">Confirmation</h2>
+
+            <p class="help-block">We sent a letter with key on your email. Please, check your inbox and visit the link from our email for confirmation your registration.</p>       
+            
+            <button class="btn btn-default btn-block" ng-disabled="inProgress" ng-click="confirmation(user.email)" type="button">Resend a key</button>
+
+            <p class="help-block ng-hide" ng-show="showConfirmationResponse">Ok. We did it again.</p>
+
+            <!-- ngRepeat: error in confirmationError -->
+        </div>
+    </div>
+
+    <div class="form-group margin-top-sm text-left paddin-X-normal">
+        <button class="btn btn-primary btn-block" ng-disabled="inProgress" ng-click="goToLogin()" type="button">
+            <i class="fa fa-sign-in fa-lg"></i>
+        </button>
+    </div>
+</div>
