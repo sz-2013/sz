@@ -8,6 +8,7 @@ generated_place.*
 *tmpviews*
 media/*
 sz/core/migrations/
-static/sz/img/
+static/*
 sz/passwords.py
-static/libs/
+sz-app
+szApp/www/libs
