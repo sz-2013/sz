@@ -1,6 +1,30 @@
 'use strict';
 
 /* Directives */
+var Helpers = {
+    failHandler: function(e){console.log(e.toString())},
+    photoPreview: function(scope, fileModel){
+        var $photoCont = $('.photo-container');
+        var $img = $photoCont.children('img');
+        return {
+            setImgMaxH: function(){
+                var min = 150;
+                var photoH = $(window).height() - 190;
+                var h = (photoH > min) ? photoH : min;
+                $img.css('maxHeight', h + 'px')
+                $(window).resize(function(){this.setImgMaxH();});
+            },
+            setImagePreviw: function(){
+                $img.attr('src', src);
+                if(title) $img.attr('title', title);
+                /*scope.$apply(function(){*/
+                scope[fileModel] = file;
+                scope.showEditPhoto = !scope.showEditPhoto;
+            },
+        }
+    },
+}
+
 
 angular.module('sz.client.directives', [])
     .directive('mobileCheck', function() {
@@ -59,35 +83,12 @@ angular.module('sz.client.directives', [])
         //focus to textarea when place was selected
         return function(scope, element, attrs) {
             var min = 200, keybowrdWidth = 500, h = $(window).height()-keybowrdWidth;
-            element.height( (h>min) ? h : min )
+            element.height( (h>min) ? h : min );
 
-            function setImgMaxH(){
-                var min = 150;
-                var photoH = $(window).height() - 190;
-                var h = (photoH > min) ? photoH : min;
-                $img.css('maxHeight', h + 'px')
-                return h + 'px'
-            }
+            if(navigator.camera!==undefined) scope.showStandartFileModel = false;
 
-            var $photoCont = $('.photo-container');
-            var $img = $photoCont.children('img');
-            setImgMaxH();
-            $(window).resize(function(){setImgMaxH();});            
-
-            if(navigator.camera!==undefined){
-                scope.showStandartFileModel = false;
-            }
-
-            function failHandler(e){console.log(e.toString())}
-
-            scope.setImagePreviw = function(src, title, file){
-                $img.attr('src', src);
-                if(title) $img.attr('title', title);
-                /*scope.$apply(function(){*/
-                scope[attrs.szFileModel] = file;
-                scope.showEditPhoto = !scope.showEditPhoto;
-                /*});*/
-            }
+            var helper = Helpers.photoPreview(scope, 'photoPreview');
+            helper.setImgMaxH();
 
             scope.makePhoto = function(isLibrary){
                 if(navigator.camera!==undefined)
@@ -101,9 +102,9 @@ angular.module('sz.client.directives', [])
 
                             options.params = params;
 
-                            scope.setImagePreviw("data:image/jpeg;base64," + imageData, options.fileName)
+                            helper.setImagePreviw("data:image/jpeg;base64," + imageData, options.fileName)
                         },
-                        failHandler, isLibrary);                
+                        Helpers.failHandler, isLibrary);                
             }
         }
     })
@@ -111,18 +112,25 @@ angular.module('sz.client.directives', [])
         //show preview for uploaded photo
         //and show photo modal window
         return function(scope, element, attrs) {
+            var helper = Helpers.photoPreview(scope, attrs.szFileModel);
+            helper.setImgMaxH();
+
             scope.$watch(attrs.szFileModel, function() {
-                angular.element(element[0]).bind('change', function(){                    
-                    if (angular.isUndefined(element[0].files))
+                var el = element[0];
+                angular.element(el).bind('change', function(){                    
+                    if (angular.isUndefined(el.files))
                     {throw new Error("This browser does not support HTML5 File API.");}
-                    if (element[0].files.length == 1){
-                        scope[attrs.szFileModel] = element[0].files[0]
-                        var photo = element[0].files[0];
+                    if (el.files.length == 1){
+                        var photo = el.files[0];
+                        scope[attrs.szFileModel] = photo;
                         if (photo.type.match('image.*')) {
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {
                                 return function(e) {
-                                    scope.setImagePreviw(e.target.result, escape(photo.name), element[0].files[0])
+                                    scope.$apply(function(){
+                                        helper.setImagePreviw(e.target.result, escape(photo.name), photo)
+                                    }); 
+                                    
                                 };
                             })(photo);
                             reader.readAsDataURL(photo);

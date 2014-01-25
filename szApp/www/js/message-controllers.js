@@ -1,5 +1,5 @@
 
-function MessageAddController($scope, messagePreviewService, $routeParams, $location, placeService){  
+function MessageAddController($scope, messageService, $routeParams, $location, placeService){  
     function _getPlacesList(){
         /*$scope.$emit("setShowLoader", true)*/
         var params = {}
@@ -57,6 +57,10 @@ function MessageAddController($scope, messagePreviewService, $routeParams, $loca
     })
     $scope.getActiveFace = function(){
         return $scope.messageFace && $scope.messageFace.face
+    }
+
+    $scope.unfacePhoto = function(){
+        
     }
 
     $scope.send = function() {    

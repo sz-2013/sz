@@ -17,6 +17,26 @@ szServices.factory('staticValueService', function($resource){
     });
 });
 
+
+szServices.factory('sessionService', function($resource){
+    var resource = $resource(apiIp + '/api/auth/:action', {}, {
+        login: { method:'POST', params:{action: 'login'}, isArray:false },
+        logout: { method:'POST', params:{action: 'logout'}, isArray:false },
+        current: { method:'GET', params:{action: 'user'}, isArray:false }
+    });
+    return resource
+});
+
+
+szServices.factory('userService', function($http,$resource){
+    return $resource(apiIp + '/api/users/:action', {}, {
+        register: {method: 'POST', params: {action:'register'}, isArray: false},
+        resend_activation_key: {method:'POST', params: {action: 'resend-activation-key'}, isArray:false},
+        profile: {method: 'GET', params: {action: 'profile'}, isArray: false}
+    });
+});
+
+
 szServices.factory('gameMapService', function($resource){
     return $resource(apiIp + '/api/gamemap/', {}, {
         getMap: { method:'GET' , isArray:false },
@@ -34,67 +54,35 @@ szServices.factory('placeService', function($resource){
     });
 });
 
-szServices.factory('userService', function($http,$resource){
-    return $resource(apiIp + '/api/users/:action', {}, {
-        register: {
-            method: 'POST',
-            params: {
-                action:'register'
-            },
-            isArray: false
-        },
-        resend_activation_key: {
-            method:'POST',
-            params: {
-                action: 'resend-activation-key'
-            },
-            isArray:false
-        },
-        profile: {
-            method: 'GET',
-            params: {
-                action: 'profile'
-            },
-            isArray: false
-        }
-    });
-});
 
-szServices.factory('messagePreviewService', function($http, $resource){
-
-    var create = function(message, success, error){
-        $http.post(apiIp + '/api/messages/previews', message, {
+szServices.factory('messageService', function($http, $resource){    
+    var url = apiIp + '/api/messages/add'
+    var pCreate = function(message, success, error){
+        $http.post(url, message, {
             headers: { 'Content-Type': false },
             transformRequest: angular.identity,
             params: {format: 'json'}
         }).success(success).error(error);
     }
-    var update = function(previewId, message, success, error){
-        $http.put(apiIp + '/api/messages/previews/' + previewId, message, {
+    var pUpdate = function(previewId, message, success, error){
+        $http.put(url + '/' + previewId, message, {
             headers: { 'Content-Type': false },
             transformRequest: angular.identity,
             params: {format: 'json'}
         }).success(success).error(error);
     }
 
-    var resource = $resource(apiIp + '/api/messages/previews/:previewId/:docCtrl', {previewId: '@id'}, {
-        query: { method:'GET', params:{}, isArray:false },
-        publish: { method:'POST', params:{docCtrl: 'publish'}, isArray:false }
+    var resource = $resource(apiIp + '/api/messages/add', {previewId: '@id'}, {
+        /*create: { method:'GET', params:{}, isArray:false },
+        update: { method:'POST', params:{docCtrl: 'publish'}, isArray:false }*/
     });
 
-    resource.create = create;
-    resource.update = update;
+    resource.prvCreate = pCreate;
+    resource.prvUpdate = pUpdate;
     return resource;
 });
 
-szServices.factory('sessionService', function($resource){
-    var resource = $resource(apiIp + '/api/auth/:action', {}, {
-        login: { method:'POST', params:{action: 'login'}, isArray:false },
-        logout: { method:'POST', params:{action: 'logout'}, isArray:false },
-        current: { method:'GET', params:{action: 'user'}, isArray:false }
-    });
-    return resource
-});
+
 
 
 /*szServices.factory('geolocationService', function ($rootScope) {
