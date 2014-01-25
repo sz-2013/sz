@@ -100,6 +100,23 @@ class PlaceService(FeedService):
         return not is_create
 
     def explore_in_venues(self, **kwargs):
+        """Gets places around point from external db
+
+        Gets places around point. Filter by radius, query and
+        return list of places, which NOT created in szdb OR created
+        but NOT active (anyway a place should be dont created in BL).
+
+        Args:
+            **kwargs:
+                latitude - the point latitude
+                longitude  - the point longitude
+                query - string key for filter
+                radius - radius for filter
+                user - user email
+
+        Returns:
+            [<Place>,..]
+        """
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service).get_db_params()
         latitude = params.get(params_names.LATITUDE)
@@ -124,6 +141,22 @@ class PlaceService(FeedService):
         return places_list
 
     def search_in_venue(self, **kwargs):
+        """Gets places around point from sz db
+
+        Gets places around point. Filter by radius, query and
+        return list of places.
+
+        Args:
+            **kwargs:
+                latitude - the point latitude
+                longitude  - the point longitude
+                query - string key for filter
+                radius - radius for filter
+                user - user email
+
+        Returns:
+            [<Place>,..]
+        """
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
         places_list = queries.search_places(**params.get_db_params())
@@ -135,6 +168,18 @@ class GameMapService(FeedService):
         self.city_service = city_service
 
     def update_gamemap(self, params):
+        """Create a gamemap for specified city
+
+        Build a square map for city.
+
+        Args:
+            params:
+                latitude - the point latitude
+                longitude  - the point longitude
+
+        Returns:
+            None
+        """
         city_id = self.city_service.get_city_by_position(
             params.get('longitude'), params.get('latitude'))['geoname_id']
         #dont forget add is_active in filter
@@ -191,6 +236,22 @@ class GameMapService(FeedService):
         return
 
     def get_gamemap(self, **kwargs):
+        """Return a square map of the city
+        around user in limit: current box, last box
+
+        Args:
+            **kwargs:
+                latitude - the point latitude
+                longitude  - the point longitude
+                user - <User>, who did it request
+
+        Return:
+            last_box - a last box, where the user did something,
+            current_box - a current user box,
+            gamemap - [{place:<Place>????, distance: D, azimuth: A},..]
+            map_width - value of boxes by x,
+            map_height - value of boxes by y,
+        """
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service).get_db_params()
         latitude = params.get(params_names.LATITUDE)
@@ -227,7 +288,14 @@ class MessageService(FeedService):
         self.city_service = city_service
         self.categorization_service = categorization_service
 
-    def unface_photo(self, faces_list, photo_box, message):
+    def unface_photo(self, MessagePhotoPreview):
+        """Put masks on a photo
+
+        Replace selected parts of photo by selected <Face> with PIL and magic.
+
+        Args:
+            MessagePhotoPreview - <MessagePhotoPreview>
+        """
         #set def face id if somewhere i forget set it
         face_id_undef = models.Face.objects.all()[0].pk
         #open original photo

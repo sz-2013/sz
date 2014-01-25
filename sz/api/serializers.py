@@ -200,8 +200,8 @@ class PlaceSerializer(serializers.Serializer):
     longitude = serializers.FloatField(required=True)
     date = serializers.Field()
 
-    def restore_object(self, instance=None):
-        attr = super(PlaceSerializer, self).validate(attrs)
+    def validate(self, attrs):
+        attrs = super(PlaceSerializer, self).validate(attrs)
         return get_place(
             attrs.get('latitude'), attrs.get('longitude'),
             attrs.get('name'))
@@ -242,6 +242,42 @@ class PlaceStandartDataSerializer(serializers.Serializer):
 """
 Message section
 """
+
+
+class MessagePhotoPreviewFacesListSerializer(serializers.ModelSerializer):
+    x = serializers.FloatField(required=True)
+    y = serializers.FloatField(required=True)
+    w = serializers.FloatField(required=True)
+    h = serializers.FloatField(required=True)
+
+
+class MessagePhotoPreviewSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(required=True)
+    photo = serializers.ImageField(required=True)
+    photo_height = serializers.FloatField(required=True)
+    photo_width = serializers.FloatField(required=True)
+    face_id = serializers.ChoiceField(required=True, choices=[
+        (face.pk, face.pk) for face in models.Face.objects.all()
+    ])
+    faces_list = serializers.Field()
+    pk = serializers.Field()
+
+    def validate_faces_list(self, attrs, source):
+        faces = attrs.get(source)
+        if not faces:
+            return attrs
+        if isinstance(faces, list):
+            for face in faces:
+                s = MessagePhotoPreviewFacesListSerializer(data=face)
+                if not s.is_valid():
+                    raise serializers.ValidationError(s.errors)
+        else:
+            raise serializers.ValidationError("'faces_list' mast be a list")
+        return attrs
+
+    def validate(self, attrs):
+        attrs = super(MessagePhotoPreviewSerializer, self).validate(attrs)
+        return models.MessagePreview.objects.unface_photo(**attrs)
 
 
 class MessageBaseSerializer(serializers.ModelSerializer):

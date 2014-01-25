@@ -4,18 +4,24 @@ import hashlib
 import os
 import random
 import re
-import uuid
+import StringIO
 import time
+import uuid
 from django.db import transaction
 from django.core import validators
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.gis.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from imagekit import models as imagekit_models
 from imagekit import processors
+from PIL import Image, ImageDraw
 from south.modelsinspector import add_introspection_rules
+
 from sz import settings
+from sz.core.utils import float_to_int
+from sz.core.image_utils import FitImage
 
 
 STANDART_ROLE_USER_NAME = "player"
@@ -50,6 +56,21 @@ def get_string_date(date):
             date.hour, date.minute, date.second] if date else []
 
 
+def get_img_absolute_urls(host_url="", img=None):
+    host_url = host_url + 'media/'
+    return host_url + img.url if img else None
+
+
+def get_img_dict_absolute_url(img_dict, host_url):
+    for key, img in img_dict.iteritems():
+        img_dict[key] = get_img_absolute_urls(host_url, img)
+    return img_dict
+
+
+def get_system_path_media(url):
+    return os.path.join(settings.MEDIA_ROOT, url)
+
+
 class ModifyingFieldDescriptor(object):
     """
     Modifies a field when set using the field's (overriden)
@@ -80,11 +101,6 @@ class LowerCaseCharField(models.CharField):
         setattr(cls, self.name, ModifyingFieldDescriptor(self))
 
 add_introspection_rules([], ["^sz\.core\.models\.LowerCaseCharField"])
-
-
-def get_img_absolute_urls(host_url="", img=None):
-    host_url = host_url + 'media/'
-    return host_url + img.url if img else None
 
 
 class Races(models.Model):
@@ -136,9 +152,15 @@ class Face(models.Model):
 
     face = imagekit_models.ProcessedImageField(
         upload_to=get_face_path, null=False, blank=True,
-        processors=[processors.ResizeToFit(150, 150), ],
+        # processors=[processors.ResizeToFit(150, 150), ],
         options={'quality': 85}
     )
+
+    def get_fit_face(self, w, h=None):
+        if h is None:
+            h = w
+        source_file = open(get_system_path_media(self.face.url))
+        return FitImage(source=source_file, width=w, height=h).generate()
 
     def __unicode__(self):
         return u"%s_%s" % (
@@ -541,7 +563,7 @@ class Place(models.Model):
         super(Place, self).save(*args, **kwargs)
 
 
-class MessageBase(models.Model):
+class Message(models.Model):
 
     date = models.DateTimeField(
         auto_now_add=True, null=True, blank=True,
@@ -592,20 +614,19 @@ class MessageBase(models.Model):
         return urls_and_size
 
     def get_photo_absolute_urls(self, photo_host_url=""):
-        # photo_host_url = photo_host_url.rstrip('/')
-        photo_host_url = photo_host_url + "media/"
         if self.photo:
-            return dict(
-                full=photo_host_url + self.photo.url,
-                reduced=photo_host_url + self.reduced_photo.url,
-                thumbnail=photo_host_url + self.thumbnail.url)
+            img_dict = dict(full=self.photo, reduced=self.reduced_photo,
+                            thumbnail=self.thumbnail)
+            return get_img_dict_absolute_url(img_dict, photo_host_url)
         else:
             return None
 
     categories = models.ManyToManyField(Category, null=True, blank=True)
+    stems = models.ManyToManyField(Stem, null=True, blank=True)
+    face = models.ForeignKey(Face, null=True, blank=True)
 
     class Meta:
-        abstract = True
+        # abstract = True
         verbose_name = _('message')
         verbose_name_plural = _('messages')
 
@@ -627,10 +648,79 @@ class MessageBase(models.Model):
         return get_string_date(self.date)
 
 
-class Message(MessageBase):
-    stems = models.ManyToManyField(Stem, null=True, blank=True)
-    face = models.ForeignKey(Face, null=True, blank=True)
+class MessagePreviewManager(models.Manager):
+    def _create_or_update(self, unfaced_photo, **kwargs):
+        if not kwargs.get('pk'):
+            preview = self.model(
+                photo=unfaced_photo,
+                face=Face.objects.get(id=kwargs.get('face_id')),
+                user=User.objects.get(email=kwargs.get('user')))
+        else:
+            preview = self.model.get(pk=kwargs.get('pk'))
+            preview.photo = unfaced_photo
+        preview.save()
+        return preview
+
+    def unface_photo(self, **kwargs):
+        """Unface received photo.
+
+        Draw all not transparent pixels from face from faces_list to the photo
+        with PIL and magic.
+
+        Args:
+            **kwargs:
+                user - a message creator identifier(email).
+                photo - img file
+                photo_height - h photo in client
+                photo_width - w photo in client
+                face_id - a <face> id
+                faces_list - list with faces positions [{x, y, h, w},..]
+
+        Returns:
+            self._create_preview(unfaced_photo, **kwargs)
+        """
+        face_full = Face.objects.get(id=kwargs.get('face_id'))
+        photo = Image.open(kwargs.get('photo'))
+        full_width, full_height = map(float_to_int, photo.size)
+
+        k_by_x = full_width/kwargs.get('photo_width')
+        k_by_y = full_height/kwargs.get('photo_height')
+
+        for face in kwargs.get('faces_list'):
+            w = float_to_int(face.get('w', 0)*k_by_x)
+            h = float_to_int(face.get('h', 0)*k_by_y)
+            x = float_to_int(face.get('x', 0)*k_by_x)
+            y = float_to_int(face.get('y', 0)*k_by_y)
+            face_img = Image.open(face_full.get_fit_face(w, h))
+            photo.paste(face_img, (x, y), face_img)
+
+        photo_io = StringIO.StringIO()
+        photo.save(photo_io, format='JPEG')
+        unfaced_photo = InMemoryUploadedFile(
+            photo_io, None, 'foo.jpg', 'image/jpeg', photo_io.len, None)
+        return self._create_or_update(unfaced_photo, **kwargs)
 
 
-class MessagePreview(MessageBase):
-    pass
+class MessagePreview(models.Model):
+    def get_photo_absolute_urls(self, photo_host_url=""):
+        if self.photo:
+            img_dict = dict(full=self.photo, reduced=self.reduced_photo,
+                            thumbnail=self.thumbnail)
+            return get_img_dict_absolute_url(img_dict, photo_host_url)
+        else:
+            return None
+
+    def get_photo_path(self, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        directory = time.strftime("CACHE/images/photos/%Y/%m/%d")
+        return os.path.join(directory, filename)
+
+    photo = imagekit_models.ProcessedImageField(
+        upload_to=get_photo_path,
+        processors=[processors.ResizeToFit(1350, 1200), ],
+        options={"quality": 85}
+    )
+    face = models.ForeignKey('Face')
+    user = models.ForeignKey('User', related_name='mpreviews')
+    objects = MessagePreviewManager()

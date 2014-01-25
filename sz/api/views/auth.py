@@ -12,6 +12,7 @@ HTTP_423_LOCKED = 423
 
 
 def token_in_data(request, user):
+    """Put token from request into response"""
     user_serializer = AuthUserSerializer(instance=user)
     response = user_serializer.data
     # print(csrf(request))
@@ -21,8 +22,7 @@ def token_in_data(request, user):
 
 
 class AuthLogin(SzApiView):
-    """ Log a user in """
-
+    """Log a user in"""
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):

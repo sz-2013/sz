@@ -10,3 +10,7 @@ def safe_get(val, func, default=None):
         return func(val)
     except Exception:
         return default
+
+
+def float_to_int(f):
+    return int((round(f)))
