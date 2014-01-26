@@ -47,7 +47,7 @@
 </div><!-- /#messageAdd-selectPlace -->
 
 
-<raphael-add-face action="faceAction" ismobile="is_mobile" ng-init="faceAction=1"
+<raphael-add-face action="faceAction" ismobile="is_mobile" issend="showEditPhoto" ng-init="faceAction=1"
     parent="'raphaelParent'" src="getActiveFace()" target="'messageAdd-messagePhoto'" start="showRaphaelAddFace"> </raphael-add-face>
 
 
@@ -57,8 +57,8 @@
     <div class="modal-dialog">
         <div class="modal-content dark-nav ">
             <div class="dark-nav-header">
-                <button aria-hidden="true" class="btn btn-link pull-left close-modal"
-                    ng-click="messagePhotoId=undefined" type="button">
+                <button aria-hidden="true" data-dismiss="modal" 
+                    class="btn btn-link pull-left close-modal" type="button">
                     <i class="fa fa-times fa-2x"></i>
                 </button>
 
@@ -96,8 +96,8 @@
                     </a>
                 </div><!-- /.dark-nav .photo-menu -->
 
-                <button data-dismiss="modal" class="btn btn-primary btn-block"
-                    id="messageAdd-editPhoto-submit" ng-click="messagePhotoId=undefined" type="button">
+                <button class="btn btn-primary btn-block"
+                    id="messageAdd-editPhoto-submit" ng-click="unfacePhoto()" type="button">
                     <i class="fa fa-check fa-2x"></i>
                 </button><!-- /#messageAdd-editPhoto-submit -->
             </div><!-- /.dark-nav .dark-nav-footer -->
@@ -107,8 +107,8 @@
 
 
 <div class="big-bordered-box" id="messageAdd" sz-message-add-box>  
-    <div class="big-bordered-box-inner" >        
-        <form role="form">            
+    <div class="big-bordered-box-inner" > 
+        <!-- <form role="form" enctype="multipart/form-data" >  -->
             <div class="form-group" id="messageAdd-textarea">
                 <textarea class="form-control" rows="2"
                     placeholder="Write some text or pick photo for post or set your emotion. Or all."
@@ -144,11 +144,11 @@
                         {{messagePlace.place_address}}</p>
                 </div> <!-- /#messageAdd-messagePlace -->
 
-                <div id="messageAdd-photoPrev">
-                    <!-- <img src="http://192.168.0.101:8080/media/photos/2013/10/10/1.jpg" class="img-responsive" > -->
-                </div>
+                <div class="text-left" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
+                    <img class="img-responsive" ng-src={{pPhoto.photo}}>
+                </div><!-- /#messageAdd-photoPrev -->
             </div><!-- /.box-inner-bottom -->
-        </form>
+        <!-- </form> -->
     </div><!-- /.big-bordered-box-inner -->
 </div><!-- /#messageAdd.big-bordered-box -->
 

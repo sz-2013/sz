@@ -57,17 +57,17 @@ def get_string_date(date):
 
 
 def get_img_absolute_urls(host_url="", img=None):
-    host_url = host_url + 'media/'
+    host_url = str(host_url) + 'media/'
     return host_url + img.url if img else None
 
 
-def get_img_dict_absolute_url(img_dict, host_url):
+def get_img_dict_absolute_url(img_dict, host_url=''):
     for key, img in img_dict.iteritems():
         img_dict[key] = get_img_absolute_urls(host_url, img)
     return img_dict
 
 
-def get_system_path_media(url):
+def get_system_path_media(url=''):
     return os.path.join(settings.MEDIA_ROOT, url)
 
 
@@ -653,8 +653,9 @@ class MessagePreviewManager(models.Manager):
         if not kwargs.get('pk'):
             preview = self.model(
                 photo=unfaced_photo,
-                face=Face.objects.get(id=kwargs.get('face_id')),
                 user=User.objects.get(email=kwargs.get('user')))
+            if kwargs.get('face_id'):
+                preview.face = Face.objects.get(id=kwargs.get('face_id'))
         else:
             preview = self.model.get(pk=kwargs.get('pk'))
             preview.photo = unfaced_photo
@@ -687,8 +688,8 @@ class MessagePreviewManager(models.Manager):
         k_by_y = full_height/kwargs.get('photo_height')
 
         for face in kwargs.get('faces_list'):
-            w = float_to_int(face.get('w', 0)*k_by_x)
-            h = float_to_int(face.get('h', 0)*k_by_y)
+            w = float_to_int(face.get('width', 0)*k_by_x)
+            h = float_to_int(face.get('height', 0)*k_by_y)
             x = float_to_int(face.get('x', 0)*k_by_x)
             y = float_to_int(face.get('y', 0)*k_by_y)
             face_img = Image.open(face_full.get_fit_face(w, h))
@@ -721,6 +722,12 @@ class MessagePreview(models.Model):
         processors=[processors.ResizeToFit(1350, 1200), ],
         options={"quality": 85}
     )
-    face = models.ForeignKey('Face')
+    reduced_photo = imagekit_models.ImageSpecField(
+        [processors.ResizeToFit(435), ],
+        source="photo", options={"quality": 85})
+    thumbnail = imagekit_models.ImageSpecField(
+        [processors.ResizeToFill(90, 90), ],
+        source="photo", options={"quality": 85})
+    face = models.ForeignKey('Face', blank=True, null=True)
     user = models.ForeignKey('User', related_name='mpreviews')
     objects = MessagePreviewManager()

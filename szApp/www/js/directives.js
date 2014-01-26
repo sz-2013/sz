@@ -6,15 +6,16 @@ var Helpers = {
     photoPreview: function(scope, fileModel){
         var $photoCont = $('.photo-container');
         var $img = $photoCont.children('img');
+        var setImgMaxH = function(){
+            var min = 150;
+            var photoH = $(window).height() - 190;
+            var h = (photoH > min) ? photoH : min;
+            $img.css('maxHeight', h + 'px')
+            $(window).resize(function(){setImgMaxH();});
+        }
         return {
-            setImgMaxH: function(){
-                var min = 150;
-                var photoH = $(window).height() - 190;
-                var h = (photoH > min) ? photoH : min;
-                $img.css('maxHeight', h + 'px')
-                $(window).resize(function(){this.setImgMaxH();});
-            },
-            setImagePreviw: function(){
+            setImgMaxH: setImgMaxH,
+            setImagePreviw: function(src, title, file){
                 $img.attr('src', src);
                 if(title) $img.attr('title', title);
                 /*scope.$apply(function(){*/
@@ -102,7 +103,7 @@ angular.module('sz.client.directives', [])
 
                             options.params = params;
 
-                            helper.setImagePreviw("data:image/jpeg;base64," + imageData, options.fileName)
+                            helper.setImagePreviw("data:image/jpeg;base64," + imageData, options.fileName, options)
                         },
                         Helpers.failHandler, isLibrary);                
             }
@@ -122,7 +123,6 @@ angular.module('sz.client.directives', [])
                     {throw new Error("This browser does not support HTML5 File API.");}
                     if (el.files.length == 1){
                         var photo = el.files[0];
-                        scope[attrs.szFileModel] = photo;
                         if (photo.type.match('image.*')) {
                             var reader = new FileReader();
                             reader.onload = (function(theFile) {

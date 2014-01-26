@@ -1,30 +1,5 @@
 'use strict';
 
-var ajax = {
-    init: function(){
-        return new XMLHttpRequest();
-        },
-    send: function(url,method,args,cookies, token,_callback){
-        var q=ajax.init();
-        q.open(method,url);
-        q.onreadystatechange=function(){
-                if(this.readyState==4 && this.status==200) {
-                    _callback(this.responseText);
-                }
-            };
-        if (cookies) {
-            q.setRequestHeader('Cookie',cookies);
-            q.setRequestHeader('X-CSRFToken',token);
-        }
-        if(method=='POST') {
-            q.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-            q.send(args);
-        } else {
-            q.send(null);
-        }
-    }
-}
-
 var urls = {
     newsfeed :'#/feed',
     search :'#/',

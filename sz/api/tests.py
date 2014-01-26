@@ -1,14 +1,25 @@
 # -*- coding: utf-8 -*-
-import uuid
 import json
+import random
+import uuid
+from django.core.files import File
 from django.utils import unittest
 from sz.api import posts, serializers
 from sz.core import models, gis as gis_core
+from sz.core.models import EMOTION_CHOICES, get_system_path_media
+
+
+def get_file(path):
+    src = open(get_system_path_media(path))
+    return File(src)
 
 GENDERS = ['u', 'm', 'f']
 RACES = ['futuri', 'amadeus', 'united']
+FACES = [get_file('faces/3.png')]
 EMAIL = "sz@sz.com"
 PSWD = '123'
+PHOTO = dict(
+    photo=get_file('photos/1.jpg'), photo_height=1024, photo_width=768)
 
 LATITUDE = 40.7755555
 LONGITUDE = -73.9747221
@@ -25,6 +36,15 @@ def generate_stuff():
     return str(uuid.uuid4()).split('-')[0]
 
 
+def generate_faces_list(face, pic_width, pic_height, n=3):
+    def gener_face(k):
+        return dict(
+            x=random.randint(0, pic_width), y=random.randint(0, pic_height),
+            width=k*face.width, height=k*face.height)
+    k_list = map(lambda i: i/100.0, random.sample(xrange(20, 50), n))
+    return map(gener_face, k_list)
+
+
 def generate_email():
     return "%s@sz.com" % generate_stuff()
 
@@ -35,6 +55,18 @@ def get_race():
 
 def get_gender():
     return models.Gender.objects.get_or_create(name=GENDERS[0])[0]
+
+
+def get_face():
+    return models.Face.objects.get_or_create(
+        emotion=EMOTION_CHOICES[0][0], face=FACES[0])[0]
+
+
+def get_photo(k=1):
+    photo = dict(photo=PHOTO['photo'])
+    photo['photo_width'] = PHOTO['photo_width']*k
+    photo['photo_height'] = PHOTO['photo_height']*k
+    return photo
 
 
 def get_normal_user_data():
@@ -412,9 +444,40 @@ class PlacesVenueListTest(BLStandartDataTest):
         pass
 
 
-class PlaceRoorTest(BLStandartDataTest):
+class PlaceRootTest(BLStandartDataTest):
     pass
 
 
-class PlaceRoorNewsTest(BLStandartDataTest):
+class PlaceRootNewsTest(BLStandartDataTest):
     pass
+
+
+########## PLACES
+from sz.api.views import messages as views_messages
+
+
+class MessagePreviewRootTest(StandartDataSerializerTest):
+    def setUp(self):
+        data_user = get_full_user_data()
+        self.user = models.User.objects.get_or_create(**data_user)[0]
+
+        data_place = get_nornal_place_data()
+        self.place = models.Place.objects.get_or_create(**data_place)[0]
+
+        face = get_face()
+        photo = get_photo()
+        faces_list = generate_faces_list(
+            face.face, photo['photo_width'], photo['photo_height'])
+        self.params = dict(user=self.user.email, face_id=face.id,
+                           faces_list=faces_list, **get_photo())
+
+    def test_unface_photo(self):
+        normal_status = 201
+        response = views_messages.MessagePhotoPreview().unface(**self.params)
+        data = response.get('data', {})
+
+        self.assertEqual(
+            response.get('status'), normal_status, msg=response)
+        self.check_val_type(data, 'photo', dict, 3)
+        self.assertEqual(data.get('face_id'), self.params['face_id'])
+        self.assertTrue(data.get('id'))

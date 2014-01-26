@@ -244,36 +244,36 @@ Message section
 """
 
 
-class MessagePhotoPreviewFacesListSerializer(serializers.ModelSerializer):
+class MessagePhotoPreviewFacesListSerializer(serializers.Serializer):
     x = serializers.FloatField(required=True)
     y = serializers.FloatField(required=True)
-    w = serializers.FloatField(required=True)
-    h = serializers.FloatField(required=True)
+    width = serializers.FloatField(required=True)
+    height = serializers.FloatField(required=True)
 
 
-class MessagePhotoPreviewSerializer(serializers.ModelSerializer):
+class MessagePhotoPreviewFacesLIstField(serializers.WritableField):
+    def from_native(self, data):
+        if data is not None:
+            if not isinstance(data, list):
+                raise ValidationError(u'face_list must be a list')
+            for face in data:
+                s = MessagePhotoPreviewFacesListSerializer(data=face)
+                if not s.is_valid():
+                    raise serializers.ValidationError(s.errors)
+        return data
+
+
+class MessagePhotoPreviewSerializer(serializers.Serializer):
     user = serializers.CharField(required=True)
     photo = serializers.ImageField(required=True)
     photo_height = serializers.FloatField(required=True)
     photo_width = serializers.FloatField(required=True)
-    face_id = serializers.ChoiceField(required=True, choices=[
-        (face.pk, face.pk) for face in models.Face.objects.all()
-    ])
-    faces_list = serializers.Field()
-    pk = serializers.Field()
-
-    def validate_faces_list(self, attrs, source):
-        faces = attrs.get(source)
-        if not faces:
-            return attrs
-        if isinstance(faces, list):
-            for face in faces:
-                s = MessagePhotoPreviewFacesListSerializer(data=face)
-                if not s.is_valid():
-                    raise serializers.ValidationError(s.errors)
-        else:
-            raise serializers.ValidationError("'faces_list' mast be a list")
-        return attrs
+    face_id = serializers.IntegerField(required=True)
+    # face_id = serializers.ChoiceField(required=True, choices=[
+    #     (face.pk, face.pk) for face in models.Face.objects.all()
+    # ])
+    faces_list = MessagePhotoPreviewFacesLIstField(required=False)
+    pk = serializers.IntegerField(required=False)
 
     def validate(self, attrs):
         attrs = super(MessagePhotoPreviewSerializer, self).validate(attrs)

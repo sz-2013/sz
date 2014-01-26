@@ -55,30 +55,38 @@ szServices.factory('placeService', function($resource){
 });
 
 
-szServices.factory('messageService', function($http, $resource){    
+szServices.factory('messageService', function($http, $resource, $rootScope){    
     var url = apiIp + '/api/messages/add'
     var pCreate = function(message, success, error){
-        $http.post(url, message, {
-            headers: { 'Content-Type': false },
-            transformRequest: angular.identity,
-            params: {format: 'json'}
-        }).success(success).error(error);
+        message.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url + '/photopreviews/0', true);
+        xhr.setRequestHeader('X-CSRF-Token', $http.defaults.headers.post['X-CSRFToken']);
+        xhr.onerror = error;
+        xhr.onload = function(e){
+            var r = eval("("+xhr.responseText+")");
+            if(xhr.status==200||xhr.status==201) var obj = {fn:success, r:r.data}
+            else var obj = {fn:error, r:r}
+
+            if(obj.fn) $rootScope.$apply(function(){obj.fn(obj.r)});
+        };
+        xhr.send(message);        
     }
     var pUpdate = function(previewId, message, success, error){
-        $http.put(url + '/' + previewId, message, {
+        $http.put(url + '/photopreviews/' + previewId, message, {
             headers: { 'Content-Type': false },
             transformRequest: angular.identity,
             params: {format: 'json'}
         }).success(success).error(error);
     }
 
-    var resource = $resource(apiIp + '/api/messages/add', {previewId: '@id'}, {
+    var resource = $resource(apiIp + '/api/messages/add/:preview/:previewId', {}, {
+        previewCreate: {method:'POST', params: {preview: 'photopreviews', previewId:'0'}, isArray:false},
+        previewUpdate: {method:'PUT', params: {preview: 'photopreviews', previewId: '@id'}, isArray:false}
         /*create: { method:'GET', params:{}, isArray:false },
         update: { method:'POST', params:{docCtrl: 'publish'}, isArray:false }*/
     });
-
-    resource.prvCreate = pCreate;
-    resource.prvUpdate = pUpdate;
+    resource.previewCreate = pCreate
     return resource;
 });
 

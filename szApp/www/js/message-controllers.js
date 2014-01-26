@@ -59,8 +59,27 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
         return $scope.messageFace && $scope.messageFace.face
     }
 
+    $scope.$on('setPhotoPreviewBox', function(e, val){$scope.photoPreviewBox = val });
+    
+    $scope.pPhoto = {photo: undefined}
     $scope.unfacePhoto = function(){
-        
+        $scope.showEditPhoto = undefined;
+        $scope.$watch('photoPreviewBox', function(newval, oldval){
+            if(newval!==undefined){
+                var preview = new FormData();
+                preview.append('photo', $scope.photoPreview)
+                preview.append('photo_height', newval.photo_height)
+                preview.append('photo_width', newval.photo_width)
+                preview.append('face_id', $scope.messageFace.id)
+                preview.append('faces_list', JSON.stringify(newval.faces_list))
+                $scope.photoPreviewBox = undefined
+                messageService.previewCreate(preview, function(r){
+                    $scope.pPhoto = r;
+                    $scope.pPhoto.photo = $scope.pPhoto.photo.thumbnail;
+                });
+            }
+        });
+        //$scope.messagePhotoId=undefined
     }
 
     $scope.send = function() {    

@@ -3,7 +3,7 @@ from django.http import Http404
 from rest_framework import permissions, status
 from rest_framework.reverse import reverse
 from sz.api.views import SzApiView
-from sz.api import serializers
+from sz.api import serializers, forms
 from sz.api import response as sz_api_response
 from sz.core import models
 from lebowski.api.views import messages as lebowski_messages
@@ -20,17 +20,19 @@ class MessagePhotoPreview(SzApiView):
         except models.MessagePreview.DoesNotExist:
             raise Http404
 
-    def unface(**kwargs):
+    def unface(self, **kwargs):
         """Create or update a <MessagePhotoPreview> instance in db
 
         Args:
             **kwargs:
+                root_url - sz url.
                 user - a message creator identifier(email).
-                photo - img file
-                photo_height - h photo in client
-                photo_width - w photo in client
-                face_id - a <face> id
-                faces_list - list with faces positions [{x, y, h, w},..]
+                photo - img file.
+                photo_height - h photo in client.
+                photo_width - w photo in client.
+                face_id - a <face> id.
+                faces_list - list with faces positions
+                                    [{x, y, height, width}, ...].
 
         Returns:
             {
@@ -39,25 +41,25 @@ class MessagePhotoPreview(SzApiView):
                 'face_id': ID
             }
         """
-        serializer = serializers.MessagePhotoPreviewSerializer(data=kwargs)
-        if not serializer.is_valid():
-            return dict(
-                status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
-        preview = serializer.object
-
-        #             faces_list.get('list'), faces_list.get('box'),
-        #             message_preview)
-        return dict(
+        print kwargs
+        preview = models.MessagePreview.objects.unface_photo(**kwargs)
+        data = dict(
             photo=preview.get_photo_absolute_urls(kwargs.get('root_url')),
             id=preview.id, face_id=preview.face.id)
+        s = status.HTTP_200_OK if kwargs.get('pk') else status.HTTP_201_CREATED
+        return dict(data=data, status=s)
 
     def request_into_params(self, request, pk=None):
+        params = self.validate_and_get_params(
+            forms.MessagePhotoPreview, request.DATA, request.FILES)
         if not LEBOWSKI_MODE_TEST:
-            user = request.user
+            user = request.user.email
         else:
             user = models.User.objects.get(email=request.DATA.get('email'))
-        return dict(root_url=reverse('client-index', request=request),
-                    user=user, photo=request.FILES, pk=pk, **request.DATA)
+
+        params.update(user=user, pk=pk,
+                      root_url=reverse('client-index', request=request))
+        return params
 
     def put(self, request, pk, format=None):
         """Here we update photo at <MessagePhotoPreview>"""
@@ -68,10 +70,11 @@ class MessagePhotoPreview(SzApiView):
 
     def post(self, request, pk=None, format=None):
         """Here we create <MessagePhotoPreview> with photo and user only"""
-        if pk:
+        if pk and pk != '0':
             return sz_api_response.Response(status=status.HTTP_400_BAD_REQUEST)
         params = self.request_into_params(request)
-        return sz_api_response.Response(**self.unface(**params))
+        response = self.unface(**params)
+        return sz_api_response.Response(**response)
 
 
 # class MessagePreviewInstance(SzApiView):

@@ -47,7 +47,6 @@ angular.module('sz.raphael.directives', [])
         return function(scope, element, attrs){
             var helper = paperHelper(scope)
             function setModal(val){
-                console.log(element[0].getBoundingClientRect())
                 helper.safeApply(function(){
                     scope[attrs.szRaphaelModal] = val;
                 });
@@ -64,12 +63,13 @@ angular.module('sz.raphael.directives', [])
             // priority: 1,
             // terminal: true,
             scope: {
-                src:'=src',
-                target:'=target',
                 action:'=action',
                 ismobile:'=ismobile',
+                issend:'=issend',
                 parent:'=parent',
-                start:'=start'
+                start:'=start',
+                src:'=src',
+                target:'=target',
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
@@ -103,7 +103,6 @@ angular.module('sz.raphael.directives', [])
 
                 function setPaper(){                    
                     var box = helper.position(targetElement)
-                    console.log(targetElement.getBoundingClientRect())
                     if(box.y<0)return
                     $scope.paper.setSize(box.width, box.height)
                     var targetPos = $(targetElement).position()
@@ -125,10 +124,22 @@ angular.module('sz.raphael.directives', [])
                     if(val===false) clearPaper();
                 })
 
-                $scope.$watch('src', function(val){
+                $scope.$watch('src', function(val){//change all face.src
                     if(val!=undefined&&facesList.length)
                         facesList.forEach(function(f){f.attr('src', val)})                
-                }, true);               
+                }, true);
+
+                $scope.$watch('issend', function(newval, oldval){
+                    if(oldval!==undefined&&newval===undefined){
+                        var box = helper.position(targetElement);
+                        var faces_list = facesList.map(function(f){return f.getBBox()});
+                        $scope.$emit('setPhotoPreviewBox', {
+                            photo_width: box.width,
+                            photo_height: box.height,
+                            faces_list: faces_list
+                        });
+                    }
+                });
 
                 function photoFace(x, y, src){
                     var width = 70, height  = 70, x = x - width/2, y = y - height/2;
