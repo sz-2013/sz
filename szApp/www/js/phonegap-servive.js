@@ -111,8 +111,9 @@ szPhoneGapService.factory('camera', function ($rootScope, phonegapReady) {
                 },
                 {
                     quality:50,
-                    /*, destinationType:navigator.camera.DestinationType.DATA_URL*/destinationType: navigator.camera.DestinationType.DATA_URL,
-                    sourceType: isLibrary ? navigator.camera.PictureSourceType.PHOTOLIBRARY: undefined,
+                    destinationType: navigator.camera.DestinationType.DATA_URL,
+                    //destinationType: navigator.camera.DestinationType.FILE_URI,
+                    sourceType: isLibrary ? navigator.camera.PictureSourceType.PHOTOLIBRARY : undefined,
                     encodingType: Camera.EncodingType.PNG,
                     allowEdit: true
                 }

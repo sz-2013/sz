@@ -24,6 +24,17 @@ var Helpers = {
             },
         }
     },
+    dataURItoBlob: function(dataURI) {
+        //http://stackoverflow.com/a/15754051/3235213
+        var byteString = atob(dataURI.split(',')[1]);
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    },
 }
 
 
@@ -95,15 +106,9 @@ angular.module('sz.client.directives', [])
                 if(navigator.camera!==undefined)
                     camera.getPicture(
                         function(imageData){
-                            var options = new FileUploadOptions();
-                            options.fileKey="file";
-                            options.fileName=imageData.substr(imageData.lastIndexOf('/')+1)+'.png';
-                            options.mimeType="text/plain";
-                            var params = new Object();
-
-                            options.params = params;
-
-                            helper.setImagePreviw("data:image/jpeg;base64," + imageData, options.fileName, options)
+                            var src = "data:image/png;base64," + imageData;
+                            var photo = Helpers.dataURItoBlob(src);
+                            helper.setImagePreviw(src,  String(Math.random()).slice(2, 12) + '.png', photo)
                         },
                         Helpers.failHandler, isLibrary);                
             }

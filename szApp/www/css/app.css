@@ -61,10 +61,11 @@ header{
     z-index: 9999;
     color:#23313f;
     font-size: 4em;
+    text-align: center;
 }
 #loader>i{
     position: absolute;
-    top:50%;    
+    top:30%;
 }
 /*---------------------*/
 .face-preview{

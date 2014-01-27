@@ -111,7 +111,7 @@
         <!-- <form role="form" enctype="multipart/form-data" >  -->
             <div class="form-group" id="messageAdd-textarea">
                 <textarea class="form-control" rows="2"
-                    placeholder="Write some text or pick photo for post or set your emotion. Or all."
+                    placeholder="Write some text or pick photo for post."
                     ng-model="text" sz-auto-resize-text-area="text" ></textarea>
             </div> <!-- /#messageAdd-textarea -->
 
@@ -144,7 +144,7 @@
                         {{messagePlace.place_address}}</p>
                 </div> <!-- /#messageAdd-messagePlace -->
 
-                <div class="text-left" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
+                <div class="text-left margin-top-sm" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
                     <img class="img-responsive" ng-src={{pPhoto.photo}}>
                 </div><!-- /#messageAdd-photoPrev -->
             </div><!-- /.box-inner-bottom -->

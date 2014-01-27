@@ -44,6 +44,7 @@
         <title>ShmotZhmot</title>
     </head>
     <body ng-controller="MasterPageController" mobile-check>
+        <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
         <div id="mainPage" class="st-container animate-fall-left" ng-show="showMainPage">
             <!-- content push wrapper -->
             <div class="st-pusher"> 
@@ -100,6 +101,7 @@
         </div> -->
 
         <!-- <script type="text/javascript" src="cordova.js"></script> -->
+        <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();

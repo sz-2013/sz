@@ -9,7 +9,7 @@ var apiIp = (window.location.protocol=="http:") ?
     window.location.origin : ('http://' + ip);
 
 szServices.factory('staticValueService', function($resource){
-    return $resource(apiIp + '/api/static/:listCtrl/:docCtrl', {}, {
+    return $resource(apiIp + '/api/static/:listCtrl', {}, {
         categories: { method:'GET', params:{listCtrl: 'categories'}, isArray:false },
         races: { method:'GET', params:{listCtrl: 'races'}, isArray:false },
         genders: { method:'GET', params:{listCtrl: 'genders'}, isArray:false },
@@ -55,24 +55,27 @@ szServices.factory('placeService', function($resource){
 });
 
 
-szServices.factory('messageService', function($http, $resource, $rootScope){    
-    var url = apiIp + '/api/messages/add'
-    var pCreate = function(message, success, error){
-        message.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
+szServices.factory('messageService', function($http, $resource, $rootScope){
+    var url = apiIp + '/api/messages/add';
+    var urlPreviw = url + '/photopreviews'
+    
+    var pCreate = function(preview, success, error){
+        preview.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', url + '/photopreviews/0', true);
+        xhr.open('POST', urlPreviw + '/0', true);
         xhr.setRequestHeader('X-CSRF-Token', $http.defaults.headers.post['X-CSRFToken']);
         xhr.onerror = error;
         xhr.onload = function(e){
             var r = eval("("+xhr.responseText+")");
             if(xhr.status==200||xhr.status==201) var obj = {fn:success, r:r.data}
             else var obj = {fn:error, r:r}
-
             if(obj.fn) $rootScope.$apply(function(){obj.fn(obj.r)});
         };
-        xhr.send(message);        
+        xhr.send(preview);
     }
+
     var pUpdate = function(previewId, message, success, error){
+        //!!!!!!!!!!!!!!!!!!
         $http.put(url + '/photopreviews/' + previewId, message, {
             headers: { 'Content-Type': false },
             transformRequest: angular.identity,

@@ -41,7 +41,6 @@ class MessagePhotoPreview(SzApiView):
                 'face_id': ID
             }
         """
-        print kwargs
         preview = models.MessagePreview.objects.unface_photo(**kwargs)
         data = dict(
             photo=preview.get_photo_absolute_urls(kwargs.get('root_url')),

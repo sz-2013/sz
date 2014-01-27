@@ -1,7 +1,7 @@
 
 function MessageAddController($scope, messageService, $routeParams, $location, placeService){  
     function _getPlacesList(){
-        /*$scope.$emit("setShowLoader", true)*/
+        /*$scope.$emit("setShowLoader",true);*/
         var params = {}
         /*params.latitude = $scope.coordinates.latitude 
                 params.longitude = $scope.coordinates.longitude*/
@@ -13,7 +13,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
         var places_list = placeService.searchInVenues(params, function(r) { 
             $scope.places_list = r.places
             $scope.showPlaceSelect = true;
-            $scope.$emit("setShowLoader", false)
+            $scope.$emit("setShowLoader",false);
         });    
     }
 
@@ -66,17 +66,25 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
         $scope.showEditPhoto = undefined;
         $scope.$watch('photoPreviewBox', function(newval, oldval){
             if(newval!==undefined){
+                $scope.$emit("setShowLoader",true);
                 var preview = new FormData();
-                preview.append('photo', $scope.photoPreview)
-                preview.append('photo_height', newval.photo_height)
-                preview.append('photo_width', newval.photo_width)
-                preview.append('face_id', $scope.messageFace.id)
-                preview.append('faces_list', JSON.stringify(newval.faces_list))
-                $scope.photoPreviewBox = undefined
-                messageService.previewCreate(preview, function(r){
-                    $scope.pPhoto = r;
-                    $scope.pPhoto.photo = $scope.pPhoto.photo.thumbnail;
-                });
+                preview.append('photo', $scope.photoPreview);
+                preview.append('photo_height', newval.photo_height);
+                preview.append('photo_width', newval.photo_width);
+                preview.append('face_id', $scope.messageFace.id);
+                preview.append('faces_list', JSON.stringify(newval.faces_list));
+                $scope.photoPreviewBox = undefined;
+                messageService.previewCreate(preview,
+                    function(r){
+                        $scope.pPhoto = r;
+                        $scope.pPhoto.photo = $scope.pPhoto.photo.thumbnail;
+                        $scope.$emit("setShowLoader",false);
+                    },
+                    function(error){
+                        console.log(error);
+                        $scope.$emit("setShowLoader",false);
+                    }
+                );
             }
         });
         //$scope.messagePhotoId=undefined
