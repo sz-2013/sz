@@ -657,7 +657,7 @@ class MessagePreviewManager(models.Manager):
             if kwargs.get('face_id'):
                 preview.face = Face.objects.get(id=kwargs.get('face_id'))
         else:
-            preview = self.model.get(pk=kwargs.get('pk'))
+            preview = self.model.objects.get(pk=kwargs.get('pk'))
             preview.photo = unfaced_photo
         preview.save()
         return preview

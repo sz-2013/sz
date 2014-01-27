@@ -74,9 +74,10 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
                 preview.append('face_id', $scope.messageFace.id);
                 preview.append('faces_list', JSON.stringify(newval.faces_list));
                 $scope.photoPreviewBox = undefined;
-                messageService.previewCreate(preview,
+                messageService.preview(preview, $scope.pPhoto.id,
                     function(r){
                         $scope.pPhoto = r;
+                        console.log($scope.pPhoto.id)
                         $scope.pPhoto.photo = $scope.pPhoto.photo.thumbnail;
                         $scope.$emit("setShowLoader",false);
                     },

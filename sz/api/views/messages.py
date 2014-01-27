@@ -16,6 +16,7 @@ class MessagePhotoPreview(SzApiView):
 
     def get_object(self, pk):
         try:
+            print pk
             return models.MessagePreview.objects.get(pk=pk)
         except models.MessagePreview.DoesNotExist:
             raise Http404
@@ -60,18 +61,13 @@ class MessagePhotoPreview(SzApiView):
                       root_url=reverse('client-index', request=request))
         return params
 
-    def put(self, request, pk, format=None):
-        """Here we update photo at <MessagePhotoPreview>"""
-        params = self.request_into_params(request, pk)
-        if params['user'] != self.get_object(pk).user.email:
-            return sz_api_response.Response(status=status.HTTP_403_FORBIDDEN)
-        return sz_api_response.Response(**self.unface(**params))
-
     def post(self, request, pk=None, format=None):
         """Here we create <MessagePhotoPreview> with photo and user only"""
-        if pk and pk != '0':
-            return sz_api_response.Response(status=status.HTTP_400_BAD_REQUEST)
-        params = self.request_into_params(request)
+        if pk:
+            if request.user.email != self.get_object(pk).user.email:
+                return sz_api_response.Response(
+                    status=status.HTTP_403_FORBIDDEN)
+        params = self.request_into_params(request, pk)
         response = self.unface(**params)
         return sz_api_response.Response(**response)
 
