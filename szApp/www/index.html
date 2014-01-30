@@ -81,7 +81,10 @@
 
                 <div class="st-content">
                     <div id="wrap">
-                        <header class="container-inn text-center" ng-include ng-show="showHeder" src="currHeader">
+                        <header class="container-inn text-center"  ng-show="showHeder">
+                            <sz-side-bar ismobile="ismobile" show="showSideBar" steffect="'st-effect-8'"></sz-side-bar>
+                            <a href="#" class="navbar-brand">ShmotZhmot</a>
+                            <span ng-include src="currHeader"></span>
                         </header><!-- /header -->
 
                         <div class="clearfix container-inn" id="main" 

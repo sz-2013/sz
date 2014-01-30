@@ -93,11 +93,15 @@ function MasterPageController($scope, $cookies, $http, $location, sessionService
 
     $scope.pageHeaders = pageHeaders;
     function setHeader(header){$scope.currHeader = 'partials/navs/headers/' + $scope.pageHeaders[header] + '.html'}
-    $scope.$on('$routeChangeStart', function(event, routeData){setHeader('main')});
     $scope.$on("setHeader", function(e, header){setHeader(header)});
 
     $scope.logout = function(){$scope.session.$logout()}
     $scope.sendMessage = function(){$scope.$broadcast('sendMessage');}
+
+    $scope.$on('$routeChangeStart', function(event, routeData){
+        setHeader('main');
+        $scope.showSideBar=false;
+    });
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
