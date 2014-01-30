@@ -269,6 +269,16 @@ header{
     max-height: 60px;
 }
 
+#messageAdd-photoPrev{
+    display: inline-block;
+    position: relative;
+}
+#messageAdd-photoPrev-remove{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
 /*--------------------------------*/
 /*Helpers-class*/
 .overflow-hidden{

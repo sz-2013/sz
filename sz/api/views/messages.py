@@ -29,11 +29,7 @@ class MessagePhotoPreview(SzApiView):
                 root_url - sz url.
                 user - a message creator identifier(email).
                 photo - img file.
-                photo_height - h photo in client.
-                photo_width - w photo in client.
-                face_id - a <face> id.
-                faces_list - list with faces positions
-                                    [{x, y, height, width}, ...].
+                also here a **reguest.DATA and pk(not req.)
 
         Returns:
             {
@@ -49,7 +45,30 @@ class MessagePhotoPreview(SzApiView):
         s = status.HTTP_200_OK if kwargs.get('pk') else status.HTTP_201_CREATED
         return dict(data=data, status=s)
 
-    def request_into_params(self, request, pk=None):
+    def post(self, request, pk=None, format=None):
+        """Here we create <MessagePhotoPreview> with photo and user only
+
+        Args:
+            reguest:
+                user - a message creator.
+                FILES - an Image instance.
+                DATA:
+                    photo_height - h photo in client.
+                    photo_width - w photo in client.
+                    face_id - a <face> id.
+                    faces_list - list with faces positions
+                                        [{x, y, height, width}, ...].
+
+            pk (not req.) - pk of a <MessagePhotoPreview>,
+                which needed to update
+
+        Returns:
+            self.unface()
+        """
+        if pk:
+            if request.user.email != self.get_object(pk).user.email:
+                return sz_api_response.Response(
+                    status=status.HTTP_403_FORBIDDEN)
         params = self.validate_and_get_params(
             forms.MessagePhotoPreview, request.DATA, request.FILES)
         if not LEBOWSKI_MODE_TEST:
@@ -59,15 +78,6 @@ class MessagePhotoPreview(SzApiView):
 
         params.update(user=user, pk=pk,
                       root_url=reverse('client-index', request=request))
-        return params
-
-    def post(self, request, pk=None, format=None):
-        """Here we create <MessagePhotoPreview> with photo and user only"""
-        if pk:
-            if request.user.email != self.get_object(pk).user.email:
-                return sz_api_response.Response(
-                    status=status.HTTP_403_FORBIDDEN)
-        params = self.request_into_params(request, pk)
         response = self.unface(**params)
         return sz_api_response.Response(**response)
 
@@ -128,107 +138,47 @@ class MessagePhotoPreview(SzApiView):
 
 
 class MessageAdd(SzApiView):
-    """ Publishes a message preview. """
+    if not LEBOWSKI_MODE_TEST:
+        permission_classes = (permissions.IsAuthenticated,)
 
-    def create(**kwargs):
+    def create(self, **kwargs):
         """Create a <MessagePhotoPreview> instance in db.
 
         Args:
             user - a message creator identifier(email)
-
-            text - message text
-            OR
-            photo_id - a <MessagePhotoPreview> id
+            alse here a **request.DATA
 
         Returns:
-            ''
+            {
+                'id': ID, 'text': TEXT, 'face': FACE, 'place': PLACE,
+                'photo': {'full': URL, 'reduced': URL, 'thumbnail': URL},
+            }
         """
-        return
+        serializer = serializers.MessageAddSerializer(data=kwargs)
+        if serializer.is_valid():
+            data = serializers.MessageSerializer(
+                instance=serializer.object).data
+            return dict(data=data, status=status.HTTP_201_CREATED)
+        return dict(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def get_object(self, pk):
-    #     try:
-    #         return models.MessagePreview.objects.get(pk=pk)
-    #     except models.MessagePreview.DoesNotExist:
-    #         raise Http404
+    def post(self, request, format=None):
+        """Here we create <Message> with photo ot text or both
 
-    # def get_face(self, pk):
-    #     try:
-    #         return models.Face.objects.get(pk=pk)
-    #     except models.Face.DoesNotExist:
-    #         raise Http404
+        Must contains at least or photo_id or text.
 
-    def post(self, request, pk, format=None):
+        Args:
+            reguest:
+                user - a message creator.
+                DATA:
+                    latitude - latitude of point from which user send a msg
+                    longitude - latitude of point from which user send a msg
+                    place - id of a terget place.
+                    photo_id(not req.)  - id of a <MessagePhotoPreview>.
+                    text(not req.)  - text.
+
+        Returns:
+            self.create()
         """
-        Here we create <Message> with user and text/<MessagePreview>
-        """
-        # message_preview = self.get_object(pk)
-        # if not LEBOWSKI_MODE_TEST:
-        #     user = request.user
-        # else:
-        #     user = models.User.objects.get(email=request.DATA.get('email'))
-        # if message_preview.user != user:
-        #     return sz_api_response.Response(status=status.HTTP_403_FORBIDDEN)
-        # serializer = serializers.MessagePreviewForPublicationSerializer(
-        #     message_preview, data=request.DATA)
-        # if serializer.is_valid():
-        #     face = self.get_face(request.DATA[u'face'])
-        #     photo = message_preview.photo
-        #     if photo:
-        #         #??!! переделать это дерьмо
-        #         faces_list = request.DATA[u'photo']
-        #         # if not faces_list or \
-        #         #     not faces_list.get('list') or \
-        #         #     not faces_list.get('box') or
-        #         #     not faces_list['box'].get('face'):
-        #         #     return sz_api_response.Response(
-        #         #         {'faces and box is requered fields'},
-        #         #         status=status.HTTP_400_BAD_REQUEST)
-        #         photo = message_service.unface_photo(
-        #             faces_list.get('list'), faces_list.get('box'),
-        #             message_preview)
-        #         if not photo:
-        #             return sz_api_response.Response(
-        #                 {'faces was not added to photo'},
-        #                 status=status.HTTP_400_BAD_REQUEST)
-        #     serializer.save()
-        #     message = models.Message(text=message_preview.text, photo=photo,
-        #                              place=message_preview.place,
-        #                              face=face, user=message_preview.user)
-        #     message.save()
-        #     for category in message_preview.categories.all():
-        #         message.categories.add(category)
-        #     message_preview.delete()
-        #     categorization_service.assert_stems(message)
-        #     #next string need to change on lebowski answer
-        #     message_serializer = serializers.MessageSerializer(
-        #         instance=message)
-        #     place_serializer = serializers.PlaceSerializer(
-        #         instance=message.place)
-        #     user_serializer = serializers.UserSerializer(
-        #         instance=message.user)
-        #     user_data = dict(
-        #         user_serializer.data,
-        #         **{
-        #             "latitude": request.DATA.get('latitude', 0),
-        #             "longitude": request.DATA.get('longitude', 0)
-        #             }
-        #         )
-        #     # data = message_serializer.data
-        #     engine_data = lebowski_messages.MessagesCreate().create({
-        #         'message': message_serializer.data,
-        #         'place': place_serializer.data,
-        #         'creator': user_data
-        #     })
-        #     root_url = reverse('client-index', request=request)
-        #     data = dict(
-        #         photo=message.get_photo_absolute_urls(root_url),
-        #         place=place_serializer.data)
-        #     if LEBOWSKI_MODE_TEST:
-        #         data['bl'] = engine_data
-        #     else:
-        #         data.update(**engine_data)
-        #     print data
-        #     return sz_api_response.Response(data)
-        # else:
-        #     return sz_api_response.Response(
-        #         serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        params = dict(user=request.user.id, **request.DATA)
+        response = self.create(**params)
+        return sz_api_response.Response(**response)

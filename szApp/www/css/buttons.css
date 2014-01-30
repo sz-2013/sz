@@ -19,7 +19,9 @@ header .navbar-brand{
 .btn-success,
 .btn-success:hover, .btn-success:active, .btn-success:focus, .btn-success.active,
 .btn-link,
-.btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link.active{
+.btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link.active,
+.btn-info,
+.btn-info:hover, .btn-info:active, .btn-info:focus, .btn-info.active{
     background-color: transparent;
     border: none;
     padding: 0;
@@ -59,6 +61,15 @@ header .btn-primary{
     color:#2c3e50;
 }
 
+.btn-info{
+    background: rgba(255,255,255,0.5);
+    color: #7f8c8d;
+    border-radius: 0;
+}
+.btn-info:hover, .btn-info:active, .btn-info:focus, .btn-info.active{
+    background: rgba(255,255,255,0.8);
+    color:#2c3e50;
+}
 
 /*header .btn{
     color:#485a6b;
@@ -86,6 +97,8 @@ header .btn:focus, header .btn.active{
 .dark-nav .btn-primary:hover, .dark-nav .btn-primary:active, .dark-nav .btn-primary:focus, .dark-nav .btn-primary.active{
     color:#fff;
 }
+
+
 
 /*.main-btn-group{padding: 0 1em;}*/
 
@@ -160,6 +173,22 @@ fieldset[disabled] .btn-success:active,
 .btn-success.disabled.active,
 .btn-success[disabled].active,
 fieldset[disabled] .btn-success.active 
+
+.btn-info.disabled,
+.btn-info[disabled],
+fieldset[disabled] .btn-info,
+.btn-info.disabled:hover,
+.btn-info[disabled]:hover,
+fieldset[disabled] .btn-info:hover,
+.btn-info.disabled:focus,
+.btn-info[disabled]:focus,
+fieldset[disabled] .btn-info:focus,
+.btn-info.disabled:active,
+.btn-info[disabled]:active,
+fieldset[disabled] .btn-info:active,
+.btn-info.disabled.active,
+.btn-info[disabled].active,
+fieldset[disabled] .btn-info.active 
 {
   background-color: transparent;
   border-color: none;

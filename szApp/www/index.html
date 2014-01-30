@@ -54,7 +54,7 @@
                         <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
                     </div>
                     <ul>
-                        <li><a href="">
+                        <li><a href="{{urls.map}}">
                             World</a>
                         <li><a href={{url.newsfeed}}>
                             News Feed <span class="badge pull-right">42</span>
@@ -81,8 +81,7 @@
 
                 <div class="st-content">
                     <div id="wrap">
-                        <header class="container-inn text-center" ng-include ng-show="showHeder"
-                            src="'partials/navs/headers/mainheader.html'">                            
+                        <header class="container-inn text-center" ng-include ng-show="showHeder" src="currHeader">
                         </header><!-- /header -->
 
                         <div class="clearfix container-inn" id="main" 
@@ -115,16 +114,17 @@
     
         <script src="libs/bootstrap/js/bootstrap.min.js"></script>        
 
-        <script src="js/services.js"></script>
-        <script src="js/phonegap-servive.js"></script>
+        <script src="js/services/services.js"></script>
+        <script src="js/services/phonegap-servive.js"></script>
 
-        <script src="js/directives.js"></script>
-        <script src="js/navs-directive.js"></script>
-        <script src="js/raphael-directive.js"></script>
+        <script src="js/directives/directives.js"></script>
+        <script src="js/directives/navs-directive.js"></script>
+        <script src="js/directives/raphael-directive.js"></script>
         
-        <script src="js/controllers.js"></script>
-        <script src="js/auth-controllers.js"></script>
-        <script src="js/message-controllers.js"></script>
+        <script src="js/controllers/controllers.js"></script>
+        <script src="js/controllers/auth-controllers.js"></script>
+        <script src="js/controllers/message-controllers.js"></script>
+        <script src="js/controllers/map-controllers.js"></script>
 
         <script src="js/app.js"></script>
         <!-- <script type="text/javascript">

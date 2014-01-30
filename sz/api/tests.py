@@ -19,8 +19,7 @@ FACES = [get_file('faces/3.png')]
 EMAIL = "sz@sz.com"
 PSWD = '123'
 PHOTO = dict(
-    photo=get_file('photos/1.jpg'), photo_height=1024, photo_width=768)
-
+    photo=get_system_path_media('photos/1.jpg'), photo_height=1024, photo_width=768)
 LATITUDE = 40.7755555
 LONGITUDE = -73.9747221
 RADIUS = 250
@@ -456,7 +455,7 @@ class PlaceRootNewsTest(BLStandartDataTest):
 from sz.api.views import messages as views_messages
 
 
-class MessagePreviewRootTest(StandartDataSerializerTest):
+class MessageTest(StandartDataSerializerTest):
     def setUp(self):
         data_user = get_full_user_data()
         self.user = models.User.objects.get_or_create(**data_user)[0]
@@ -468,16 +467,63 @@ class MessagePreviewRootTest(StandartDataSerializerTest):
         photo = get_photo()
         faces_list = generate_faces_list(
             face.face, photo['photo_width'], photo['photo_height'])
-        self.params = dict(user=self.user.email, face_id=face.id,
-                           faces_list=faces_list, **get_photo())
+        self.preview_params = dict(
+            user=self.user.email, face_id=face.id,
+            faces_list=faces_list, **photo)
+        self.message_params = dict(user=self.user.id, place=self.place.id,
+                                   latitude=LATITUDE, longitude=LONGITUDE)
 
-    def test_unface_photo(self):
-        normal_status = 201
-        response = views_messages.MessagePhotoPreview().unface(**self.params)
-        data = response.get('data', {})
-
+    def _get_data(self, normal_status, response):
         self.assertEqual(
             response.get('status'), normal_status, msg=response)
-        self.check_val_type(data, 'photo', dict, 3)
-        self.assertEqual(data.get('face_id'), self.params['face_id'])
-        self.assertTrue(data.get('id'))
+        return response.get('data', {})
+
+    def test_message_preview_unface_photo(self):
+        def _get_data(normal_status, response):
+            data = self._get_data(normal_status, response)
+            self.check_val_type(data, 'photo', dict, 3)
+            self.assertEqual(
+                data.get('face_id'), self.preview_params['face_id'])
+            self.assertTrue(data.get('id'))
+            return data
+
+        def _get_photo_name(data):
+            return data.get('photo').get('full').split('/')[-1]
+
+        #create
+        response = views_messages.MessagePhotoPreview().unface(
+            **self.preview_params)
+        data = _get_data(201, response)
+
+        #update
+        pr_id = data.get('id')
+        photo_name = _get_photo_name(data)
+        self.preview_params['pk'] = pr_id
+        response = views_messages.MessagePhotoPreview().unface(
+            **self.preview_params)
+        data = _get_data(200, response)
+        self.assertEqual(data.get('id'), pr_id)
+        self.assertNotEqual(_get_photo_name(data), photo_name)
+        return pr_id
+
+    def test_message_empty(self):
+        response = views_messages.MessageAdd().create(**self.message_params)
+        self._get_data(400, response)
+
+    def test_message_create(self):
+        self.message_params['text'] = generate_stuff()
+        self.message_params['photo_id'] = \
+            self.test_message_preview_unface_photo()
+        response = views_messages.MessageAdd().create(**self.message_params)
+        self._get_data(201, response)
+
+    def test_message_photo_only(self):
+        self.message_params['photo_id'] = \
+            self.test_message_preview_unface_photo()
+        response = views_messages.MessageAdd().create(**self.message_params)
+        self._get_data(201, response)
+
+    def test_message_text_only(self):
+        self.message_params['text'] = generate_stuff()
+        response = views_messages.MessageAdd().create(**self.message_params)
+        self._get_data(201, response)

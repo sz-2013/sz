@@ -68,7 +68,6 @@
             <ul><li><span class="text-center">
                 <div class="photo-container" id="raphaelParent">                    
                     <img id="messageAdd-messagePhoto">
-                        <!-- src="http://91.142.158.33:8080/media/photos/2013/10/10/1.jpg" -->
                 </div>
             </span></li></ul><!-- /.dark-nav ul -->
 
@@ -143,10 +142,15 @@
                     <p class="overflow-hidden" ng-show="messagePlace.place_address">
                         {{messagePlace.place_address}}</p>
                 </div> <!-- /#messageAdd-messagePlace -->
-
-                <div class="text-left margin-top-sm" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
-                    <img class="img-responsive" ng-src={{pPhoto.photo}}>
-                </div><!-- /#messageAdd-photoPrev -->
+                <div class="text-left">
+                    <div class="margin-top-sm" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
+                        <img class="img-responsive" ng-src={{pPhoto.photo}}>
+                        <button class="btn btn-info btn-block text-center"
+                            id="messageAdd-photoPrev-remove" ng-click="removePhoto()">
+                            <i class="fa fa-times fa-2x"></i>
+                        </button>
+                    </div><!-- /#messageAdd-photoPrev -->
+                </div>
             </div><!-- /.box-inner-bottom -->
         <!-- </form> -->
     </div><!-- /.big-bordered-box-inner -->

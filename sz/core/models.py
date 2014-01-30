@@ -26,7 +26,7 @@ from sz.core.image_utils import FitImage
 
 STANDART_ROLE_USER_NAME = "player"
 STANDART_ROLE_PLACE_NAME = "shop"
-
+ACTIVATION_KEY_PATTERN = re.compile('^[a-f0-9]{32}$')
 
 """Static clases"""
 
@@ -157,9 +157,9 @@ class Face(models.Model):
     )
 
     def get_fit_face(self, w, h=None):
-        if h is None:
-            h = w
         source_file = open(get_system_path_media(self.face.url))
+        if not h:
+            h = w
         return FitImage(source=source_file, width=w, height=h).generate()
 
     def __unicode__(self):
@@ -345,9 +345,6 @@ class User(AbstractBaseUser):
         verbose_name_plural = _('users')
 
 
-ACTIVATION_KEY_PATTERN = re.compile('^[a-f0-9]{32}$')
-
-
 class RegistrationManager(models.Manager):
 
     def activate(self, activation_key):
@@ -445,7 +442,6 @@ class PlaceManager(models.GeoManager):
 
 
 class Place(models.Model):
-    #BUG - why id is NULL?
     #name&position - уникальный индификатор
     name = models.CharField(max_length=128, verbose_name=u"название")
     position = models.PointField(verbose_name=u"координаты")
@@ -563,92 +559,18 @@ class Place(models.Model):
         super(Place, self).save(*args, **kwargs)
 
 
-class Message(models.Model):
+class MessageManager(models.Manager):
+    def createMessage(self, **attrs):
+        photo = None
+        if attrs.get('photo_id'):
+            preview = MessagePreview.objects.get(id=attrs.pop('photo_id'))
+            photo = preview.photo
+            preview.delete()
+        message = self.model(**attrs)
+        message.photo = photo
+        message.save()
+        return message
 
-    date = models.DateTimeField(
-        auto_now_add=True, null=True, blank=True,
-        editable=False, verbose_name=u"дата добавления")
-
-    text = models.TextField(
-        max_length=1024, null=False,
-        blank=True, verbose_name=u"сообщение")
-
-    user = models.ForeignKey(
-        User, verbose_name=_('user'))
-
-    place = models.ForeignKey(
-        Place, verbose_name=u"место")
-
-    def get_photo_path(self, filename):
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
-        directory = time.strftime("photos/%Y/%m/%d")
-        return os.path.join(directory, filename)
-
-    photo = imagekit_models.ProcessedImageField(
-        upload_to=get_photo_path,
-        verbose_name=u"фотография", null=False, blank=True,
-        processors=[processors.ResizeToFit(1350, 1200), ],
-        options={"quality": 85}
-    )
-
-    reduced_photo = imagekit_models.ImageSpecField(
-        [processors.ResizeToFit(435), ],
-        source="photo", options={"quality": 85})
-
-    thumbnail = imagekit_models.ImageSpecField(
-        [processors.ResizeToFill(90, 90), ],
-        source="photo", options={"quality": 85})
-
-    def get_photo_absolute_urls_and_size(self, photo_host_url=""):
-        urls = self.get_photo_absolute_urls(photo_host_url)
-        urls_and_size = {}
-        if urls:
-            for (name, url) in urls.items():
-                photo = \
-                    name == "full" and self.photo or \
-                    name == "reduced" and self.reduced_photo or \
-                    self.thumbnail
-                urls_and_size[name] = {
-                    "url": url, "width": photo.width, "height": photo.height}
-        return urls_and_size
-
-    def get_photo_absolute_urls(self, photo_host_url=""):
-        if self.photo:
-            img_dict = dict(full=self.photo, reduced=self.reduced_photo,
-                            thumbnail=self.thumbnail)
-            return get_img_dict_absolute_url(img_dict, photo_host_url)
-        else:
-            return None
-
-    categories = models.ManyToManyField(Category, null=True, blank=True)
-    stems = models.ManyToManyField(Stem, null=True, blank=True)
-    face = models.ForeignKey(Face, null=True, blank=True)
-
-    class Meta:
-        # abstract = True
-        verbose_name = _('message')
-        verbose_name_plural = _('messages')
-
-    def __unicode__(self):
-        return u"%s" % self.text
-
-    def save(self, force_insert=False, force_update=False, using=None):
-        if self.text is None:
-            self.text = ''
-        self.text = self.text.strip()
-        models.Model.save(
-            self, force_insert=force_insert,
-            force_update=force_update, using=using)
-
-    def is_photo(self):
-        return True if self.photo else False
-
-    def get_string_date(self):
-        return get_string_date(self.date)
-
-
-class MessagePreviewManager(models.Manager):
     def _create_or_update(self, unfaced_photo, **kwargs):
         if not kwargs.get('pk'):
             preview = self.model(
@@ -682,16 +604,17 @@ class MessagePreviewManager(models.Manager):
         """
         face_full = Face.objects.get(id=kwargs.get('face_id'))
         photo = Image.open(kwargs.get('photo'))
+        # photo = Image.open()
         full_width, full_height = map(float_to_int, photo.size)
 
-        k_by_x = full_width/kwargs.get('photo_width')
-        k_by_y = full_height/kwargs.get('photo_height')
+        k_by_x = full_width / kwargs.get('photo_width')
+        k_by_y = full_height / kwargs.get('photo_height')
 
         for face in kwargs.get('faces_list'):
-            w = float_to_int(face.get('width', 0)*k_by_x)
-            h = float_to_int(face.get('height', 0)*k_by_y)
-            x = float_to_int(face.get('x', 0)*k_by_x)
-            y = float_to_int(face.get('y', 0)*k_by_y)
+            w = float_to_int(face.get('width', 0) * k_by_x)
+            h = float_to_int(face.get('height', 0) * k_by_y)
+            x = float_to_int(face.get('x', 0) * k_by_x)
+            y = float_to_int(face.get('y', 0) * k_by_y)
             face_img = Image.open(face_full.get_fit_face(w, h))
             photo.paste(face_img, (x, y), face_img)
 
@@ -703,6 +626,11 @@ class MessagePreviewManager(models.Manager):
 
 
 class MessagePreview(models.Model):
+    objects = MessageManager()
+
+    face = models.ForeignKey('Face', blank=True, null=True)
+    user = models.ForeignKey('User', related_name='mpreviews')
+
     def get_photo_absolute_urls(self, photo_host_url=""):
         if self.photo:
             img_dict = dict(full=self.photo, reduced=self.reduced_photo,
@@ -728,6 +656,68 @@ class MessagePreview(models.Model):
     thumbnail = imagekit_models.ImageSpecField(
         [processors.ResizeToFill(90, 90), ],
         source="photo", options={"quality": 85})
-    face = models.ForeignKey('Face', blank=True, null=True)
-    user = models.ForeignKey('User', related_name='mpreviews')
-    objects = MessagePreviewManager()
+
+
+class Message(models.Model):
+    class Meta:
+        verbose_name = _('message')
+        verbose_name_plural = _('messages')
+    objects = MessageManager()
+
+    user = models.ForeignKey(
+        User, verbose_name=_('user'))
+    place = models.ForeignKey(
+        Place, verbose_name=u"место")
+    date = models.DateTimeField(
+        auto_now_add=True, null=True, blank=True,
+        editable=False, verbose_name=u"дата добавления")
+    text = models.TextField(
+        max_length=1024, null=False,
+        blank=True, verbose_name=u"сообщение")
+
+    face = models.ForeignKey(Face, null=True, blank=True)
+
+    def get_photo_path(self, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        directory = time.strftime("photos/%Y/%m/%d")
+        return os.path.join(directory, filename)
+
+    def get_photo_absolute_urls(self, photo_host_url=""):
+        if self.photo:
+            img_dict = dict(full=self.photo, reduced=self.reduced_photo,
+                            thumbnail=self.thumbnail)
+            return get_img_dict_absolute_url(img_dict, photo_host_url)
+        return None
+
+    photo = imagekit_models.ProcessedImageField(
+        upload_to=get_photo_path,
+        verbose_name=u"фотография", null=False, blank=True,
+        processors=[processors.ResizeToFit(1350, 1200), ],
+        options={"quality": 85}
+    )
+
+    reduced_photo = imagekit_models.ImageSpecField(
+        [processors.ResizeToFit(435), ],
+        source="photo", options={"quality": 85})
+
+    thumbnail = imagekit_models.ImageSpecField(
+        [processors.ResizeToFill(90, 90), ],
+        source="photo", options={"quality": 85})
+
+    def __unicode__(self):
+        return u"%s" % self.text
+
+    # def save(self, force_insert=False, force_update=False, using=None):
+    #     if self.text is None:
+    #         self.text = ''
+    #     self.text = self.text.strip()
+    #     models.Model.save(
+    #         self, force_insert=force_insert,
+    #         force_update=force_update, using=using)
+
+    def is_photo(self):
+        return True if self.photo else False
+
+    def get_string_date(self):
+        return get_string_date(self.date)

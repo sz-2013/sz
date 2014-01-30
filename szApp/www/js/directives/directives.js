@@ -94,7 +94,7 @@ angular.module('sz.client.directives', [])
         //Set optimal  heigth for message box and set 
         //focus to textarea when place was selected
         return function(scope, element, attrs) {
-            var min = 200, keybowrdWidth = 500, h = $(window).height()-keybowrdWidth;
+            var min = 250, keybowrdWidth = 500, h = $(window).height()-keybowrdWidth;
             element.height( (h>min) ? h : min );
 
             if(navigator.camera!==undefined) scope.showStandartFileModel = false;

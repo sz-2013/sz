@@ -1,5 +1,5 @@
 
-function LoginController($scope, $location, sessionService){
+function LoginController($scope, $location, sessionService, $rootScope){
     $scope.inProgress = false;
     $scope.loginAlert = new Object;
     $scope.showResendBut = false;
@@ -14,15 +14,18 @@ function LoginController($scope, $location, sessionService){
         return $scope.loginAlert.password || $scope.loginAlert.non_field_errors
     }
 
-    $scope.login = function(email, password){
+    $scope.login = function(e){
+        if(e.keyCode!==undefined&&e.keyCode!==13) return
         $scope.inProgress = true;
-        $scope.session.email = email;
-        $scope.session.password = password;
+        $rootScope.showLoader = true;
+        $scope.session.email = $scope.email;
+        $scope.session.password = $scope.password;
         var session = $scope.session.$login(            
             function(response){
                 $scope.session = session;
                 $scope.inProgress = false;
-                $location.path($scope.urls.homePathAuth.slice(1))
+                $rootScope.showLoader = false;
+                $location.path($scope.urls.getPath('homePathAuth'))
             },
             function(error){                         
                 if(error.status==400){   
@@ -33,6 +36,7 @@ function LoginController($scope, $location, sessionService){
                     $scope.showResendBut = true;
                 }
                 $scope.inProgress = false;
+                $rootScope.showLoader = false;
             }
         );
     }
@@ -61,6 +65,7 @@ function RigistrationController($scope, userService){
     $scope.tmlText.errorsText = errorsText
 
     $scope.inProgress = false;
+    $rootScope.showLoader = false;
     $scope.regStage1 = true
     $scope.isEmailAlert = function(maxlength){
         return ($scope.user.email && $scope.loginAlert && $scope.user.email.length!=0) || 
@@ -92,6 +97,7 @@ function RigistrationController($scope, userService){
     $scope.registration = function(){
         if(values_is_right()){
             $scope.inProgress = true;
+            $rootScope.showLoader = true;
             var user = $scope.user;
             user.race = $scope.user.race.id;
             for (var i in $scope.genders){
@@ -105,10 +111,12 @@ function RigistrationController($scope, userService){
                 function(response){
                     $scope.regStage1 = false;
                     $scope.inProgress = false;
+                    $rootScope.showLoader = false;
                 },
                 function(error){
                     $scope.loginAlert = error.data.data;
                     $scope.inProgress = false;
+                    $rootScope.showLoader = false;
             })            
         }
         else{
@@ -127,24 +135,28 @@ function RigistrationController($scope, userService){
 
 function RegistrationConfirmation($scope, userService, $location, $route){
     $scope.inProgress = false;
+    $rootScope.showLoader = false;
 
     $scope.confirmation = function(email){
         $scope.showConfirmationResponse = false;
         delete $scope.confirmationError
         $scope.inProgress = true;
+        $rootScope.showLoader = true;
         var email = $scope.user && $scope.user.email
         userService.resend_activation_key({'email': email},
         function(response){
             $scope.inProgress = false;
+            $rootScope.showLoader = false;
             $scope.showConfirmationResponse = true;
         },
         function(error){
             $scope.inProgress = false;
+            $rootScope.showLoader = false;
             $scope.confirmationError = error.data});
     }
 
     $scope.goToLogin = function(){
-        var loginUrl = $scope.urls.login.slice(1);
+        var loginUrl = $scope.urls.getPath('login');
         if($location.path()!=loginUrl) $location.path(loginUrl);
         else $route.reload();
     }

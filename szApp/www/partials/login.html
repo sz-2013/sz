@@ -22,7 +22,8 @@
                 <div class="form-group" id="login-pswd" ng-class="{'has-error':isPswdAlert()}">
                     <div class="input-group" id="login-pswd-info">
                         <span class="input-group-addon"> <i class="fa fa-key fa-fw"> </i></span>
-                        <input type="password" class="form-control" id="inputPassword" placeholder="Password" ng-model="password" ng-disabled="inProgress">
+                        <input type="password" class="form-control" id="inputPassword" placeholder="Password"
+                            ng-disabled="inProgress" ng-keydown="login($event)" ng-model="password">
                     </div><!-- /#login-pswd-info -->
 
                     <span class="text-danger" id="login-pswd-alert" ng-show="loginAlert.password">
@@ -51,7 +52,7 @@
 
 
     <div class="form-group margin-top-sm text-left paddin-X-normal" id="login-mainButtons">
-        <button class="btn btn-primary" id="login-mainButtons-login" ng-disabled="inProgress" ng-click="login(email, password)" type="submit">
+        <button class="btn btn-primary" id="login-mainButtons-login" ng-disabled="inProgress" ng-click="login()" type="submit">
             <i class="fa fa-sign-in fa-lg"></i>
         </button><!-- /#login-mainButtons-login -->
 

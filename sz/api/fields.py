@@ -1,5 +1,8 @@
+import json
 from rest_framework import fields
 from rest_framework import relations
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 # from sz.api import pagination
 # from sz.api import services
 
@@ -36,3 +39,38 @@ class ResourceField (relations.HyperlinkedIdentityField):
     def field_to_native(self, obj, field_name):
         url = super(ResourceField, self).field_to_native(obj, field_name)
         return {'url': url, }
+
+
+class FacesInFacesListFeils(forms.Field):
+    default_error_messages = {
+        'wrong_type': _(u'face in faces_list must be a dict instance'),
+        'wrong_keys': _(u'"x", "y", "width" and "height" must be in a face'),
+    }
+
+    def validate(self, value):
+        if not isinstance(value, dict):
+            raise forms.ValidationError(self.error_messages['wrong_type'])
+        if not value.get('x') and not value.get('y') and \
+           not value.get('width') and not value.get('height'):
+                raise forms.ValidationError(self.error_messages['wrong_keys'])
+
+
+class FacesListField(forms.Field):
+    default_error_messages = {
+        'wrong_type': _(u'faces_list must be a list instance'),
+    }
+
+    def _to_list(self, value):
+        return json.loads(value)
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+        return self._to_list(value)
+
+    def validate(self, value):
+        if value:
+            if not isinstance(value, list):
+                raise forms.ValidationError(self.error_messages['wrong_type'])
+            f = FacesInFacesListFeils()
+            map(f.clean, value)

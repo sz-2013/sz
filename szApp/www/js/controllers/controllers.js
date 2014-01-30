@@ -5,9 +5,8 @@ var urls = {
     search :'#/',
     placeSelect :'#/places/select',
     map :'#/map',
-    messageAdd :function(id){
-        var id = id || ''
-        return '#/messages/add/' + id.toString()
+    messageAdd :function(){
+        return '#/messages/add/'
     },
     place :function(id){
         var url = '#/places/' + id
@@ -21,7 +20,18 @@ var urls = {
     homePathAuth :'#/',
     brand :'#',
     registration :'#/registration',
-    wiki :'#'
+    wiki :'#',
+    afterMessageAdd: function(placeId){
+        return '#'
+    },
+    getPath: function(name){
+        var attrs_and_args = name.split('(')
+        var path = attrs_and_args[0]
+        var arg = (attrs_and_args.length>1) ? attrs_and_args[1].split(')')[0] : undefined
+        if(typeof(path)==='string')return path.slice(1)
+        if(typeof(path)==='function')return path(arg).slice(1)
+    }
+
 }
 
 
@@ -29,7 +39,10 @@ var partials = {
     'regConfirm':'partials/registration-confirmation.html',
 }
 
-
+var pageHeaders = {
+    'main': 'main-header',
+    'messageAdd': 'messageadd-header'
+}
 function randomSets(r){
     function random(){
         return Math.floor(4 + Math.random() * 5)
@@ -78,10 +91,13 @@ function MasterPageController($scope, $cookies, $http, $location, sessionService
         $http.defaults.headers.put['X-CSRFToken'] = token;
     });
 
-    $scope.logout = function(){
-        console.log($http.defaults.headers.post['X-CSRFToken'])
-        $scope.session.$logout()
-    }    
+    $scope.pageHeaders = pageHeaders;
+    function setHeader(header){$scope.currHeader = 'partials/navs/headers/' + $scope.pageHeaders[header] + '.html'}
+    $scope.$on('$routeChangeStart', function(event, routeData){setHeader('main')});
+    $scope.$on("setHeader", function(e, header){setHeader(header)});
+
+    $scope.logout = function(){$scope.session.$logout()}
+    $scope.sendMessage = function(){$scope.$broadcast('sendMessage');}
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];

@@ -60,7 +60,7 @@ szServices.factory('messageService', function($http, $resource, $rootScope){
     
     var preview = function(preview, id, success, error){
         var previewurl = url + '/photopreviews/' + ( id || '' );
-
+        var error = error || function(e){console.log(e); $rootScope.showLoader = false;}
         preview.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
         var xhr = new XMLHttpRequest();
         xhr.open('POST', previewurl, true);
@@ -79,10 +79,7 @@ szServices.factory('messageService', function($http, $resource, $rootScope){
     }
 
     var resource = $resource(url, {}, {
-        previewCreate: {method:'POST', params: {preview: 'photopreviews', previewId:'0'}, isArray:false},
-        previewUpdate: {method:'PUT', params: {preview: 'photopreviews', previewId: '@id'}, isArray:false}
-        /*create: { method:'GET', params:{}, isArray:false },
-        update: { method:'POST', params:{docCtrl: 'publish'}, isArray:false }*/
+        create: {method:'POST', params: {}, isArray:false}
     });
     resource.preview = preview
     return resource;

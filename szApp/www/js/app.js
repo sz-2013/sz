@@ -24,6 +24,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/login', {templateUrl: 'partials/login.html', controller: LoginController})
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
         .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
+        .when('/map', {templateUrl: 'partials/map.html', controller: MapController})
         /*
         
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})
@@ -37,7 +38,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .otherwise({redirectTo: '/'});
 }]);
 
-szApp.config(['$httpProvider', function($httpProvider){
+szApp.config(['$httpProvider', function($httpProvider, $rootScope){
     $httpProvider.responseInterceptors.push(function($q) {
         return function(promise){
             return promise.then(function(response) {

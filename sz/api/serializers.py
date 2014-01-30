@@ -280,45 +280,38 @@ class MessagePhotoPreviewSerializer(serializers.Serializer):
         return models.MessagePreview.objects.unface_photo(**attrs)
 
 
-class MessageBaseSerializer(serializers.ModelSerializer):
-    photo = serializers.ImageField(required=False)
+class MessageAddSerializer(serializers.ModelSerializer):
+    photo_id = serializers.IntegerField(required=False)
 
     class Meta:
+        model = models.Message
         read_only_fields = ('date',)
-        exclude = ('place', 'user', 'stems',)
+        exclude = ('stems',)
 
     def validate(self, attrs):
         """
         Check that the start is before the stop.
         """
         text = attrs.get('text').strip() if attrs.get('text') else ''
-        photo = attrs.get('photo', None)
+        photo_id = attrs.get('photo_id', None)
+        photo = models.MessagePreview.objects.get(
+            pk=photo_id) if photo_id else None
         if not (photo or text != ""):
             raise serializers.ValidationError("Message don't must be empty")
+        if photo and photo.user != attrs.get("user"):
+            raise serializers.ValidationError(
+                "Users in attrs and in MessagePreview mismatch")
         return attrs
 
+    def restore_object(self, attrs, instance=None):
+        if not instance:
+            instance = models.Message.objects.createMessage(**attrs)
+        return instance
 
-class MessageSerializer(MessageBaseSerializer):
 
+class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Message
-        read_only_fields = ('date',)
-        exclude = ('place', 'user', 'stems',)
-
-
-class MessagePreviewSerializer(MessageBaseSerializer):
-
-    class Meta:
-        model = models.MessagePreview
-        exclude = ('user',)
-
-
-class MessagePreviewForPublicationSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.MessagePreview
-        fields = ('categories',)
-
 
 # class MessageBigLSerializer(serializers.Serializer):
 #     message_id = serializers.IntegerField(source="id")
