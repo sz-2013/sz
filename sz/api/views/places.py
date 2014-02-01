@@ -16,23 +16,27 @@ class PlaceRoot(SzApiView):
     LIMIT = 10
 
     def _serialize_item(self, item, user):
+        """Place instance serializer
+
+        Args:
+            item - {<Place>, distance},
+                where <Place> - a <Place> instance, distance - int
+            user - a <User> instance
+
+        Return:
+            serializers.place_detail_serialiser(**params)
+        """
         if not item:
             return
         params = dict(
             place=item['place'], distance=item['distance'], user=user)
         return serializers.place_detail_serialiser(**params)
 
-    def validate_req_params(self, query, email=None):
+    def validate_req_params(self, query):
         params = self.validate_and_get_params(
             self.form, query)
-        if not settings.LEBOWSKI_MODE_TEST:
-            params['user'] = email   # @TODO(kunla): validate emil here?
-        else:
-            params['user'] = query.get('email')
         params['limit'] = self.LIMIT
-        s = serializers.UserSerializer(data={"email": params['user']})
-        user = s.object if s.is_valid() else None
-        return params, user
+        return params
 
 
 class PlaceRootNews(SzApiView):
@@ -60,11 +64,16 @@ class PlaceVenueExplore(PlaceRoot):
     For example,
     [places for position (50.2616113, 127.5266082) radius 250]
     (?latitude=50.2616113&longitude=127.5266082&radius=250).
+
+    Returns:
+        ?????
     """
     form = forms.PlaceExploreRequestForm
 
-    def explore(self, **kwargs):
-        params, creator = self.validate_req_params(**kwargs)
+    def get(self, request, format=None):
+        params = self.validate_req_params(request.QUERY_PARAMS)
+        creator = request.user
+        params['user'] = creator
         places_list = place_service.explore_in_venues(**params)
         if places_list:
             bl_data = serializers.UserStandartDataSerializer(
@@ -78,7 +87,8 @@ class PlaceVenueExplore(PlaceRoot):
             # engine_data = posts.places_create(bl_data)
 
             data = {}
-            data['data'] = dict(user=creator, places_explored=len(places_list))
+            data['data'] = dict(
+                user=creator.email, places_explored=len(places_list))
             data['status'] = status.HTTP_201_CREATED
             gamemap_service.update_gamemap(params)
 
@@ -96,14 +106,9 @@ class PlaceVenueExplore(PlaceRoot):
             # if settings.LEBOWSKI_MODE_TEST:
             #     data['bl'] = engine_data
             #     data['status'] = status.HTTP_201_CREATED
-            return data
-        return {}
-
-    def get(self, request, format=None):
-        response = self.explore(
-            query=request.QUERY_PARAMS,
-            email=request.QUERY_PARAMS.get('email'))
-        return sz_api_response(**response)
+            return sz_api_response(**data)
+        return sz_api_response(
+            data=dict(user=creator.email, places_explored=len(places_list)))
 
 
 class PlaceVenueSearch(PlaceRoot):
@@ -112,17 +117,17 @@ class PlaceVenueSearch(PlaceRoot):
     For example,
     [places for position (50.2616113, 127.5266082) radius 250]
     (?latitude=50.2616113&longitude=127.5266082&radius=250).
+
+    Returns:
+        [self._serialize_item(item, request.user), ..]
     """
     form = forms.PlaceSearchRequestForm
 
     def get(self, request, format=None):
-        kwargs = dict(
-            query=request.QUERY_PARAMS,
-            email=request.QUERY_PARAMS.get('email'))
-        params, user = self.validate_req_params(**kwargs)
+        params = self.validate_req_params(request.QUERY_PARAMS)
         places_list = place_service.search_in_venue(**params)
         place_response = map(
-            lambda item: self._serialize_item(item, user), places_list)
+            lambda item: self._serialize_item(item, request.user), places_list)
         data = dict(places=place_response)
         return sz_api_response(data)
 
@@ -151,8 +156,9 @@ class GameMapRoot(PlaceRoot):
     form = forms.PlaceSearchRequestForm
 
     def get(self, request, format=None):
-        params, user = self.validate_req_params(request)
-        gamemap = gamemap_service.get_gamemap(**params)
+        params = self.validate_req_params(request.QUERY_PARAMS)
+        user = request.user
+        gamemap = gamemap_service.get_gamemap(user, **params)
         data = dict(
             last_box=self._serialize_item(gamemap.get('last_box'), user),
             current_box=self._serialize_item(gamemap.get('current_box'), user),

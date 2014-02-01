@@ -16,34 +16,9 @@ class MessagePhotoPreview(SzApiView):
 
     def get_object(self, pk):
         try:
-            print pk
             return models.MessagePreview.objects.get(pk=pk)
         except models.MessagePreview.DoesNotExist:
             raise Http404
-
-    def unface(self, **kwargs):
-        """Create or update a <MessagePhotoPreview> instance in db
-
-        Args:
-            **kwargs:
-                root_url - sz url.
-                user - a message creator identifier(email).
-                photo - img file.
-                also here a **reguest.DATA and pk(not req.)
-
-        Returns:
-            {
-                'photo': {'full': URL, 'reduced': URL, 'thumbnail': URL},
-                'id': ID,
-                'face_id': ID
-            }
-        """
-        preview = models.MessagePreview.objects.unface_photo(**kwargs)
-        data = dict(
-            photo=preview.get_photo_absolute_urls(kwargs.get('root_url')),
-            id=preview.id, face_id=preview.face.id)
-        s = status.HTTP_200_OK if kwargs.get('pk') else status.HTTP_201_CREATED
-        return dict(data=data, status=s)
 
     def post(self, request, pk=None, format=None):
         """Here we create <MessagePhotoPreview> with photo and user only
@@ -63,7 +38,11 @@ class MessagePhotoPreview(SzApiView):
                 which needed to update
 
         Returns:
-            self.unface()
+            {
+                'photo': {'full': URL, 'reduced': URL, 'thumbnail': URL},
+                'id': ID,
+                'face_id': ID
+            }
         """
         if pk:
             if request.user.email != self.get_object(pk).user.email:
@@ -75,11 +54,14 @@ class MessagePhotoPreview(SzApiView):
             user = request.user.email
         else:
             user = models.User.objects.get(email=request.DATA.get('email'))
-
-        params.update(user=user, pk=pk,
-                      root_url=reverse('client-index', request=request))
-        response = self.unface(**params)
-        return sz_api_response.Response(**response)
+        root_url = reverse('client-index', request=request)
+        params.update(pk=pk, user=user)
+        preview = models.MessagePreview.objects.unface_photo(**params)
+        data = dict(
+            photo=preview.get_photo_absolute_urls(root_url),
+            id=preview.id, face_id=preview.face.id)
+        s = status.HTTP_200_OK if pk else status.HTTP_201_CREATED
+        return sz_api_response.Response(data=data, status=s)
 
 
 # class MessagePreviewInstance(SzApiView):

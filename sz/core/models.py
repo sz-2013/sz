@@ -333,8 +333,8 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-    def get_string_date_confirm(self):
-        return get_string_date(self.date_confirm)
+    # def get_string_date_confirm(self):
+    #     return get_string_date(self.date_confirm)
 
     @property
     def is_staff(self):
@@ -502,13 +502,12 @@ class Place(models.Model):
     def foursquare_details_url(self):
         return "https://foursquare.com/v/%s" % self.fsq_id
 
-    def get_string_date(self):
-        return get_string_date(self.date_is_active)
+    # def get_string_date(self):
+    #     return get_string_date(self.date_is_active)
 
     def get_last_message_date(self):
-        date = self.message_set.all() and \
-            self.message_set.order_by('-date')[0].date
-        return get_string_date(date)
+        return self.message_set.all() and \
+            self.message_set.order_by('-date')[0].date or None
 
     def get_gamemap_position(self):
         if not self.gamemap_position:
@@ -532,11 +531,17 @@ class Place(models.Model):
         return self.owner.race if self.owner else None
 
     def is_owner(self, user):
+        """As user can received <User>, userid or user email"""
         if not user or not self.owner:
             return False
         if isinstance(user, int):
             user_id = user
-        elif isinstance(user, object):
+        elif isinstance(user, basestring):
+            user_list = User.objects.filter(email=user)
+            if not user_list:
+                return False
+            user_id = user_list[0].id
+        elif isinstance(user, User):
             user_id = user.id
         else:
             return False

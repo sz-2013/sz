@@ -3,6 +3,7 @@ import json
 import random
 import uuid
 from django.core.files import File
+from django.test.client import RequestFactory
 from django.utils import unittest
 from sz.api import posts, serializers
 from sz.core import models, gis as gis_core
@@ -18,8 +19,7 @@ RACES = ['futuri', 'amadeus', 'united']
 FACES = [get_file('faces/3.png')]
 EMAIL = "sz@sz.com"
 PSWD = '123'
-PHOTO = dict(
-    photo=get_system_path_media('photos/1.jpg'), photo_height=1024, photo_width=768)
+PHOTO = dict(file='photos/1.jpg', photo_height=1024, photo_width=768)
 LATITUDE = 40.7755555
 LONGITUDE = -73.9747221
 RADIUS = 250
@@ -29,6 +29,21 @@ PLACE_LAT = 40.76022
 PLACE_LON = -73.98439
 CITY_ID = 1
 POSITION = gis_core.ll_to_point(PLACE_LON, PLACE_LAT)
+
+api_root = '/api/'
+API = {
+    'user': {
+        'create': api_root + 'users/register/',
+    },
+    'place': {
+        'explore': api_root + 'places/explore-in-venues/',
+        'search': api_root + 'search-in-venues',
+    },
+    'message': {
+        'photopreview': api_root + 'messages/add/photopreviews/',
+        'create': api_root + 'messages/add/'
+    },
+}
 
 
 def generate_stuff():
@@ -41,7 +56,7 @@ def generate_faces_list(face, pic_width, pic_height, n=3):
             x=random.randint(0, pic_width), y=random.randint(0, pic_height),
             width=k*face.width, height=k*face.height)
     k_list = map(lambda i: i/100.0, random.sample(xrange(20, 50), n))
-    return map(gener_face, k_list)
+    return json.dumps(map(gener_face, k_list))
 
 
 def generate_email():
@@ -62,10 +77,63 @@ def get_face():
 
 
 def get_photo(k=1):
-    photo = dict(photo=PHOTO['photo'])
+    photo = dict(file=PHOTO['file'])
     photo['photo_width'] = PHOTO['photo_width']*k
     photo['photo_height'] = PHOTO['photo_height']*k
     return photo
+
+
+def get_data(response):
+    content = json.loads(response.render().content)
+    return content.get('data') if isinstance(content, dict) else content
+
+
+def get_response(path, method, views,
+                 query=None, files=None, data=None, user=None, kwargs=None):
+    """Generate request.
+
+    Args:
+        path - path for request, str.
+        method - method for request, str.
+        views - str,
+        normal_code - expected code, num.
+        query - query for request, dict
+        data - data for request, dict
+        user - <User> instance
+        files - dict, for ex
+            {"photo": SHORT_PATH} or {"photo": PHOTO_FILE}
+        kwargs - dict
+
+    Returns:
+        response
+    """
+    factory = RequestFactory()
+    request = getattr(factory, method.lower())(path)
+    request._dont_enforce_csrf_checks = True
+    if files:
+        files_storage = {}
+        for name, f in files.iteritems():
+            if isinstance(f, basestring):
+                f = get_file(f)
+            if isinstance(f, File):
+                files_storage[name] = f
+        request.FILES.update(**files_storage)
+    if data:
+        request.POST.update(**data)
+    if query:
+        # query_list = ["%s=%s" % (k, v) for k, v in query.iteritems()]
+        # request.GET = QueryDict(';'.join(query_list))
+        request.GET = query
+    if user:
+        request.user = user
+    if not kwargs:
+        kwargs = {}
+    return views.as_view()(request, **kwargs)
+
+
+def get_string_date(date):
+    return [date.year, date.month, date.day,
+            date.hour, date.minute, date.second] if date else []
 
 
 def get_normal_user_data():
@@ -108,7 +176,8 @@ class BLStandartDataTest(unittest.TestCase):
         if val_len is not None:
             self.assertEqual(len(val), val_len)
 
-    def check_place_data(self, data, place, user=None):
+    def check_place_data(self, data, place, bl_test=True,
+                         user=None, is_owner=None, distance=None):
         """
         (STANDART_PLACE_DATA)
         [https://github.com/sz-2013/sz/wiki/BL:-STANDART_PLACE_DATA]
@@ -123,38 +192,58 @@ class BLStandartDataTest(unittest.TestCase):
 
         self.assertEqual(data.get('place_id'), place.id)
         self.assertEqual(data.get('place_name'), place.name)
-        self.assertEqual(data.get('place_city'), place.city)    # int
+        self.assertEqual(data.get('place_city'), place.city_id)    # int
         self.assertEqual(
             data.get('place_longitude'), place.longitude())  # float
         self.assertEqual(
             data.get('place_latitude'), place.latitude())  # float
+        self.assertEqual(data.get('place_address'), place.address)   # str
         self.assertEqual(
-            data.get('place_gamemap_position'),
-            place.get_gamemap_position() or [])
+            data.get('place_gamemap_position'), place.get_gamemap_position())
         self.assertEqual(data.get('place_role'), place.role.name)
-        self.assertEqual(data.get('place_date'), place.get_string_date())
         self.assertEqual(
-            data.get('place_last_message_date'), place.get_last_message_date())
+            data.get('place_date'), get_string_date(place.date_is_active))
+        self.assertEqual(data.get('place_last_message_date'),
+                         get_string_date(place.get_last_message_date()),
+                         msg="%s - %s" % (
+                             type(data.get('place_last_message_date')),
+                             type(get_string_date(
+                                 place.get_last_message_date()))
+                         ))
         self.assertEqual(data.get('place_state'), place.is_active)
 
-        self.check_val_type(data, 'place_lvl', int)
+        if bl_test:
+            self.check_val_type(data, 'place_lvl', int)
 
-        check_profit('place_profit_owner')
-        check_profit('place_profit_race')
-        check_profit('place_penalty')
+            check_profit('place_profit_owner')
+            check_profit('place_profit_race')
+            check_profit('place_penalty')
 
-        self.check_val_type(data, 'place_towers', list, 0)
+            self.check_val_type(data, 'place_towers', list, 0)
 
-        self.check_val_type(data, 'place_owner', list, 2)
-        owner_id, owner_sp = data.get('place_owner')
-        self.assertEqual(owner_id, place.owner and place.owner.id)
-        self.check_val_type(owner_sp, 'place_owner[1] (owner_sp)', float)
+            self.check_val_type(data, 'place_owner', list, 2)
+            owner_id, owner_sp = data.get('place_owner')
+            self.assertEqual(owner_id, place.owner and place.owner.id)
+            self.check_val_type(owner_sp, 'place_owner[1] (owner_sp)', float)
 
-        self.assertEqual(data.get('place_owner'), place.get_owner_race())
+            self.assertEqual(data.get('place_owner'), place.get_owner_race())
+
         if user:
             self.check_val_type(data, 'place_user', float)
         if data.get('place_opener'):
             self.check_val_type(data, 'place_opener', int)
+
+        if is_owner is not None:
+            if isinstance(is_owner, bool):
+                self.assertEqual(data.get('is_owner'), is_owner)
+            else:
+                self.assertIn('is_owner', data)
+        if distance is not None:
+            if isinstance(distance, bool):
+                self.assertIn('distance', data)
+            else:
+                self.assertEqual(data.get('distance'), distance)
+        return data
 
     def check_user_data(self, data, user):
         """
@@ -192,6 +281,7 @@ class BLStandartDataTest(unittest.TestCase):
 
         self.check_val_type(data, 'user_inventory', list)
         self.check_val_type(data, 'user_radius', int)
+        return data
 
 
 class StandartDataSerializerTest(BLStandartDataTest):
@@ -213,42 +303,25 @@ class UserStandartDataSerializerTest(StandartDataSerializerTest):
         self.assertEqual(data.get('user_gender'), self.user.gender.name)
         self.assertEqual(data.get('user_race'), self.user.race.name)
         self.assertEqual(data.get('user_role'), self.user.role.name)
-        self.assertEqual(
-            data.get('user_date_confirm'),
-            self.user.get_string_date_confirm())
+        self.assertEqual(data.get('user_date_confirm'),
+                         get_string_date(self.user.date_confirm))
 
 
 class PlaceDetailSerialiserTest(StandartDataSerializerTest):
-    def check_standart_data(self):
-        data = serializers.PlaceStandartDataSerializer(
-            instance=self.place).data
-
-        self.assertEqual(data.get('place_id'), self.place.id)
-        self.assertEqual(data.get('place_name'), self.place.name)
-        self.assertEqual(data.get('place_city'), self.place.city_id)
-        self.assertEqual(data.get('place_latitude'), self.place.latitude())
-        self.assertEqual(data.get('place_longitude'), self.place.longitude())
-        self.assertEqual(data.get('place_address'), self.place.address)
-        self.assertEqual(
-            data.get('place_gamemap_position'),
-            self.place.get_gamemap_position())
-        self.assertEqual(data.get('place_date'), self.place.get_string_date())
-        self.assertEqual(data.get('place_role'), self.place.role.name)
-        self.assertEqual(data.get('place_fsqid'), self.place.fsq_id)
-        self.assertEqual(
-            data.get('place_owner_race'), self.place.get_owner_race())
-        return data
+    def check_standart_data_place(self, data, is_owner=None, distance=None):
+        return self.check_place_data(data, self.place, bl_test=False,
+                                     is_owner=is_owner, distance=distance)
 
     def test_standart_data(self):
-        self.check_standart_data()
+        data = serializers.PlaceStandartDataSerializer(
+            instance=self.place).data
+        self.check_standart_data_place(data)
 
     def test_place_detail_serialiser(self):
         distance = 100
         data = serializers.place_detail_serialiser(
             self.place, self.user, distance)
-        self.check_standart_data()
-        self.assertEqual(data.get('is_owner'), False)
-        self.assertEqual(data.get('distance'), distance)
+        self.check_standart_data_place(data, is_owner=False, distance=distance)
 
 
 class RegistrationSerialiserTest(unittest.TestCase):
@@ -319,26 +392,26 @@ class RegistrationSerialiserTest(unittest.TestCase):
 """Posts"""
 
 
-class PostMainTest(unittest.TestCase):
-    def test_wrong_url(self):
-        data = posts.main_post(data={'data': 0}, prefix='wrong_path')
-        self.assertEqual(data.get('status'), 404)
-        self.assertEqual(data.get('data'), 'Not Found')
+# class PostMainTest(unittest.TestCase):
+#     def test_wrong_url(self):
+#         data = posts.main_post(data={'data': 0}, prefix='wrong_path')
+#         self.assertEqual(data.get('status'), 404)
+#         self.assertEqual(data.get('data'), 'Not Found')
 
-########## USERS
+# ########## USERS
 
 
-class UserCreatePostTest(unittest.TestCase):
-    def test_create_wrong_data(self):
-        #@TODO(kunla): uncomment it when bl will answer 400
-        # data = posts.users_create({'data': 0})
-        # self.assertEqual(data.get('status'), 400)
-        # self.assertEqual(data.get('data'), '')
-        pass
+# class UserCreatePostTest(unittest.TestCase):
+#     def test_create_wrong_data(self):
+#         #@TODO(kunla): uncomment it when bl will answer 400
+#         # data = posts.users_create({'data': 0})
+#         # self.assertEqual(data.get('status'), 400)
+#         # self.assertEqual(data.get('data'), '')
+#         pass
 
-    def test_create(self):
-        #@TODO(kunla): doit
-        pass
+#     def test_create(self):
+#         #@TODO(kunla): doit
+#         pass
 
 
 ########## PLACE
@@ -362,21 +435,25 @@ from sz.api.views import users as views_users
 
 class UsersRootTest(BLStandartDataTest):
     def setUp(self):
-        self.request = get_normal_user_data()
-        self.response = views_users.UsersRoot().create(self.request)
+        self.data = get_normal_user_data()
+
+    def _get_data(self, status_code, method, view, data=None):
+        response = get_response(
+            API['user']['create'], method, view, data=data)
+        self.assertEqual(
+            response.status_code, status_code, msg=response.render())
+        return get_data(response)
 
     def test_create(self):
-        normal_status = 201
-        normal_data = dict(
-            email=self.request['email'], is_anonymous=False,
-            is_authenticated=True)
+        normal_data = dict(email=self.data['email'], is_anonymous=False,
+                           is_authenticated=True)
 
-        user = models.User.objects.get_or_create(
-            email=self.request['email'])[0]
+        data = self._get_data(201, 'post', views_users.UsersRoot, self.data)
+        user = models.User.objects.filter(email=data['email'])
 
-        self.assertEqual(
-            self.response.get('status'), normal_status, msg=self.response)
-        self.assertEqual(self.response.get('data'), normal_data)
+        self.assertEqual(len(user), 1)
+        user = user[0]
+        self.assertEqual(data, normal_data)
 
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_active)
@@ -385,23 +462,24 @@ class UsersRootTest(BLStandartDataTest):
         self.assertIsNone(user.date_confirm)
         self.assertEqual(user.role.name, models.STANDART_ROLE_USER_NAME)
         self.assertIsNone(user.last_box)
+        return self.data['email']
 
     def test_activate(self):
-        normal_status = 201
+        email = self.test_create()
 
-        user = models.User.objects.get_or_create(
-            email=self.request['email'])[0]
+        def _get_user():
+            return models.User.objects.get_or_create(
+                email=email)[0]
+
+        user = _get_user()
         activation_key = models.RegistrationProfile.objects.get(
             user=user).activation_key
 
         activate_response = views_users.activate_user(activation_key)
 
-        user = models.User.objects.get_or_create(
-            email=self.request['email'])[0]
-
+        user = _get_user()
         self.assertEqual(
-            activate_response.get('status'), normal_status,
-            msg=activate_response)
+            activate_response.get('status'), 201, msg=activate_response)
         self.check_user_data(activate_response.get('data'), user)
 
         self.assertTrue(user.is_active)
@@ -422,25 +500,30 @@ from sz.api.views import places as views_places
 class PlacesVenueListTest(BLStandartDataTest):
     def setUp(self):
         self.user = models.User.objects.get_or_create(email=EMAIL)[0]
-        query = dict(latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
-        self.kwargs = dict(query=query, email=self.user.email)
+        self.query = dict(
+            latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
+
+    def _get_data(self, status_code, action, view):
+        response = get_response(
+            API['place'][action], 'GET', view,
+            query=self.query, user=self.user)
+        self.assertEqual(
+            response.status_code, status_code, msg=response.render())
+        return get_data(response)
 
     def test_explore(self):
-        normal_status = 201
-        normal_creator = dict(email=self.user.email)
-
-        response = views_places.PlaceVenueExplore().explore(**self.kwargs)
-        data = response.get('data', {})
-
-        self.assertEqual(
-            response.get('status'), normal_status, msg=response)
+        data = self._get_data(201, 'explore', views_places.PlaceVenueExplore)
         self.check_val_type(data, 'places_explored', int)
-        self.check_val_type(data, 'user', dict)
-        self.assertEqual(data.get('user'), normal_creator)
+        # self.check_val_type(data, 'user', dict)
+        self.assertEqual(data.get('user'), self.user.email)
 
     def test_search(self):
-        #@TODO(kunla): and what to test here?
-        pass
+        data = self._get_data(200, 'search', views_places.PlaceVenueSearch)
+        self.check_val_type(data, 'places', list)
+        for d in data['places']:
+            p = models.Place.objects.get(id=d.get('place_id'))
+            self.check_place_data(data=d, place=p, bl_test=False,
+                                  is_owner=0, distance=True)
 
 
 class PlaceRootTest(BLStandartDataTest):
@@ -451,7 +534,7 @@ class PlaceRootNewsTest(BLStandartDataTest):
     pass
 
 
-########## PLACES
+########## MESSAGE
 from sz.api.views import messages as views_messages
 
 
@@ -468,18 +551,18 @@ class MessageTest(StandartDataSerializerTest):
         faces_list = generate_faces_list(
             face.face, photo['photo_width'], photo['photo_height'])
         self.preview_params = dict(
-            user=self.user.email, face_id=face.id,
-            faces_list=faces_list, **photo)
-        self.message_params = dict(user=self.user.id, place=self.place.id,
-                                   latitude=LATITUDE, longitude=LONGITUDE)
+            face_id=face.id, faces_list=faces_list,
+            photo_width=photo['photo_width'],
+            photo_height=photo['photo_height'])
+        self.message_params = dict(
+            place=self.place.id, latitude=LATITUDE, longitude=LONGITUDE)
 
     def _get_data(self, normal_status, response):
         self.assertEqual(
-            response.get('status'), normal_status, msg=response)
-        return response.get('data', {})
+            response.status_code, normal_status, msg=response.render())
+        return get_data(response)
 
-    def test_message_preview_unface_photo(self):
-        def _get_data(normal_status, response):
+    def __get_data(self, normal_status, response):
             data = self._get_data(normal_status, response)
             self.check_val_type(data, 'photo', dict, 3)
             self.assertEqual(
@@ -487,43 +570,52 @@ class MessageTest(StandartDataSerializerTest):
             self.assertTrue(data.get('id'))
             return data
 
-        def _get_photo_name(data):
-            return data.get('photo').get('full').split('/')[-1]
+    def _get_photo_name(self, data):
+        return data.get('photo').get('full').split('/')[-1]
 
+    def _get_response(self, pk=None):
+        path = API['message']['photopreview']
+        kwargs = dict(pk=pk)
+        if pk:
+            path += '%s/update/' % pk
+        return get_response(
+            path, 'POST', views_messages.MessagePhotoPreview,
+            data=self.preview_params, user=self.user,
+            files=dict(photo=PHOTO['file']), kwargs=kwargs)
+
+    def test_message_preview(self):
         #create
-        response = views_messages.MessagePhotoPreview().unface(
-            **self.preview_params)
-        data = _get_data(201, response)
+        response = self._get_response()
+        data = self.__get_data(201, response)
 
-        #update
-        pr_id = data.get('id')
-        photo_name = _get_photo_name(data)
-        self.preview_params['pk'] = pr_id
-        response = views_messages.MessagePhotoPreview().unface(
-            **self.preview_params)
-        data = _get_data(200, response)
-        self.assertEqual(data.get('id'), pr_id)
-        self.assertNotEqual(_get_photo_name(data), photo_name)
-        return pr_id
+        return data.get('id'), self._get_photo_name(data)
 
-    def test_message_empty(self):
-        response = views_messages.MessageAdd().create(**self.message_params)
-        self._get_data(400, response)
+    def test_message_preview_update(self):
+        pk, photo_name = self.test_message_preview()
+        response = self._get_response(pk)
+        data = self.__get_data(200, response)
+        self.assertEqual(data.get('id'), pk)
+        self.assertNotEqual(self._get_photo_name(data), photo_name)
 
-    def test_message_create(self):
-        self.message_params['text'] = generate_stuff()
-        self.message_params['photo_id'] = \
-            self.test_message_preview_unface_photo()
-        response = views_messages.MessageAdd().create(**self.message_params)
-        self._get_data(201, response)
 
-    def test_message_photo_only(self):
-        self.message_params['photo_id'] = \
-            self.test_message_preview_unface_photo()
-        response = views_messages.MessageAdd().create(**self.message_params)
-        self._get_data(201, response)
+    # def test_message_empty(self):
+    #     response = c.post(API['message']['create'], self.message_params)
+    #     self._get_data(400, response)
 
-    def test_message_text_only(self):
-        self.message_params['text'] = generate_stuff()
-        response = views_messages.MessageAdd().create(**self.message_params)
-        self._get_data(201, response)
+    # def test_message_create(self):
+    #     self.message_params['text'] = generate_stuff()
+    #     self.message_params['photo_id'] = \
+    #         self.test_message_preview()
+    #     response = c.post(API['message']['create'], self.message_params)
+    #     self._get_data(201, response)
+
+    # def test_message_photo_only(self):
+    #     self.message_params['photo_id'] = \
+    #         self.test_message_preview()
+    #     response = c.post(API['message']['create'], self.message_params)
+    #     self._get_data(201, response)
+
+    # def test_message_text_only(self):
+    #     self.message_params['text'] = generate_stuff()
+    #     response = c.post(API['message']['create'], self.message_params)
+    #     self._get_data(201, response)

@@ -26,7 +26,7 @@ urlpatterns = patterns(
     url(r'^messages/add/photopreviews/?$',
         messages.MessagePhotoPreview.as_view(),
         name='message-photoprewies-create'),
-    url(r'^messages/add/photopreviews/(?P<pk>\d+)/?$',
+    url(r'^messages/add/photopreviews/(?P<pk>\d+)/update/?$',
         messages.MessagePhotoPreview.as_view(),
         name='message-photoprewies-update'),
     url(r'^messages/add/?$',

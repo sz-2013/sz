@@ -1,7 +1,7 @@
 import json
 import re
 import urllib2
-from rest_framework import status
+from rest_framework import status as httpStatus
 from sz import blsettings as settings
 from sz.settings import LEBOWSKI_MODE_TEST
 
@@ -23,7 +23,7 @@ def get_data(response):
     except Exception, e:
         return dict(
             data="something wrong with 'get_data' function: %s" % e,
-            status=status.HTTP_400_BAD_REQUEST)
+            status=httpStatus.HTTP_400_BAD_REQUEST)
 
 
 def main_post(data, prefix):
@@ -57,7 +57,7 @@ def main_post(data, prefix):
     except (urllib2.HTTPError, urllib2.URLError), e:
         data = e.reason
         status = e.code if isinstance(
-            e, urllib2.HTTPError) else status.HTTP_400_BAD_REQUEST
+            e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST
     main_data = dict(data=data, status=status)
     if LEBOWSKI_MODE_TEST:
         main_data['data'] = dict(

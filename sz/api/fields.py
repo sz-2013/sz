@@ -1,6 +1,8 @@
 import json
+import datetime
 from rest_framework import fields
 from rest_framework import relations
+from rest_framework import serializers
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 # from sz.api import pagination
@@ -74,3 +76,25 @@ class FacesListField(forms.Field):
                 raise forms.ValidationError(self.error_messages['wrong_type'])
             f = FacesInFacesListFeils()
             map(f.clean, value)
+
+
+class StringDataField(serializers.WritableField):
+    def to_native(self, date):
+        if isinstance(date, datetime.datetime):
+            return [date.year, date.month, date.day,
+                    date.hour, date.minute, date.second]
+        else:
+            return []
+
+
+class MessagePhotoPreviewFacesLIstField(serializers.WritableField):
+    def from_native(self, data):
+        if data is not None:
+            if not isinstance(data, list):
+                raise serializers.ValidationError(u'face_list must be a list')
+            for face in data:
+                s = serializers.MessagePhotoPreviewFacesListSerializer(
+                    data=face)
+                if not s.is_valid():
+                    raise serializers.ValidationError(s.errors)
+        return data

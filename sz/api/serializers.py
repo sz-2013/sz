@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from sz.api import fields as sz_api_fields
+from sz.api.fields import StringDataField, MessagePhotoPreviewFacesLIstField
 from sz.core import models, gis as gis_core
 
 
@@ -176,7 +177,7 @@ class UserStandartDataSerializer(serializers.Serializer):
     user_gender = serializers.IntegerField(source="gender.name")
     user_race = serializers.IntegerField(source="race.name")
     user_role = serializers.IntegerField(source="role.name")
-    user_date_confirm = serializers.Field(source="get_string_date_confirm")
+    user_date_confirm = StringDataField(source="date_confirm")
 
 
 """
@@ -223,10 +224,11 @@ class PlaceStandartDataSerializer(serializers.Serializer):
     place_address = serializers.CharField(source="address", required=False)
     place_gamemap_position = serializers.Field(
         source="get_gamemap_position", )  # [x, y]
-    place_date = serializers.Field(source="get_string_date")
     place_role = serializers.Field(source="role.name")
+    place_date = StringDataField(source="date_is_active")
+    place_last_message_date = StringDataField(source="get_last_message_date")
+    place_state = serializers.BooleanField(source="is_active")
     place_fsqid = serializers.CharField(source="fsq_id")
-    # place_last_message_date
     # place_lvl = serializers.Field(source="lvl")
     #place_owner = serializers.CommaSeparatedIntegerField(
     #       source="get_owner_info") # [id, 0]
@@ -249,18 +251,6 @@ class MessagePhotoPreviewFacesListSerializer(serializers.Serializer):
     y = serializers.FloatField(required=True)
     width = serializers.FloatField(required=True)
     height = serializers.FloatField(required=True)
-
-
-class MessagePhotoPreviewFacesLIstField(serializers.WritableField):
-    def from_native(self, data):
-        if data is not None:
-            if not isinstance(data, list):
-                raise ValidationError(u'face_list must be a list')
-            for face in data:
-                s = MessagePhotoPreviewFacesListSerializer(data=face)
-                if not s.is_valid():
-                    raise serializers.ValidationError(s.errors)
-        return data
 
 
 class MessagePhotoPreviewSerializer(serializers.Serializer):

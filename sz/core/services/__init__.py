@@ -112,7 +112,7 @@ class PlaceService(FeedService):
                 longitude  - the point longitude
                 query - string key for filter
                 radius - radius for filter
-                user - user email
+                user - <User>
 
         Returns:
             [<Place>,..]
@@ -125,7 +125,7 @@ class PlaceService(FeedService):
         query = params.get(params_names.QUERY)
         radius = params.get(params_names.RADIUS)
         creator = {
-            'email': kwargs[u'user'],
+            'email': kwargs[u'user'].email,
             'latitude': latitude, 'longitude': longitude
         }
         #get place_list from 4qk
@@ -152,8 +152,6 @@ class PlaceService(FeedService):
                 longitude  - the point longitude
                 query - string key for filter
                 radius - radius for filter
-                user - user email
-
         Returns:
             [<Place>,..]
         """
@@ -235,7 +233,7 @@ class GameMapService(FeedService):
                     p.update_gamemap(x + 1, y + 1)
         return
 
-    def get_gamemap(self, **kwargs):
+    def get_gamemap(self, user, **kwargs):
         """Return a square map of the city
         around user in limit: current box, last box
 
@@ -257,7 +255,7 @@ class GameMapService(FeedService):
         latitude = params.get(params_names.LATITUDE)
         longitude = params.get(params_names.LONGITUDE)
         city_id = params.get(params_names.CITY_ID)
-        user = models.User.objects.get(email=kwargs.get('user'))
+        user = models.User.objects.get(email=user)
         last_box = user.last_box
         if not last_box:
             return {}
