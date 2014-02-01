@@ -43,18 +43,12 @@ class ResourceField (relations.HyperlinkedIdentityField):
         return {'url': url, }
 
 
-class FacesInFacesListFeils(forms.Field):
-    default_error_messages = {
-        'wrong_type': _(u'face in faces_list must be a dict instance'),
-        'wrong_keys': _(u'"x", "y", "width" and "height" must be in a face'),
-    }
-
-    def validate(self, value):
-        if not isinstance(value, dict):
-            raise forms.ValidationError(self.error_messages['wrong_type'])
-        if not value.get('x') and not value.get('y') and \
-           not value.get('width') and not value.get('height'):
-                raise forms.ValidationError(self.error_messages['wrong_keys'])
+class FacesListInstanceForm(forms.Form):
+    x = forms.FloatField(required=True)
+    y = forms.FloatField(required=True)
+    height = forms.FloatField(required=True)
+    width = forms.FloatField(required=True)
+    face_id = forms.IntegerField(required=True)
 
 
 class FacesListField(forms.Field):
@@ -70,12 +64,14 @@ class FacesListField(forms.Field):
             return None
         return self._to_list(value)
 
-    def validate(self, value):
-        if value:
-            if not isinstance(value, list):
+    def validate(self, faces_list):
+        if faces_list:
+            if not isinstance(faces_list, list):
                 raise forms.ValidationError(self.error_messages['wrong_type'])
-            f = FacesInFacesListFeils()
-            map(f.clean, value)
+            for f in faces_list:
+                request_form = FacesListInstanceForm(data=f)
+                if not request_form.is_valid():
+                    raise forms.ValidationError(request_form.errors)
 
 
 class StringDataField(serializers.WritableField):

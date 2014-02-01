@@ -65,9 +65,8 @@ class GameMapRequestForm(forms.Form):
         required=True, min_value=-180.0, max_value=180.0, label=u'Долгота')
 
 
-class MessagePhotoPreview(forms.Form):
+class MessagePhotoPreviewForm(forms.Form):
     photo = forms.ImageField(required=True)
     photo_width = forms.FloatField(required=True)
     photo_height = forms.FloatField(required=True)
-    face_id = forms.IntegerField(required=False)
     faces_list = FacesListField(required=False)

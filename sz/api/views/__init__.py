@@ -90,14 +90,6 @@ class ApiRoot(SzApiView):
                     'users-resending-activation-key', request=request),
             },
             'message': {
-                'messages_previews_list': reverse(
-                    'message-preview-list', request=request),
-                'message_preview_publish': reverse(
-                    'message-preview-publish',
-                    request=request, kwargs={'pk': 22}),
-                'message_previews_detail': reverse(
-                    'message-previews-detail',
-                    request=request, kwargs={'pk': 22}),
                 # 'messages-search': reverse(
                 #    'message-search', request=request),
             },

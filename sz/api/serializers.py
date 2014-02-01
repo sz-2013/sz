@@ -251,6 +251,7 @@ class MessagePhotoPreviewFacesListSerializer(serializers.Serializer):
     y = serializers.FloatField(required=True)
     width = serializers.FloatField(required=True)
     height = serializers.FloatField(required=True)
+    face_id = serializers.IntegerField(required=True)
 
 
 class MessagePhotoPreviewSerializer(serializers.Serializer):

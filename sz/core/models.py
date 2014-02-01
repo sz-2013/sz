@@ -576,16 +576,21 @@ class MessageManager(models.Manager):
         message.save()
         return message
 
-    def _create_or_update(self, unfaced_photo, **kwargs):
+    def _create_or_update_preview(self, unfaced_photo, **kwargs):
         if not kwargs.get('pk'):
             preview = self.model(
                 photo=unfaced_photo,
                 user=User.objects.get(email=kwargs.get('user')))
-            if kwargs.get('face_id'):
-                preview.face = Face.objects.get(id=kwargs.get('face_id'))
         else:
             preview = self.model.objects.get(pk=kwargs.get('pk'))
             preview.photo = unfaced_photo
+        preview.save()
+        preview.faces.clear()
+        faces_id_list = [f_data.get('face_id') for f_data in
+                         kwargs.get('faces_list', [])]
+        for face_id in faces_id_list:
+            face = Face.objects.get(id=face_id)
+            preview.faces.add(face)
         preview.save()
         return preview
 
@@ -601,13 +606,12 @@ class MessageManager(models.Manager):
                 photo - img file
                 photo_height - h photo in client
                 photo_width - w photo in client
-                face_id - a <face> id
-                faces_list - list with faces positions [{x, y, h, w},..]
+                faces_list - list with faces positions
+                    [{x, y, height, width, face_id},..]
 
         Returns:
             self._create_preview(unfaced_photo, **kwargs)
         """
-        face_full = Face.objects.get(id=kwargs.get('face_id'))
         photo = Image.open(kwargs.get('photo'))
         # photo = Image.open()
         full_width, full_height = map(float_to_int, photo.size)
@@ -615,11 +619,12 @@ class MessageManager(models.Manager):
         k_by_x = full_width / kwargs.get('photo_width')
         k_by_y = full_height / kwargs.get('photo_height')
 
-        for face in kwargs.get('faces_list'):
+        for face in kwargs.get('faces_list', []):
             w = float_to_int(face.get('width', 0) * k_by_x)
             h = float_to_int(face.get('height', 0) * k_by_y)
             x = float_to_int(face.get('x', 0) * k_by_x)
             y = float_to_int(face.get('y', 0) * k_by_y)
+            face_full = Face.objects.get(id=face.get('face_id'))
             face_img = Image.open(face_full.get_fit_face(w, h))
             photo.paste(face_img, (x, y), face_img)
 
@@ -627,13 +632,13 @@ class MessageManager(models.Manager):
         photo.save(photo_io, format='JPEG')
         unfaced_photo = InMemoryUploadedFile(
             photo_io, None, 'foo.jpg', 'image/jpeg', photo_io.len, None)
-        return self._create_or_update(unfaced_photo, **kwargs)
+        return self._create_or_update_preview(unfaced_photo, **kwargs)
 
 
 class MessagePreview(models.Model):
     objects = MessageManager()
 
-    face = models.ForeignKey('Face', blank=True, null=True)
+    faces = models.ManyToManyField('Face', blank=True, null=True)
     user = models.ForeignKey('User', related_name='mpreviews')
 
     def get_photo_absolute_urls(self, photo_host_url=""):
@@ -661,6 +666,9 @@ class MessagePreview(models.Model):
     thumbnail = imagekit_models.ImageSpecField(
         [processors.ResizeToFill(90, 90), ],
         source="photo", options={"quality": 85})
+
+    def get_faces_id(self):
+        return [face.id for face in self.faces.all()]
 
 
 class Message(models.Model):

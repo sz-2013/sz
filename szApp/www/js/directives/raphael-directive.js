@@ -64,6 +64,7 @@ angular.module('sz.raphael.directives', [])
             // terminal: true,
             scope: {
                 action:'=action',
+                face: '=face',
                 ismobile:'=ismobile',
                 issend:'=issend',
                 parent:'=parent',
@@ -94,7 +95,7 @@ angular.module('sz.raphael.directives', [])
                     /*setPaper()  */
                     var elements = $scope.paper.getElementsByPoint(mouse.x, mouse.y);
                     if(elements.length) return
-                    var f = photoFace(mouse.x, mouse.y, $scope.src)
+                    var f = photoFace(mouse.x, mouse.y)
                     facesList.push(f)                        
                     /*f.doAction()*/
                   /*  e.stopPropagation();                        
@@ -124,15 +125,19 @@ angular.module('sz.raphael.directives', [])
                     if(val===false) clearPaper();
                 })
 
-                $scope.$watch('src', function(val){//change all face.src
+                /*$scope.$watch('src', function(val){//change all face.src
                     if(val!=undefined&&facesList.length)
                         facesList.forEach(function(f){f.attr('src', val)})                
-                }, true);
+                }, true);*/
 
                 $scope.$watch('issend', function(newval, oldval){
                     if(oldval!==undefined&&newval===undefined){
                         var box = helper.position(targetElement);
-                        var faces_list = facesList.map(function(f){return f.getBBox()});
+                        var faces_list = facesList.map(function(f){
+                            var box=f.getBBox();
+                            box.face_id = f.face_id;
+                            return box
+                        });
                         $scope.$emit('setPhotoPreviewBox', {
                             photo_width: box.width,
                             photo_height: box.height,
@@ -141,13 +146,14 @@ angular.module('sz.raphael.directives', [])
                     }
                 });
 
-                function photoFace(x, y, src){
+                function photoFace(x, y){
                     var width = 70, height  = 70, x = x - width/2, y = y - height/2;
                     var minw = 50, minh = 50;
                     var step = width/5, time = 700;
-                    var face = $scope.paper.image(src, x, y, width, height)
+                    var face = $scope.paper.image($scope.face.face, x, y, width, height)
                     face.t = time;
                     face.step = step;
+                    face.face_id = $scope.face.id
 
                     function changeVal(dir){
                         var dir = dir || 1;

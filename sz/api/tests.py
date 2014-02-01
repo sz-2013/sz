@@ -50,11 +50,14 @@ def generate_stuff():
     return str(uuid.uuid4()).split('-')[0]
 
 
-def generate_faces_list(face, pic_width, pic_height, n=3):
+def generate_faces_list(pic_width, pic_height, n=3):
+    face = get_face()
+
     def gener_face(k):
         return dict(
             x=random.randint(0, pic_width), y=random.randint(0, pic_height),
-            width=k*face.width, height=k*face.height)
+            width=k*face.face.width, height=k*face.face.height,
+            face_id=face.id)
     k_list = map(lambda i: i/100.0, random.sample(xrange(20, 50), n))
     return json.dumps(map(gener_face, k_list))
 
@@ -256,7 +259,7 @@ class BLStandartDataTest(unittest.TestCase):
         self.assertEqual(data.get('user_role'), user.role.name)
         self.assertEqual(data.get('user_gender'), user.gender.name)
         self.assertEqual(
-            data.get('user_date_confirm'), user.get_string_date_confirm())
+            data.get('user_date_confirm'), get_string_date(user.date_confirm))
 
         self.check_val_type(data, 'user_faces', list)
         self.check_val_type(data, 'user_places', int)
@@ -538,7 +541,7 @@ class PlaceRootNewsTest(BLStandartDataTest):
 from sz.api.views import messages as views_messages
 
 
-class MessageTest(StandartDataSerializerTest):
+class MessagePreviewTest(StandartDataSerializerTest):
     def setUp(self):
         data_user = get_full_user_data()
         self.user = models.User.objects.get_or_create(**data_user)[0]
@@ -546,58 +549,60 @@ class MessageTest(StandartDataSerializerTest):
         data_place = get_nornal_place_data()
         self.place = models.Place.objects.get_or_create(**data_place)[0]
 
-        face = get_face()
-        photo = get_photo()
-        faces_list = generate_faces_list(
-            face.face, photo['photo_width'], photo['photo_height'])
-        self.preview_params = dict(
-            face_id=face.id, faces_list=faces_list,
-            photo_width=photo['photo_width'],
-            photo_height=photo['photo_height'])
         self.message_params = dict(
             place=self.place.id, latitude=LATITUDE, longitude=LONGITUDE)
 
-    def _get_data(self, normal_status, response):
+    def _get_data(self, status_code, response):
         self.assertEqual(
-            response.status_code, normal_status, msg=response.render())
+            response.status_code, status_code, msg=response.render())
         return get_data(response)
 
-    def __get_data(self, normal_status, response):
-            data = self._get_data(normal_status, response)
-            self.check_val_type(data, 'photo', dict, 3)
-            self.assertEqual(
-                data.get('face_id'), self.preview_params['face_id'])
-            self.assertTrue(data.get('id'))
-            return data
+    def _check_data_prewview(self, status_code, pk=None):
+        photo = get_photo()
+        del photo['file']
+        faces_list = generate_faces_list(
+            photo['photo_width'], photo['photo_height'])
+        params = dict(faces_list=faces_list, **photo)
 
-    def _get_photo_name(self, data):
-        return data.get('photo').get('full').split('/')[-1]
-
-    def _get_response(self, pk=None):
         path = API['message']['photopreview']
         kwargs = dict(pk=pk)
         if pk:
             path += '%s/update/' % pk
-        return get_response(
+        response = get_response(
             path, 'POST', views_messages.MessagePhotoPreview,
-            data=self.preview_params, user=self.user,
+            data=params, user=self.user,
             files=dict(photo=PHOTO['file']), kwargs=kwargs)
 
-    def test_message_preview(self):
-        #create
-        response = self._get_response()
-        data = self.__get_data(201, response)
+        data = self._get_data(status_code, response)
 
-        return data.get('id'), self._get_photo_name(data)
+        normal_photo_dict = dict(full='', reduced='', thumbnail='')
+        self.check_val_type(data, 'photo', dict, 3)
+        self.assertEqual(normal_photo_dict.keys(), data.get('photo').keys())
+        for url in data.get('photo').values():
+            self.assertTrue(isinstance(url, basestring))
+
+        self.check_val_type(data, 'id', int)
+        if pk:
+            self.assertEqual(data['id'], pk)
+
+        faces_id = list(set(
+            [f_data.get('face_id') for f_data in json.loads(faces_list)]))
+        self.assertEqual(data.get('faces_id'), faces_id)
+        return data['id'], data['photo']['full'].split('/')[-1]
+
+    def test_message_preview(self):
+        self._check_data_prewview(201)
 
     def test_message_preview_update(self):
-        pk, photo_name = self.test_message_preview()
-        response = self._get_response(pk)
-        data = self.__get_data(200, response)
-        self.assertEqual(data.get('id'), pk)
-        self.assertNotEqual(self._get_photo_name(data), photo_name)
+        pk, photo_name = self._check_data_prewview(201)
+
+        newpk, newphoto_name = self._check_data_prewview(200, pk)
+        self.assertEqual(pk, newpk)
+        self.assertNotEqual(photo_name, newphoto_name)
 
 
+class MessageAddTest(MessagePreviewTest):
+    pass
     # def test_message_empty(self):
     #     response = c.post(API['message']['create'], self.message_params)
     #     self._get_data(400, response)

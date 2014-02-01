@@ -67,7 +67,6 @@ angular.module("navs-directive", [])
                     document.addEventListener( eventstart, bodyClickFn );
                 }
                 $scope.$watch('show', function(val){
-                    console.log(val)
                     if(val===true) open_navs();
                     if(val===false) resetMenu();
                 });
