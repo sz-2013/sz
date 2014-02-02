@@ -251,26 +251,25 @@ class GameMapService(FeedService):
             map_height - value of boxes by y,
         """
         params = parameters.PlaceSearchParametersFactory.create(
-            kwargs, self.city_service).get_db_params()
-        latitude = params.get(params_names.LATITUDE)
-        longitude = params.get(params_names.LONGITUDE)
-        city_id = params.get(params_names.CITY_ID)
+            kwargs, self.city_service)
+        # latitude = params.get(params_names.LATITUDE)
+        # longitude = params.get(params_names.LONGITUDE)
+        # city_id = params.get(params_names.CITY_ID)
         user = models.User.objects.get(email=user)
-        last_box = user.last_box
-        if not last_box:
-            return {}
-        radius_from_last_box = gis_core.distance(
-            longitude, latitude, last_box.longitude(), last_box.latitude())
-        params['radius'] = radius_from_last_box
-        params['limit'] = 1000
+        # radius_from_last_box = gis_core.distance(
+        #     longitude, latitude, last_box.longitude(), last_box.latitude())
+        # params['radius'] = radius_from_last_box
         places_list = filter(
-            lambda p: p.gamemap_position, queries.search_places(**params))
+            lambda p: p.gamemap_position,
+            queries.search_places(**params.get_db_params()))
         places_positions = [p.get_gamemap_position() for p in places_list]
         places_x = sorted(map(lambda pos: pos[0], places_positions))
         places_y = sorted(map(lambda pos: pos[1], places_positions))
+        last_box = user.last_box and \
+            self._make_place_distance_item(user.last_box, params) or None
         data = dict(
             last_box=last_box,
-            current_box=places_list[0],
+            current_box=self._make_place_distance_item(places_list[0], params),
             gamemap=self._make_distance_items_list(params, places_list),
             map_width=places_x[-1] - places_x[0],
             map_height=places_y[-1] - places_y[0],

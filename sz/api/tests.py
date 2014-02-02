@@ -43,6 +43,9 @@ API = {
         'photopreview': api_root + 'messages/add/photopreviews/',
         'create': api_root + 'messages/add/'
     },
+    'gamemap': {
+        'get_gamemap': api_root + 'gamemap/',
+    },
 }
 
 
@@ -248,7 +251,7 @@ class BLStandartDataTest(unittest.TestCase):
                 self.assertEqual(data.get('distance'), distance)
         return data
 
-    def check_user_data(self, data, user):
+    def check_user_data(self, data, user, bl_test=True):
         """
         (STANDART_USER_DATA)
         [https://github.com/sz-2013/sz/wiki/BL:-STANDART_USER_DATA]
@@ -264,26 +267,27 @@ class BLStandartDataTest(unittest.TestCase):
         self.check_val_type(data, 'user_faces', list)
         self.check_val_type(data, 'user_places', int)
 
-        self.check_val_type(data, 'user_zp', list, 2)
-        zp, zp_add = data.get('user_zp')
-        self.check_val_type(zp, 'user_zp[0](zp_value))', float)
-        self.check_val_type(zp_add, 'user_zp[1](zp_add_value))', float)
+        if bl_test:
+            self.check_val_type(data, 'user_zp', list, 2)
+            zp, zp_add = data.get('user_zp')
+            self.check_val_type(zp, 'user_zp[0](zp_value))', float)
+            self.check_val_type(zp_add, 'user_zp[1](zp_add_value))', float)
 
-        self.check_val_type(data, 'user_stats', dict)
-        stats = data.get('user_stats')
-        self.assertEqual(
-            sorted(stats.keys()),
-            sorted(['agility', 'strength', 'fortune', 'intellect']))
-        for stat_name, val in stats.iteritems():
-            _stat_name = 'user_stats: %s' % stat_name
-            self.check_val_type(val, _stat_name, list, 2)
-            lvl, lvl_up_cost = val
-            self.check_val_type(lvl, "%s[0](lvl)" % (_stat_name), int)
-            self.check_val_type(
-                lvl_up_cost, "%s[1](lvl_up_cost)" % (_stat_name), float)
+            self.check_val_type(data, 'user_stats', dict)
+            stats = data.get('user_stats')
+            self.assertEqual(
+                sorted(stats.keys()),
+                sorted(['agility', 'strength', 'fortune', 'intellect']))
+            for stat_name, val in stats.iteritems():
+                _stat_name = 'user_stats: %s' % stat_name
+                self.check_val_type(val, _stat_name, list, 2)
+                lvl, lvl_up_cost = val
+                self.check_val_type(lvl, "%s[0](lvl)" % (_stat_name), int)
+                self.check_val_type(
+                    lvl_up_cost, "%s[1](lvl_up_cost)" % (_stat_name), float)
 
-        self.check_val_type(data, 'user_inventory', list)
-        self.check_val_type(data, 'user_radius', int)
+            self.check_val_type(data, 'user_inventory', list)
+            self.check_val_type(data, 'user_radius', int)
         return data
 
 
@@ -417,17 +421,17 @@ class RegistrationSerialiserTest(unittest.TestCase):
 #         pass
 
 
-########## PLACE
+# ########## PLACE
 
 
-class PlaceCreateTest(unittest.TestCase):
-    pass
+# class PlaceCreateTest(unittest.TestCase):
+#     pass
 
 
-########## Message
+# ########## Message
 
-class MessageCreateTest(unittest.TestCase):
-    pass
+# class MessageCreateTest(unittest.TestCase):
+#     pass
 
 
 """Views"""
@@ -515,10 +519,11 @@ class PlacesVenueListTest(BLStandartDataTest):
         return get_data(response)
 
     def test_explore(self):
+        models.Place.objects.all().delete()
         data = self._get_data(201, 'explore', views_places.PlaceVenueExplore)
         self.check_val_type(data, 'places_explored', int)
-        # self.check_val_type(data, 'user', dict)
-        self.assertEqual(data.get('user'), self.user.email)
+        self.check_user_data(
+            data.get('user'), self.user, data['places_explored'])
 
     def test_search(self):
         data = self._get_data(200, 'search', views_places.PlaceVenueSearch)
@@ -535,6 +540,54 @@ class PlaceRootTest(BLStandartDataTest):
 
 class PlaceRootNewsTest(BLStandartDataTest):
     pass
+
+
+########## GAMEMAP
+from sz.api.views import place_service, gamemap_service
+
+
+class GameMapTest(BLStandartDataTest):
+    def setUp(self):
+        models.Place.objects.all().delete()
+        self.user = models.User.objects.get_or_create(
+            **get_full_user_data())[0]
+        self.params = dict(latitude=LATITUDE, longitude=LONGITUDE,
+                           radius=RADIUS, user=self.user)
+        places = place_service.explore_in_venues(**self.params)
+        [p.create_in_engine() for p in places]
+
+    def test_update_gamemap(self):
+        for p in models.Place.objects.all():
+            self.assertIsNone(p.get_gamemap_position())
+        gamemap_service.update_gamemap(self.params)
+        for p in models.Place.objects.all():
+            self.check_val_type(
+                p.get_gamemap_position(), 'gamemap_position', list, 2)
+
+    def test_get_gamemap(self):
+        def _get_data(current_box):
+            params = dict(latitude=current_box.latitude(),
+                          longitude=current_box.longitude(), radius=RADIUS)
+            response = get_response(
+                API['gamemap']['get_gamemap'], 'GET', views_places.GameMapRoot,
+                query=params, user=self.user)
+            self.assertEqual(
+                response.status_code, 200, msg=response.render())
+            return get_data(response)
+        gamemap_service.update_gamemap(self.params)
+        current_box = models.Place.objects.all()[0]
+        data = _get_data(current_box)
+        self.assertIsNone(data.get('last_box'))
+        self.check_val_type(data, 'current_box', dict)
+        self.check_place_data(data=data['current_box'], place=current_box,
+                              bl_test=False, is_owner=0, distance=True)
+        self.check_val_type(data['map_width'], 'map_width', int)
+        self.check_val_type(data['map_height'], 'map_height', int)
+        self.check_val_type(data, 'gamemap', list)
+        for box in data['gamemap']:
+            place = models.Place.objects.get(pk=box['place_id'])
+            self.check_place_data(data=box, place=place,
+                                  bl_test=False, is_owner=0, distance=True)
 
 
 ########## MESSAGE

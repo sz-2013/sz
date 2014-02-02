@@ -75,40 +75,38 @@ class PlaceVenueExplore(PlaceRoot):
         creator = request.user
         params['user'] = creator
         places_list = place_service.explore_in_venues(**params)
-        if places_list:
-            bl_data = serializers.UserStandartDataSerializer(
-                instance=creator).data
+        user_data = serializers.UserStandartDataSerializer(
+            instance=creator).data
+        places_len = len(places_list)
+        code = status.HTTP_200_OK
+        if places_len:
+            places_len = 0
+            bl_data = user_data
             bl_data['user_longitude'] = params.get('latitude')
             bl_data['user_latitude'] = params.get('longitude')
             bl_data['places'] = map(
                 lambda p: serializers.place_detail_serialiser(
                     place=p, user=creator),
                 places_list)
-            # engine_data = posts.places_create(bl_data)
 
-            data = {}
-            data['data'] = dict(
-                user=creator.email, places_explored=len(places_list))
-            data['status'] = status.HTTP_201_CREATED
-            gamemap_service.update_gamemap(params)
+            engine_data = posts.places_create(bl_data)
 
-            # data['data'] = dict(user=engine_data["data"].get("user", {}))
-            # data['status'] = engine_data.get("status")
-            # if engine_data['status'] == status.HTTP_201_CREATED:
-            #     for p_data in engine_data['data'].get('places', []):
-            #         s = serializers.PlaceStandartDataSerializer(data=p_data)
-            #         if s.is_valid():
-            #             p = s.object
-            #             p.create_in_engine()
-            #             val+=1
-            #    gamemap_service.update_gamemap(params)
-            # data['places_explored'] = val
-            # if settings.LEBOWSKI_MODE_TEST:
-            #     data['bl'] = engine_data
-            #     data['status'] = status.HTTP_201_CREATED
-            return sz_api_response(**data)
+            # data['data'] = dict(
+            #     user=creator.email, places_explored=len(places_list))
+            # data['status'] = status.HTTP_201_CREATED
+            # gamemap_service.update_gamemap(params)
+
+            user_data = dict(user=engine_data["data"].get("user", user_data))
+            code = engine_data.get("status")
+            if code == status.HTTP_201_CREATED:
+                for p_data in engine_data['data'].get('places', []):
+                    s = serializers.PlaceStandartDataSerializer(data=p_data)
+                    if s.is_valid():
+                        s.object.create_in_engine()
+                        places_len += 1
+                gamemap_service.update_gamemap(params)
         return sz_api_response(
-            data=dict(user=creator.email, places_explored=len(places_list)))
+            data=dict(user=user_data, places_explored=places_len), status=code)
 
 
 class PlaceVenueSearch(PlaceRoot):

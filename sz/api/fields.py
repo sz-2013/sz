@@ -74,6 +74,14 @@ class FacesListField(forms.Field):
                     raise forms.ValidationError(request_form.errors)
 
 
+class IdListField(serializers.WritableField):
+    def to_native(self, djangoManyRelatedManager):
+        try:
+            return [obj.id for obj in djangoManyRelatedManager.all()]
+        except AttributeError, e:
+            raise forms.ValidationError(e)
+
+
 class StringDataField(serializers.WritableField):
     def to_native(self, date):
         if isinstance(date, datetime.datetime):

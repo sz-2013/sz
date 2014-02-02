@@ -324,6 +324,9 @@ class User(AbstractBaseUser):
         self.is_in_engine = True
         self.save()
 
+    def get_own_places(self):
+        return len(self.place_set.all())
+
     def __unicode__(self):
         return self.email
 

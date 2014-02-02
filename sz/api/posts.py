@@ -1,5 +1,4 @@
 import json
-import re
 import urllib2
 from rest_framework import status as httpStatus
 from sz import blsettings as settings
@@ -47,23 +46,22 @@ def main_post(data, prefix):
                 "data": {"receive": ANSWER, "tranceive": Args.data}
             }
     """
-    # send_data = json.dumps(data)
-    # req = urllib2.Request(ENGINE_URL + prefix)
-    # req.add_header('Content-Type', 'application/json')
-    # try:
-    #     answer = urllib2.urlopen(req, send_data)
-    #     data = json.loads(answer.read())
-    #     status = answer.code
-    # except (urllib2.HTTPError, urllib2.URLError), e:
-    #     data = e.reason
-    #     status = e.code if isinstance(
-    #         e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST
-    # main_data = dict(data=data, status=status)
-    # if LEBOWSKI_MODE_TEST:
-    #     main_data['data'] = dict(
-    #         receive=main_data['data'], tranceive=send_data)
-    # return main_data
-    return
+    send_data = json.dumps(data)
+    req = urllib2.Request(ENGINE_URL + prefix)
+    req.add_header('Content-Type', 'application/json')
+    try:
+        answer = urllib2.urlopen(req, send_data)
+        data = json.loads(answer.read())
+        status = answer.code
+    except (urllib2.HTTPError, urllib2.URLError), e:
+        data = e.reason
+        status = e.code if isinstance(
+            e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST
+    main_data = dict(data=data, status=status)
+    if LEBOWSKI_MODE_TEST:
+        main_data['data'] = dict(
+            receive=main_data['data'], tranceive=send_data)
+    return main_data
 
 
 def main_get(data, prefix):

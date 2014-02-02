@@ -5,7 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from sz.api import fields as sz_api_fields
-from sz.api.fields import StringDataField, MessagePhotoPreviewFacesLIstField
+from sz.api.fields import IdListField, MessagePhotoPreviewFacesLIstField, \
+    StringDataField
 from sz.core import models, gis as gis_core
 
 
@@ -178,6 +179,8 @@ class UserStandartDataSerializer(serializers.Serializer):
     user_race = serializers.IntegerField(source="race.name")
     user_role = serializers.IntegerField(source="role.name")
     user_date_confirm = StringDataField(source="date_confirm")
+    user_faces = IdListField(source="faces")
+    user_places = serializers.IntegerField(source="get_own_places")
 
 
 """

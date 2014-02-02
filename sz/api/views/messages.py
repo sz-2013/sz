@@ -91,7 +91,7 @@ class MessageAdd(SzApiView):
         params = dict(user=request.user.id, **request.DATA)
         serializer = serializers.MessageAddSerializer(data=params)
         if serializer.is_valid():
-            # CREATE IN BL HERE!!!
+            # CREATE IN BL HERE!!! messages_create
             data = serializers.MessageSerializer(
                 instance=serializer.object).data
             return sz_api_response.Response(
