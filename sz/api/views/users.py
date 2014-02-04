@@ -27,7 +27,11 @@ def activate_user(activation_key):
     user_data = serializers.UserStandartDataSerializer(instance=user).data
     engine_data = posts.users_create(user_data)
     if engine_data['status'] == status.HTTP_201_CREATED:
-        user.create_in_engine()
+        user = user.create_in_engine()
+        s = serializers.UserStandartDataSerializer(
+            instance=user, data=engine_data['data'])
+        if not s.is_valid():
+            return dict(status=status.HTTP_400_BAD_REQUEST, data=s.errors)
     return engine_data
 
 

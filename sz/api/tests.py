@@ -182,8 +182,9 @@ class BLStandartDataTest(unittest.TestCase):
         if val_len is not None:
             self.assertEqual(len(val), val_len)
 
-    def check_place_data(self, data, place, bl_test=True,
-                         user=None, is_owner=None, distance=None):
+    def check_place_data(self, data, place, bl_test=True, user=None,
+                         is_owner=None, distance=None, place_user=True,
+                         place_opener=True):
         """
         (STANDART_PLACE_DATA)
         [https://github.com/sz-2013/sz/wiki/BL:-STANDART_PLACE_DATA]
@@ -235,7 +236,14 @@ class BLStandartDataTest(unittest.TestCase):
             self.assertEqual(data.get('place_owner'), place.get_owner_race())
 
         if user:
-            self.check_val_type(data, 'place_user', float)
+            self.check_val_type(data, 'place_user', list)
+            if place_user:
+                user_sp = data['place_user']
+                self.assertEqual(len(user_sp), 2)
+                self.check_val_type(user_sp[0], 'user_sp: current sp', float)
+                self.check_val_type(user_sp[1], 'user_sp: sp_add', float)
+            if place_opener:
+                self.assertEqual(data.get('place_opener'), user.id)
         if data.get('place_opener'):
             self.check_val_type(data, 'place_opener', int)
 
@@ -599,18 +607,12 @@ class MessagePreviewTest(StandartDataSerializerTest):
         data_user = get_full_user_data()
         self.user = models.User.objects.get_or_create(**data_user)[0]
 
-        data_place = get_nornal_place_data()
-        self.place = models.Place.objects.get_or_create(**data_place)[0]
-
-        self.message_params = dict(
-            place=self.place.id, latitude=LATITUDE, longitude=LONGITUDE)
-
     def _get_data(self, status_code, response):
         self.assertEqual(
             response.status_code, status_code, msg=response.render())
         return get_data(response)
 
-    def _check_data_prewview(self, status_code, pk=None):
+    def _check_data_preview(self, status_code, pk=None):
         photo = get_photo()
         del photo['file']
         faces_list = generate_faces_list(
@@ -641,39 +643,61 @@ class MessagePreviewTest(StandartDataSerializerTest):
         faces_id = list(set(
             [f_data.get('face_id') for f_data in json.loads(faces_list)]))
         self.assertEqual(data.get('faces_id'), faces_id)
-        return data['id'], data['photo']['full'].split('/')[-1]
+        return data['id'], data['photo']['full'].split('/')[-1], faces_id
 
     def test_message_preview(self):
-        self._check_data_prewview(201)
+        self._check_data_preview(201)
 
     def test_message_preview_update(self):
-        pk, photo_name = self._check_data_prewview(201)
+        pk, photo_name, faces_id = self._check_data_preview(201)
 
-        newpk, newphoto_name = self._check_data_prewview(200, pk)
+        newpk, newphoto_name, faces_id = self._check_data_preview(200, pk)
         self.assertEqual(pk, newpk)
         self.assertNotEqual(photo_name, newphoto_name)
 
 
 class MessageAddTest(MessagePreviewTest):
-    pass
-    # def test_message_empty(self):
-    #     response = c.post(API['message']['create'], self.message_params)
-    #     self._get_data(400, response)
+    def setUp(self):
+        data_user = get_full_user_data()
+        self.user = models.User.objects.get_or_create(**data_user)[0]
 
-    # def test_message_create(self):
-    #     self.message_params['text'] = generate_stuff()
-    #     self.message_params['photo_id'] = \
-    #         self.test_message_preview()
-    #     response = c.post(API['message']['create'], self.message_params)
-    #     self._get_data(201, response)
+        data_place = get_nornal_place_data()
+        self.place = models.Place.objects.get_or_create(**data_place)[0]
 
-    # def test_message_photo_only(self):
-    #     self.message_params['photo_id'] = \
-    #         self.test_message_preview()
-    #     response = c.post(API['message']['create'], self.message_params)
-    #     self._get_data(201, response)
+        self.params = dict(
+            place=self.place.id, latitude=LATITUDE, longitude=LONGITUDE)
 
-    # def test_message_text_only(self):
-    #     self.message_params['text'] = generate_stuff()
-    #     response = c.post(API['message']['create'], self.message_params)
-    #     self._get_data(201, response)
+        self.photo_id, photo_name, self.faces_id = \
+            self._check_data_preview(201)
+
+    def __get_data(self, status_code):
+        response = get_response(API['message']['create'], 'POST',
+                                views_messages.MessageAdd, data=self.params)
+        return self._get_data(status_code, response)
+
+    def test_message_empty(self):
+        self.__get_data(400)
+
+    def _check_data_create(self):
+        data = self.__get_data(201)
+        self.assertFalse(
+            models.MessagePreview.objects.filter(id=self.photo_id))
+        self.check_user_data(data.get('user'), self.user)
+        self.check_place_data(
+            data.get('place'), place=self.place, user=self.user, is_owner=0,
+            distance=True, place_user=True)
+
+    def test_message_create(self):
+        self.params['text'] = generate_stuff()
+        self.params['photo_id'] = self.photo_id
+        self.params['faces_id'] = self.faces_id
+        self._check_data_create()
+
+    def test_message_photo_only(self):
+        self.params['photo_id'] = self.photo_id
+        self.params['faces_id'] = self.faces_id
+        self._check_data_create()
+
+    def test_message_text_only(self):
+        self.params['text'] = generate_stuff()
+        self._check_data_create()

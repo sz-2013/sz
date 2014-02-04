@@ -41,6 +41,8 @@
         <link rel="stylesheet" href="css/buttons.css">
         <link rel="stylesheet" href="css/mainnav.css">
         <link rel="stylesheet" href="css/app.css">
+
+        <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
         <title>ShmotZhmot</title>
     </head>
     <body ng-controller="MasterPageController" mobile-check>
@@ -64,16 +66,7 @@
                         </a></li>
                         <li><a href="">
                             Events
-                        </a><li>
-                        <a href="">
-                            Map
-                        </a></li>
-                        <li><a href="">
-                            Your places <span class="badge pull-right">42</span>
-                        </a></li>
-                        <li><a href="">
-                            Your messages <span class="badge pull-right">42</span>
-                        </a></li>
+                        </a><li>                        
                         <li><a>Blagoweschensk</a></li>
                         <li><a ng-click="logout()">Exit</a></li>
                     </ul>                                       
@@ -89,6 +82,19 @@
 
                         <div class="clearfix container-inn" id="main" 
                             ng-show="showContent" ng-view sz-scroll-detect> </div><!-- /ng-view -->
+
+                        <div class="animate-spread-center" id="badgeArea"
+                            ng-click="badges.hideBadge()" ng-show="badges.show"  sz-badges>
+                            <div class="media sz-badge">
+                                <div class="pull-left">
+                                    <i class="fa fa-star fa-5x"></i>
+                                </div>
+                                <div class="media-body">
+                                    <h2 class="media-heading">{{badges.current.header}}</h2>
+                                    <p>{{badges.current.body}}</p>
+                                </div>
+                            </div>
+                        </div><!-- /#badgeArea -->
                     </div><!-- /#wrap -->
 
                     <footer class="container-inn" ng-show="showFooter">

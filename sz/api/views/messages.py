@@ -3,10 +3,9 @@ from django.http import Http404
 from rest_framework import permissions, status
 from rest_framework.reverse import reverse
 from sz.api.views import SzApiView
-from sz.api import serializers, forms
+from sz.api import forms, posts, serializers
 from sz.api import response as sz_api_response
 from sz.core import models
-from lebowski.api.views import messages as lebowski_messages
 from sz.settings import LEBOWSKI_MODE_TEST
 
 
@@ -80,6 +79,7 @@ class MessageAdd(SzApiView):
                     longitude - latitude of point from which user send a msg
                     place - id of a terget place.
                     photo_id(not req.)  - id of a <MessagePhotoPreview>.
+                    faces_id(not req.)  - list of used faces ids
                     text(not req.)  - text.
 
         Returns:
@@ -88,13 +88,40 @@ class MessageAdd(SzApiView):
                 'photo': {'full': URL, 'reduced': URL, 'thumbnail': URL},
             }
         """
-        params = dict(user=request.user.id, **request.DATA)
+        user = request.user
+        params = dict(user=user.id, **request.DATA)
         serializer = serializers.MessageAddSerializer(data=params)
         if serializer.is_valid():
-            # CREATE IN BL HERE!!! messages_create
-            data = serializers.MessageSerializer(
-                instance=serializer.object).data
-            return sz_api_response.Response(
-                data=data, status=status.HTTP_201_CREATED)
+            message = serializer.object
+            bl_data = serializers.UserStandartDataShortSerializer(
+                instance=user).data
+            bl_data['user_longitude'] = params.get('latitude')
+            bl_data['user_latitude'] = params.get('longitude')
+            bl_data.update(**serializers.PlaceStandartDataShortSerializer(
+                instance=message.place).data)
+            bl_data['message_faces'] = params.get('faces_list', [])
+            bl_data['message_photo'] = message.photo and True or False
+            bl_data['message_text'] = message.text
+
+            engine_data = posts.messages_create(bl_data)
+            if engine_data.get('status') == status.HTTP_201_CREATED:
+                user_s = serializers.UserStandartDataSerializer(
+                    data=engine_data['data'].get('user', {}),
+                    instance=user)
+                if not user_s.is_valid():
+                    return sz_api_response.Response(
+                        data=user_s.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+                place_s = serializers.PlaceStandartDataSerializer(
+                    data=engine_data['data'].get('place', {}),
+                    instance=message.place)
+                if not place_s.is_valid():
+                    return sz_api_response.Response(
+                        data=place_s.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+            return sz_api_response.Response(**engine_data)
+
         return sz_api_response.Response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)

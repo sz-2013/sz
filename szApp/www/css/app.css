@@ -80,6 +80,42 @@ header{
     cursor: pointer;
 }
 /*---------------------*/
+#badgeArea{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    right:0;
+    background: rgba(255,255,255,0.3);
+    z-index: 9000;
+    text-align: center;
+}
+
+.sz-badge{
+    box-shadow: 0 -2px 2px 2px #ecf0f1;
+    max-width: 80%;
+    min-width: 300px;
+    max-height: 80%;
+    min-height: 100px;
+    top:15%;
+    text-align: justify;
+    display: inline-block;
+    position: relative;
+    border-radius: 15px;
+    cursor: pointer;
+    border:1px solid #CCC;
+    background-color: #fff;
+    padding: 15px;
+}
+
+.sz-badge .media-heading{
+    font-weight: bold;
+}
+
+.sz-badge .fa-star{
+    color: #f1c40f;
+}
 
 /*---------------------*/
 

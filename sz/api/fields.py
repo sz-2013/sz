@@ -82,6 +82,28 @@ class IdListField(serializers.WritableField):
             raise forms.ValidationError(e)
 
 
+class IntFloatListField(serializers.WritableField):
+    def from_native(self, data):
+        if not isinstance(data, list):
+            raise serializers.ValidationError(u'data must be a list')
+        if not data:
+            return data
+        if len(data) != 2:
+            raise serializers.ValidationError(u'list is too long')
+        data_int = data[0]
+        data_float = data[1]
+        if not isinstance(data_int, int):
+            raise serializers.ValidationError(
+                u'first data element must be a int')
+        if data_float and not isinstance(data_float, float):
+            raise serializers.ValidationError(
+                u'second data element must be a float')
+        if not data_float and not isinstance(data_float, float):
+            raise serializers.ValidationError(
+                u'wrong type for second data element')
+        return data
+
+
 class StringDataField(serializers.WritableField):
     def to_native(self, date):
         if isinstance(date, datetime.datetime):

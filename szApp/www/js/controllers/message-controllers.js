@@ -70,6 +70,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
             message.longitude = $scope.coordinates.longitude;
             message.place = $scope.messagePlace.place_id;
             if($scope.pPhoto.id) message.photo_id = $scope.pPhoto.id
+            message.faces_id = $scope.pPhoto.id ? $scope.pPhoto.faces_id : []
             message.text = $scope.text || '';
             $rootScope.showLoader = true;
             messageService.create(message,

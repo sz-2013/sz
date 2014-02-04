@@ -22,6 +22,7 @@ from south.modelsinspector import add_introspection_rules
 from sz import settings
 from sz.core.utils import float_to_int
 from sz.core.image_utils import FitImage
+from sz.core.utils import diff_lists
 
 
 STANDART_ROLE_USER_NAME = "player"
@@ -277,6 +278,7 @@ class User(AbstractBaseUser):
     email = models.CharField(
         _('email address'), max_length=72, unique=True,
         db_index=True, validators=[validators.EmailValidator()])
+    radius = models.IntegerField(default=250, blank=True, null=True)
     is_superuser = models.BooleanField(
         _('superuser status'), default=False,
         help_text=_('Designates that this user has all permissions without '
@@ -323,9 +325,13 @@ class User(AbstractBaseUser):
     def create_in_engine(self):
         self.is_in_engine = True
         self.save()
+        return self
 
     def get_own_places(self):
         return len(self.place_set.all())
+
+    def get_faces_id(self):
+        return sorted([f.id for f in self.faces.all()])
 
     def __unicode__(self):
         return self.email
@@ -335,6 +341,20 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+    def update_faces(self, faces_new):
+        faces_old = self.get_faces_id()
+        faces_for_remove = diff_lists(faces_old, faces_new)
+        faces_for_add = diff_lists(faces_new, faces_old)
+        for f in faces_for_remove:
+            self.faces.remove(Face.objects.get(id=f))
+        for f in faces_for_add:
+            self.faces.add(Face.objects.get(id=f))
+        return self
+
+    def update_radius(self, r):
+        self.radius = r
+        self.save()
 
     # def get_string_date_confirm(self):
     #     return get_string_date(self.date_confirm)
@@ -517,14 +537,27 @@ class Place(models.Model):
             return None
         return map(lambda pos: int(pos), self.gamemap_position.split(','))
 
+    def get_fake_owner_data(self):
+        return [self.owner.id, 0.0] if self.owner else []
+
     def create_in_engine(self):
         self.is_active = True
         self.date_is_active = timezone.now()
         self.save()
+        return self
 
     def update_gamemap(self, x, y):
         self.gamemap_position = "%s,%s" % (x, y)
         self.save()
+        return self
+
+    def update_owner(self, new_id):
+        old_id = self.owner if self.owner.id else None
+        if old_id != new_id:
+            new = User.objects.get(id=new_id) if new_id else None
+            self.owner = new
+            self.save()
+        return self
 
     # def get_owner_info(self):
     #     owner_id =

@@ -34,7 +34,7 @@ var Helpers = {
             ia[i] = byteString.charCodeAt(i);
         }
         return new Blob([ab], { type: mimeString });
-    },
+    }
 }
 
 
@@ -146,25 +146,6 @@ angular.module('sz.client.directives', [])
             });
         }
     })
-    /*.directive('szMessagePhotoLoad', function() {
-        return function(scope, element, attrs) {
-            scope.$watch('photoSrc', function(val){
-            	if(val){
-            		element.attr('src',val)
-            		element.ready(function(){
-            			scope.photoBox = {
-            				width : element.width(),
-            				height : element.height()
-            			}       
-            			if(scope.images && scope.images.photo)     		
-            				scope.images.photo.src = val;
-            			scope.canvas.height = element.parent().height()
-            			element.hide()
-            		})
-            	}
-            })
-        };
-    })*/
     .directive('szSelectPlace', function() {
         //the directive for a selected place modal window
         return function(scope, element, attrs) {
@@ -178,16 +159,34 @@ angular.module('sz.client.directives', [])
             }
         };
     })
-    .directive('szAchivment', function($timeout) {
-        //directive for achivment or informational pop windows
-        //hide this windows after sets time (attrs.timeout)
+    .directive('szBadges', function($timeout) {
         return function(scope, element, attrs) {
-            function hideAchive(){
+            function addBadge(){
+                scope.showBadgeArea = true
+            }
+
+            scope.$watch('badges.current', function(val){
+                if(val!==undefined) addBadge()
+                else scope.showBadgeArea = false;
+            })
+            /*function hideAchive(){
                 scope.showAchive = false
             } 
             scope.$watch(attrs.ngShow, function(val){
                 if(val)$timeout(hideAchive, attrs.timeout);
-            });
+            });*/
+        };
+    })
+    .directive('szAchivment', function($timeout) {
+        //directive for achivment or informational pop windows
+        //hide this windows after sets time (attrs.timeout)
+        return function(scope, element, attrs) {
+            /*function hideAchive(){
+                scope.showAchive = false
+            } 
+            scope.$watch(attrs.ngShow, function(val){
+                if(val)$timeout(hideAchive, attrs.timeout);
+            });*/
         };
     })
     /*.directive('szNewsFeedFilter', function () {

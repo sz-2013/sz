@@ -1,5 +1,4 @@
 'use strict';
-
 var urls = {
     newsfeed :'#/feed',
     search :'#/',
@@ -43,6 +42,18 @@ var pageHeaders = {
     'main': 'main-header',
     'messageAdd': 'messageadd-header'
 }
+
+function objPop(obj) {
+  for (var key in obj) {
+    // Uncomment below to fix prototype problem.
+    if (!Object.hasOwnProperty.call(obj, key)) continue;
+    var result = obj[key];
+    // If the property can't be deleted fail with an error.
+    if (!delete obj[key]) { throw new Error(); }
+    return result;
+  } 
+}
+
 function randomSets(r){
     function random(){
         return Math.floor(4 + Math.random() * 5)
@@ -55,7 +66,7 @@ function randomSets(r){
 }
 
 
-function MasterPageController($scope, $cookies, $http, $location, sessionService, staticValueService, geolocation) {
+function MasterPageController($scope, $cookies, $http, $location, $timeout, sessionService, staticValueService, geolocation) {
     $scope.$on("setShowLoader", function(e, val){$scope.showLoader=val});
     $scope.showContent = true;
     $scope.showFooter = false;
@@ -68,11 +79,14 @@ function MasterPageController($scope, $cookies, $http, $location, sessionService
     var races = staticValueService.races({}, function(r) {$scope.races = r.data.map(function(race){return randomSets(race) }); });
     var genders = staticValueService.genders({}, function(r) { $scope.genders = r.data; });
     var faces = staticValueService.faces({}, function(r) {$scope.faces = r.data; });
-
+    var coords = {latitude: 40.7755555, longitude: -73.9747221}
     geolocation.getCurrentPosition(
-        function (position) { $scope.coordinates = position.coords;},
+        function (position) {
+            //$scope.coordinates = position.coords;
+            $scope.coordinates = coords;
+        },
         function (error) { 
-            $scope.coordinates = { longitude: 128, latitude: 56 };
+            $scope.coordinates = coords;
             console.log(error)}
     )
         
@@ -102,9 +116,39 @@ function MasterPageController($scope, $cookies, $http, $location, sessionService
         setHeader('main');
         $scope.showSideBar=false;
     });
+
+    $scope.badges = {
+        show: false,
+        current: undefined,
+        queue: [],
+        update: function(newlist){
+            if( !angular.isArray(newlist) ) var newlist = [newlist]
+            for (var i = newlist.length - 1; i >= 0; i--) {
+                var b = newlist[i];
+                var name = String(Math.random()).slice(2, 12)
+                b.name = name;
+                $scope.badges.queue.push(b);
+            };
+            $scope.badges.setCurrent()
+        },
+        setCurrent: function(){
+            if($scope.badges.current === undefined){
+                $scope.badges.current = $scope.badges.queue.pop()
+                $scope.badges.show = true;
+                $timeout($scope.badges.hideBadge, 3000);
+            }
+        },
+        hideBadge: function(){
+            $scope.badges.show = false;
+            $scope.badges.current = undefined;
+            if($scope.badges.queue.length) $timeout($scope.badges.setCurrent, 1000);
+        }
+    }
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
 
 function HomeController($scope){}
+
+
 

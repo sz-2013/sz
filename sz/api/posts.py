@@ -2,6 +2,7 @@ import json
 import urllib2
 from rest_framework import status as httpStatus
 from sz import blsettings as settings
+from sz.core.utils import reverse_data
 from sz.settings import LEBOWSKI_MODE_TEST
 
 ENGINE_URL = "http://%(host)s:%(port)s/" % {
@@ -47,11 +48,16 @@ def main_post(data, prefix):
             }
     """
     send_data = json.dumps(data)
+    print data
+    print '----------------'
     req = urllib2.Request(ENGINE_URL + prefix)
     req.add_header('Content-Type', 'application/json')
     try:
         answer = urllib2.urlopen(req, send_data)
-        data = json.loads(answer.read())
+        r = answer.read()
+        print [r
+        ]
+        data = json.loads(r)
         status = answer.code
     except (urllib2.HTTPError, urllib2.URLError), e:
         data = e.reason

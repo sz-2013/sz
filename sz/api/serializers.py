@@ -5,8 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from sz.api import fields as sz_api_fields
-from sz.api.fields import IdListField, MessagePhotoPreviewFacesLIstField, \
-    StringDataField
+from sz.api.fields import IdListField, IntFloatListField, \
+    MessagePhotoPreviewFacesLIstField, StringDataField
 from sz.core import models, gis as gis_core
 
 
@@ -179,9 +179,20 @@ class UserStandartDataSerializer(serializers.Serializer):
     user_race = serializers.IntegerField(source="race.name")
     user_role = serializers.IntegerField(source="role.name")
     user_date_confirm = StringDataField(source="date_confirm")
-    user_faces = IdListField(source="faces")
-    user_places = serializers.IntegerField(source="get_own_places")
+    user_faces = IdListField(source="faces", required=True)
+    user_places = serializers.IntegerField(
+        source="get_own_places", required=False)
 
+    def restore_object(self, attrs, instance=None):
+        if instance:
+            return instance.update_faces(
+                attrs.get('user_faces')).update_radius(
+                attrs.get('user_radius'))
+
+
+class UserStandartDataShortSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField(source="id")
+    user_email = serializers.EmailField(source="email")
 
 """
 Place section
@@ -222,20 +233,24 @@ class PlaceStandartDataSerializer(serializers.Serializer):
     place_id = serializers.IntegerField(source="id")
     place_name = serializers.CharField(source="name", required=True)
     place_city = serializers.Field(source="city_id")
-    place_latitude = serializers.FloatField(source="latitude", required=True)
-    place_longitude = serializers.FloatField(source="longitude", required=True)
+    place_latitude = serializers.FloatField(
+        source="latitude", required=True)
+    place_longitude = serializers.FloatField(
+        source="longitude", required=True)
     place_address = serializers.CharField(source="address", required=False)
     place_gamemap_position = serializers.Field(
         source="get_gamemap_position", )  # [x, y]
     place_role = serializers.Field(source="role.name")
     place_date = StringDataField(source="date_is_active")
-    place_last_message_date = StringDataField(source="get_last_message_date")
+    place_last_message_date = StringDataField(
+        source="get_last_message_date", required=False)
     place_state = serializers.BooleanField(source="is_active")
-    place_fsqid = serializers.CharField(source="fsq_id")
+    place_fsqid = serializers.CharField(source="fsq_id", required=False)
     # place_lvl = serializers.Field(source="lvl")
-    #place_owner = serializers.CommaSeparatedIntegerField(
-    #       source="get_owner_info") # [id, 0]
-    place_owner_race = serializers.CharField(source="get_owner_race")
+    place_owner = IntFloatListField(
+        required=False, source="get_fake_owner_data")  # [id, 0.0]
+    place_owner_race = serializers.CharField(
+        source="get_owner_race", required=False)
 
     def validate(self, attrs):
         attrs = super(PlaceStandartDataSerializer, self).validate(attrs)
@@ -243,6 +258,15 @@ class PlaceStandartDataSerializer(serializers.Serializer):
             attrs.get('place_latitude'), attrs.get('place_longitude'),
             attrs.get('place_name'))
 
+    def restore_object(self, attrs, instance=None):
+        if instance:
+            owner = attrs['place_owner']
+            return instance.update_owner(owner[0] if owner else None)
+
+
+class PlaceStandartDataShortSerializer(serializers.Serializer):
+    place_id = serializers.IntegerField(source="id")
+    place_name = serializers.CharField(source="name", required=True)
 
 """
 Message section
