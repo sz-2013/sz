@@ -5,26 +5,25 @@ from sz.core import models
 from sz.api.fields import FacesListField
 
 
-class PlaceExploreRequestForm(forms.Form):
+class PositionRequestForm(forms.Form):
     latitude = forms.FloatField(
         required=True, min_value=-90.0, max_value=90.0, label=u'Широта')
     longitude = forms.FloatField(
         required=True, min_value=-180.0, max_value=180.0, label=u'Долгота')
-    query = forms.CharField(required=False, label=u'Запрос')
+
+
+class PositionWithRadiusRequestForm(PositionRequestForm):
     radius = forms.IntegerField(
         required=True, min_value=0, max_value=5000,
         label=u'Удалённость', initial=settings.BLOCKS_RADIUS)
 
 
-class PlaceSearchRequestForm(forms.Form):
-    latitude = forms.FloatField(
-        required=True, min_value=-90.0, max_value=90.0, label=u'Широта')
-    longitude = forms.FloatField(
-        required=True, min_value=-180.0, max_value=180.0, label=u'Долгота')
+class PlaceExploreRequestForm(PositionWithRadiusRequestForm):
     query = forms.CharField(required=False, label=u'Запрос')
-    radius = forms.IntegerField(
-        required=False, min_value=0, max_value=5000,
-        label=u'Удалённость', initial=settings.BLOCKS_RADIUS)
+
+
+class PlaceSearchRequestForm(PlaceExploreRequestForm):
+    pass
 
 
 class PaginatedRequestForm(forms.Form):
@@ -58,15 +57,19 @@ class NewsRequestForm(MessageRequestForm):
     )
 
 
-class GameMapRequestForm(forms.Form):
-    latitude = forms.FloatField(
-        required=True, min_value=-90.0, max_value=90.0, label=u'Широта')
-    longitude = forms.FloatField(
-        required=True, min_value=-180.0, max_value=180.0, label=u'Долгота')
+class GameMapRequestForm(PositionRequestForm):
+    pass
 
 
-class MessagePhotoPreviewForm(forms.Form):
+class MessagePhotoPreviewRequestForm(forms.Form):
     photo = forms.ImageField(required=True)
     photo_width = forms.FloatField(required=True)
     photo_height = forms.FloatField(required=True)
+    faces_list = FacesListField(required=False)
+
+
+class MessageAddRequestForm(PositionRequestForm):
+    place = forms.IntegerField(required=True)
+    text = forms.CharField(required=False)
+    photo_id = forms.IntegerField(required=False)
     faces_list = FacesListField(required=False)

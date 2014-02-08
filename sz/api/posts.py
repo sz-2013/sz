@@ -28,39 +28,38 @@ def get_data(response):
 
 def main_post(data, prefix):
     """
-    Do post on BigLebowski
+Do post on BigLebowski
 
-    Args:
-        data: data, which will be transformed into json and sended to BL.
-        prefix: url prefix for this data.
+Args:
+data: data, which will be transformed into json and sended to BL.
+prefix: url prefix for this data.
 
-    Returns:
-        {"status": ANSWER_STATUS, "data": ANSWER}
+Returns:
+{"status": ANSWER_STATUS, "data": ANSWER}
 
-        if BL is not available return:
-            {"status": e.code or 400, "data": e.reason}
+if BL is not available return:
+{"status": e.code or 400, "data": e.reason}
 
-    LEBOWSKI_MODE_TEST:
-        returns:
-            {
-                "status": ANSWER_STATUS,
-                "data": {"receive": ANSWER, "tranceive": Args.data}
-            }
-    """
+LEBOWSKI_MODE_TEST:
+returns:
+{
+"status": ANSWER_STATUS,
+"data": {"receive": ANSWER, "tranceive": Args.data}
+}
+"""
     send_data = json.dumps(data)
-    print data
-    print '----------------'
+    # print data
+    # print '----------------'
     req = urllib2.Request(ENGINE_URL + prefix)
     req.add_header('Content-Type', 'application/json')
     try:
         answer = urllib2.urlopen(req, send_data)
         r = answer.read()
-        print [r
-        ]
+        print [r]
         data = json.loads(r)
         status = answer.code
     except (urllib2.HTTPError, urllib2.URLError), e:
-        data = e.reason
+        data = str(e.reason)
         status = e.code if isinstance(
             e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST
     main_data = dict(data=data, status=status)

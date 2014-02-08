@@ -603,10 +603,12 @@ class Place(models.Model):
 class MessageManager(models.Manager):
     def createMessage(self, **attrs):
         photo = None
-        if attrs.get('photo_id'):
-            preview = MessagePreview.objects.get(id=attrs.pop('photo_id'))
-            photo = preview.photo
-            preview.delete()
+        if 'photo_id' in attrs:
+            photo_id = attrs.pop('photo_id')
+            if photo_id:
+                preview = MessagePreview.objects.get(id=photo_id)
+                photo = preview.photo
+                preview.delete()
         message = self.model(**attrs)
         message.photo = photo
         message.save()

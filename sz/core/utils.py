@@ -34,7 +34,7 @@ def reverse_data(data, to_dict=None, to_items=None):
         <--- {'a': [1, {'c': 3, 'd': 4}, 3], 'b': 2}
     """
     def is_dict_child(item):
-        return isinstance(item, tuple) and len(item) == 2
+        return isinstance(item, tuple) and len(item) == 2 and item[0].__hash__
 
     def can_be_iter(v):
         return isinstance(v, (list, tuple, dict))
@@ -45,15 +45,18 @@ def reverse_data(data, to_dict=None, to_items=None):
     def can_be_items(v):
         return isinstance(v, dict)
 
+    def check_string(v):
+        return v.encode('utf8') if isinstance(v, unicode) else v
+
     if to_items and can_be_items(data):
         data = data.items()
 
     if can_be_iter(data):
         for i, item in enumerate(data):
-            print item
             if can_be_iter(item):
                 if is_dict_child(item):
-                    key, value = item
+                    key = check_string(item[0])
+                    value = check_string(item[1])
                     newitem = (key, reverse_data(value, to_dict, to_items))
                 else:
                     newitem = reverse_data(item, to_dict, to_items)
@@ -61,4 +64,5 @@ def reverse_data(data, to_dict=None, to_items=None):
 
     if to_dict and can_be_dict(data):
         data = dict(data)
+
     return data

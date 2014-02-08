@@ -514,7 +514,8 @@ from sz.api.views import places as views_places
 
 class PlacesVenueListTest(BLStandartDataTest):
     def setUp(self):
-        self.user = models.User.objects.get_or_create(email=EMAIL)[0]
+        data_user = get_full_user_data()
+        self.user = models.User.objects.get_or_create(**data_user)[0]
         self.query = dict(
             latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
 
@@ -672,7 +673,8 @@ class MessageAddTest(MessagePreviewTest):
 
     def __get_data(self, status_code):
         response = get_response(API['message']['create'], 'POST',
-                                views_messages.MessageAdd, data=self.params)
+                                views_messages.MessageAdd,
+                                data=self.params, user=self.user)
         return self._get_data(status_code, response)
 
     def test_message_empty(self):

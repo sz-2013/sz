@@ -47,7 +47,7 @@ class MessagePhotoPreview(SzApiView):
                 return sz_api_response.Response(
                     status=status.HTTP_403_FORBIDDEN)
         params = self.validate_and_get_params(
-            forms.MessagePhotoPreviewForm, request.DATA, request.FILES)
+            forms.MessagePhotoPreviewRequestForm, request.DATA, request.FILES)
         if not LEBOWSKI_MODE_TEST:
             user = request.user.email
         else:
@@ -90,6 +90,13 @@ class MessageAdd(SzApiView):
         """
         user = request.user
         params = dict(user=user.id, **request.DATA)
+        params = self.validate_and_get_params(
+            forms.MessageAddRequestForm, request.DATA, request.FILES)
+        if not LEBOWSKI_MODE_TEST:
+            user = request.user
+        else:
+            user = models.User.objects.get(email=request.DATA.get('email'))
+        params['user'] = user.id
         serializer = serializers.MessageAddSerializer(data=params)
         if serializer.is_valid():
             message = serializer.object
@@ -97,10 +104,10 @@ class MessageAdd(SzApiView):
                 instance=user).data
             bl_data['user_longitude'] = params.get('latitude')
             bl_data['user_latitude'] = params.get('longitude')
-            bl_data.update(**serializers.PlaceStandartDataShortSerializer(
+            bl_data.update(serializers.PlaceStandartDataShortSerializer(
                 instance=message.place).data)
             bl_data['message_faces'] = params.get('faces_list', [])
-            bl_data['message_photo'] = message.photo and True or False
+            bl_data['message_photo'] = True if message.photo else False
             bl_data['message_text'] = message.text
 
             engine_data = posts.messages_create(bl_data)

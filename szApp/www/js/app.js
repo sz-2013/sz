@@ -39,7 +39,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
 }]);
 
 szApp.config(['$httpProvider', function($httpProvider, $rootScope){
-    $httpProvider.responseInterceptors.push(function($q) {
+    $httpProvider.responseInterceptors.push(function($q, $rootScope) {
         return function(promise){
             return promise.then(function(response) {
                 if (angular.isDefined(response.data.data))
@@ -47,6 +47,7 @@ szApp.config(['$httpProvider', function($httpProvider, $rootScope){
                 return response;
             }, function(response) {
                 console.error(angular.toJson(response.data));
+                $rootScope.showLoader = false;
                 return $q.reject(response);
             });
         }

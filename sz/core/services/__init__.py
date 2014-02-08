@@ -270,7 +270,7 @@ class GameMapService(FeedService):
         data = dict(
             last_box=last_box,
             current_box=self._make_place_distance_item(places_list[0], params),
-            gamemap=self._make_distance_items_list(params, places_list),
+            columns=self._make_distance_items_list(params, places_list),
             map_width=places_x[-1] - places_x[0],
             map_height=places_y[-1] - places_y[0],
         )

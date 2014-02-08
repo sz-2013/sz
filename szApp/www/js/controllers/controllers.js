@@ -117,33 +117,44 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         $scope.showSideBar=false;
     });
 
-    $scope.badges = {
-        show: false,
-        current: undefined,
-        queue: [],
-        update: function(newlist){
-            if( !angular.isArray(newlist) ) var newlist = [newlist]
-            for (var i = newlist.length - 1; i >= 0; i--) {
-                var b = newlist[i];
-                var name = String(Math.random()).slice(2, 12)
-                b.name = name;
-                $scope.badges.queue.push(b);
-            };
-            $scope.badges.setCurrent()
-        },
-        setCurrent: function(){
-            if($scope.badges.current === undefined){
-                $scope.badges.current = $scope.badges.queue.pop()
-                $scope.badges.show = true;
-                $timeout($scope.badges.hideBadge, 3000);
+    var badges = function(){
+        var tmChange = 1000;
+        var tmShow = 3000;
+        function _getBadgesExplored(value){
+            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places'}
+        }
+        return {
+            show: false,
+            current: undefined,
+            queue: [],
+            update: function(newlist){
+                if( !angular.isArray(newlist) ) var newlist = [newlist]
+                for (var i = newlist.length - 1; i >= 0; i--) {
+                    $scope.badges.queue.push(newlist[i]);
+                };
+                $scope.badges.setCurrent()
+            },
+            setCurrent: function(){
+                if($scope.badges.current === undefined){
+                    $scope.badges.current = $scope.badges.queue.pop()
+                    $scope.badges.show = true;
+                    $timeout($scope.badges.hideBadge, tmShow);
+                }
+            },
+            hideBadge: function(){
+                $scope.badges.show = false;
+                $scope.badges.current = undefined;
+                if($scope.badges.queue.length) $timeout($scope.badges.setCurrent, tmChange);
+            },
+            setBadges: function(value){
+                var badge;
+                if(value.name=='explored') var badge = _getBadgesExplored(value)
+
+                if(badges) $scope.badges.update(badge)
             }
-        },
-        hideBadge: function(){
-            $scope.badges.show = false;
-            $scope.badges.current = undefined;
-            if($scope.badges.queue.length) $timeout($scope.badges.setCurrent, 1000);
         }
     }
+    $scope.badges = badges()
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
