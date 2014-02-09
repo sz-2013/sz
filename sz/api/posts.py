@@ -55,7 +55,7 @@ returns:
     try:
         answer = urllib2.urlopen(req, send_data)
         r = answer.read()
-        print [r]
+        # print [r]
         data = json.loads(r)
         status = answer.code
     except (urllib2.HTTPError, urllib2.URLError), e:

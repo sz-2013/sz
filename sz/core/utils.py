@@ -17,6 +17,10 @@ def float_to_int(f):
 
 
 def diff_lists(a, b):
+    if not a:
+        a = []
+    if not b:
+        b = []
     b = set(b)
     return [aa for aa in a if aa not in b]
 

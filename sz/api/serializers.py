@@ -175,9 +175,9 @@ User section
 class UserStandartDataSerializer(serializers.Serializer):
     user_id = serializers.IntegerField(source="id")
     user_email = serializers.EmailField(source="email")
-    user_gender = serializers.IntegerField(source="gender.name")
-    user_race = serializers.IntegerField(source="race.name")
-    user_role = serializers.IntegerField(source="role.name")
+    user_gender = serializers.CharField(source="gender.name")
+    user_race = serializers.CharField(source="race.name")
+    user_role = serializers.CharField(source="role.name")
     user_date_confirm = StringDataField(source="date_confirm")
     user_faces = IdListField(source="faces", required=True)
     user_places = serializers.IntegerField(
@@ -247,21 +247,15 @@ class PlaceStandartDataSerializer(serializers.Serializer):
     place_state = serializers.BooleanField(source="is_active")
     place_fsqid = serializers.CharField(source="fsq_id", required=False)
     # place_lvl = serializers.Field(source="lvl")
-    place_owner = IntFloatListField(
-        required=False, source="get_fake_owner_data")  # [id, 0.0]
+    # place_owner = IntFloatListField(
+    #     required=False, source="get_fake_owner_data")  # [id, 0.0]
     place_owner_race = serializers.CharField(
         source="get_owner_race", required=False)
 
     def validate(self, attrs):
         attrs = super(PlaceStandartDataSerializer, self).validate(attrs)
         return get_place(
-            attrs.get('place_latitude'), attrs.get('place_longitude'),
-            attrs.get('place_name'))
-
-    def restore_object(self, attrs, instance=None):
-        if instance:
-            owner = attrs['place_owner']
-            return instance.update_owner(owner[0] if owner else None)
+            attrs.get('latitude'), attrs.get('longitude'), attrs.get('name'))
 
 
 class PlaceStandartDataShortSerializer(serializers.Serializer):

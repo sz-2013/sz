@@ -168,6 +168,14 @@ def get_place_query(**kwargs):
 
 
 class BLStandartDataTest(unittest.TestCase):
+    def _getdata_(self, status_code, path, method, view,
+                  data=None, user=None, query=None):
+        response = get_response(
+            path, method, view, data=data, user=user, query=query)
+        self.assertEqual(
+            response.status_code, status_code, msg=response.render())
+        return get_data(response)
+
     def check_val_type(self, data, name, val_type, val_len=None):
         if isinstance(data, dict):
             val = data.get(name)
@@ -276,10 +284,10 @@ class BLStandartDataTest(unittest.TestCase):
         self.check_val_type(data, 'user_places', int)
 
         if bl_test:
-            self.check_val_type(data, 'user_zp', list, 2)
-            zp, zp_add = data.get('user_zp')
-            self.check_val_type(zp, 'user_zp[0](zp_value))', float)
-            self.check_val_type(zp_add, 'user_zp[1](zp_add_value))', float)
+            self.check_val_type(data, 'user_zc', list, 2)
+            zp, zp_add = data.get('user_zc')
+            self.check_val_type(zp, 'user_zc[0](zp_value))', float)
+            self.check_val_type(zp_add, 'user_zc[1](zp_add_value))', float)
 
             self.check_val_type(data, 'user_stats', dict)
             stats = data.get('user_stats')
@@ -296,6 +304,37 @@ class BLStandartDataTest(unittest.TestCase):
 
             self.check_val_type(data, 'user_inventory', list)
             self.check_val_type(data, 'user_radius', int)
+        return data
+
+    def user_create_inactive(self, user_data=None):
+        if user_data is None:
+            user_data = get_normal_user_data()
+        data = self._getdata_(201, API['user']['create'], 'post',
+                              views_users.UsersRoot, user_data)
+        user = models.User.objects.filter(email=data['email'])
+        self.assertEqual(len(user), 1)
+        user = user[0]
+        return dict(user=user, data=data)
+
+    def user_activate(self):
+        user = self.user_create_inactive()['user']
+        activation_key = models.RegistrationProfile.objects.get(
+            user=user).activation_key
+
+        activate_response = views_users.activate_user(activation_key)
+        user = models.User.objects.filter(email=user.email)
+        self.assertEqual(len(user), 1)
+        user = user[0]
+        return dict(user=user, activate_response=activate_response)
+
+    def place_explore(self, user=None):
+        if user is None:
+            user = self.user_activate()
+        query = dict(latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
+
+        data = self._getdata_(
+            201, API['place']['explore'], 'GET',
+            views_places.PlaceVenueExplore, user=user, query=query)
         return data
 
 
@@ -337,7 +376,7 @@ class PlaceDetailSerialiserTest(StandartDataSerializerTest):
         data = serializers.place_detail_serialiser(
             self.place, self.user, distance)
         self.check_standart_data_place(data, is_owner=False, distance=distance)
-
+"""
 
 class RegistrationSerialiserTest(unittest.TestCase):
     # idk but when race and gener in serialiser is ChoiceField -
@@ -402,45 +441,7 @@ class RegistrationSerialiserTest(unittest.TestCase):
         self.assertTrue(s.is_valid())
         self.assertTrue(isinstance(s.object, models.User))
         return s.object
-
-
-"""Posts"""
-
-
-# class PostMainTest(unittest.TestCase):
-#     def test_wrong_url(self):
-#         data = posts.main_post(data={'data': 0}, prefix='wrong_path')
-#         self.assertEqual(data.get('status'), 404)
-#         self.assertEqual(data.get('data'), 'Not Found')
-
-# ########## USERS
-
-
-# class UserCreatePostTest(unittest.TestCase):
-#     def test_create_wrong_data(self):
-#         #@TODO(kunla): uncomment it when bl will answer 400
-#         # data = posts.users_create({'data': 0})
-#         # self.assertEqual(data.get('status'), 400)
-#         # self.assertEqual(data.get('data'), '')
-#         pass
-
-#     def test_create(self):
-#         #@TODO(kunla): doit
-#         pass
-
-
-# ########## PLACE
-
-
-# class PlaceCreateTest(unittest.TestCase):
-#     pass
-
-
-# ########## Message
-
-# class MessageCreateTest(unittest.TestCase):
-#     pass
-
+"""
 
 """Views"""
 
@@ -449,9 +450,6 @@ from sz.api.views import users as views_users
 
 
 class UsersRootTest(BLStandartDataTest):
-    def setUp(self):
-        self.data = get_normal_user_data()
-
     def _get_data(self, status_code, method, view, data=None):
         response = get_response(
             API['user']['create'], method, view, data=data)
@@ -460,14 +458,13 @@ class UsersRootTest(BLStandartDataTest):
         return get_data(response)
 
     def test_create(self):
-        normal_data = dict(email=self.data['email'], is_anonymous=False,
+        user_data = get_normal_user_data()
+        normal_data = dict(email=user_data['email'], is_anonymous=False,
                            is_authenticated=True)
+        user_dict = self.user_create_inactive(user_data)
+        data = user_dict['data']
+        user = user_dict['user']
 
-        data = self._get_data(201, 'post', views_users.UsersRoot, self.data)
-        user = models.User.objects.filter(email=data['email'])
-
-        self.assertEqual(len(user), 1)
-        user = user[0]
         self.assertEqual(data, normal_data)
 
         self.assertFalse(user.is_superuser)
@@ -477,22 +474,12 @@ class UsersRootTest(BLStandartDataTest):
         self.assertIsNone(user.date_confirm)
         self.assertEqual(user.role.name, models.STANDART_ROLE_USER_NAME)
         self.assertIsNone(user.last_box)
-        return self.data['email']
 
     def test_activate(self):
-        email = self.test_create()
+        user_dict = self.user_activate()
+        user = user_dict['user']
+        activate_response = user_dict['activate_response']
 
-        def _get_user():
-            return models.User.objects.get_or_create(
-                email=email)[0]
-
-        user = _get_user()
-        activation_key = models.RegistrationProfile.objects.get(
-            user=user).activation_key
-
-        activate_response = views_users.activate_user(activation_key)
-
-        user = _get_user()
         self.assertEqual(
             activate_response.get('status'), 201, msg=activate_response)
         self.check_user_data(activate_response.get('data'), user)
@@ -514,8 +501,7 @@ from sz.api.views import places as views_places
 
 class PlacesVenueListTest(BLStandartDataTest):
     def setUp(self):
-        data_user = get_full_user_data()
-        self.user = models.User.objects.get_or_create(**data_user)[0]
+        self.user = self.user_activate()['user']
         self.query = dict(
             latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
 
@@ -529,10 +515,12 @@ class PlacesVenueListTest(BLStandartDataTest):
 
     def test_explore(self):
         models.Place.objects.all().delete()
-        data = self._get_data(201, 'explore', views_places.PlaceVenueExplore)
+        data = self.place_explore(self.user)
         self.check_val_type(data, 'places_explored', int)
-        self.check_user_data(
-            data.get('user'), self.user, data['places_explored'])
+        self.check_val_type(data, 'user', dict)
+        user_data = data.get('user')
+        # print user_data
+        self.check_user_data(user_data, self.user, data['places_explored'])
 
     def test_search(self):
         data = self._get_data(200, 'search', views_places.PlaceVenueSearch)

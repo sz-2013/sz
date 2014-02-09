@@ -91,17 +91,16 @@ class PlaceVenueExplore(PlaceRoot):
             places_tuples = map(
                 lambda data: (str(data.get('place_id')), data), places_list)
             bl_data['places'] = dict(places_tuples)
-            engine_data = posts.places_create(bl_data)
-            code = engine_data.get("status")
-            data = engine_data["data"]
+            engine_answer = posts.places_create(bl_data)
+            code = engine_answer.get("status")
+            engine_data = engine_answer.get("data", {})
             if code != status.HTTP_201_CREATED:
-                return sz_api_response(status=code, data=data)
-            user_data = dict(
-                user=data.get("user", user_data))
-            for p_data in data.get('places', []):
+                return sz_api_response(status=code, data=engine_data)
+            user_data = engine_data.get("user")
+            for p_id, p_data in engine_data.get('places', {}).iteritems():
                 s = serializers.PlaceStandartDataSerializer(data=p_data)
                 if s.is_valid():
-                    s.object.create_in_engine()
+                    s.object.create_in_engine(p_data)
                     places_len += 1
             gamemap_service.update_gamemap(params)
             # code = status.HTTP_201_CREATED

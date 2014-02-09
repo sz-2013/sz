@@ -537,13 +537,19 @@ class Place(models.Model):
             return None
         return map(lambda pos: int(pos), self.gamemap_position.split(','))
 
-    def get_fake_owner_data(self):
-        return [self.owner.id, 0.0] if self.owner else []
+    # def get_fake_owner_data(self):
+    #     return [self.owner.id, 0.0] if self.owner else []
 
-    def create_in_engine(self):
+    def create_in_engine(self, attrs):
         self.is_active = True
         self.date_is_active = timezone.now()
         self.save()
+        return self.update(attrs)
+
+    def update(self, attrs):
+        print attrs
+        owner = attrs['place_owner']
+        self.update_owner(owner[0] if owner else None)
         return self
 
     def update_gamemap(self, x, y):
