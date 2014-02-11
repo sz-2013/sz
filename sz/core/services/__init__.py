@@ -250,6 +250,19 @@ class GameMapService(FeedService):
             map_width - value of boxes by x,
             map_height - value of boxes by y,
         """
+        def _get_path(last, curr):
+            last_pos = last.get_gamemap_position()
+            curr_pos = curr.get_gamemap_position()
+
+            def _get_range(i):
+                pos_list = [last_pos[i], curr_pos[i]]
+                r = xrange(min(pos_list), max(pos_list) + i)
+                return r if min(pos_list) == last_pos[i] else reversed(r)
+
+            x_path = map(lambda x: (x, last_pos[1]), _get_range(0))
+            y_path = map(lambda y: (curr_pos[0], y), _get_range(1))
+            return x_path + y_path
+
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
         # latitude = params.get(params_names.LATITUDE)
@@ -265,14 +278,17 @@ class GameMapService(FeedService):
         places_positions = [p.get_gamemap_position() for p in places_list]
         places_x = sorted(map(lambda pos: pos[0], places_positions))
         places_y = sorted(map(lambda pos: pos[1], places_positions))
-        last_box = user.last_box and \
-            self._make_place_distance_item(user.last_box, params) or None
+        user_last_box = user.last_box or random.choice(places_list)
+        user_cur_box = places_list[0]
+        last_box = self._make_place_distance_item(user_last_box, params)
+        path = _get_path(user_last_box, user_cur_box)
         data = dict(
             last_box=last_box,
-            current_box=self._make_place_distance_item(places_list[0], params),
+            current_box=self._make_place_distance_item(user_cur_box, params),
             columns=self._make_distance_items_list(params, places_list),
             map_width=places_x[-1] - places_x[0],
             map_height=places_y[-1] - places_y[0],
+            path = path
         )
         return data
 

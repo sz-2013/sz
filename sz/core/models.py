@@ -493,7 +493,7 @@ class Place(models.Model):
     # lvl = models.IntegerField(default=None,
     #     null=True, blank=True, verbose_name=u"lvl in a engine",)
     gamemap_position = models.CommaSeparatedIntegerField(
-        max_length=3, default=None, null=True, blank=True,
+        max_length=7, default=None, null=True, blank=True,
         verbose_name="position 'x,y' in a gamemap")
     owner = models.ForeignKey(
         User, verbose_name=_('owner of a place'), blank=True, null=True)

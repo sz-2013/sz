@@ -2,6 +2,7 @@
     <div style="display:inline-block; height:100%; width:30px;" ng-repeat="(num, c) in map.columns" ng-class-even="gray">
     </div>
 </div> -->
+width: {{gamemap.map_width}}; height: {{gamemap.map_height}}
 <ul id="map-mapArea">
-    <li ng-repeat="(x, c) in map.columns">{{x}}</li>
+    <li ng-repeat="(x, c) in gamemap.columns">{{x}} - {{c.length}}</li>
 </ul>
