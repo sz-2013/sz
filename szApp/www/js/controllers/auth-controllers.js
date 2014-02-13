@@ -15,7 +15,7 @@ function LoginController($scope, $location, sessionService, $rootScope){
     }
 
     $scope.login = function(e){
-        if(e.keyCode!==undefined&&e.keyCode!==13) return
+        if(e!==undefined&&e.keyCode!==undefined&&e.keyCode!==13) return
         $scope.inProgress = true;
         $rootScope.showLoader = true;
         $scope.session.email = $scope.email;
@@ -133,7 +133,7 @@ function RigistrationController($scope, userService){
 }
 
 
-function RegistrationConfirmation($scope, userService, $location, $route){
+function RegistrationConfirmation($scope, userService, $location, $route, $rootScope){
     $scope.inProgress = false;
     $rootScope.showLoader = false;
 

@@ -75,6 +75,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.eventstart = false;  
     $scope.urls = urls;
     $scope.partials = partials;
+    $scope.isForcedLandscape = false;
 
     var races = staticValueService.races({}, function(r) {$scope.races = r.data.map(function(race){return randomSets(race) }); });
     var genders = staticValueService.genders({}, function(r) { $scope.genders = r.data; });
@@ -94,12 +95,17 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         $scope.session = session 
     });
 
+    function redirectAnonymous(){
+        var s = $scope.session;
+        if(s!==undefined&&s.is_anonymous===true&&$location.path()!==$scope.urls.getPath('registration')){
+            $location.path($scope.urls.login.slice(1))
+            return true
+        }
+        return
+    }
     $scope.$watch('session.is_anonymous', function(newValue, oldValue) {
         if(newValue===undefined) return
-        if(newValue===true&&$location.path()!=$scope.urls.registration.slice(1)){
-            $location.path($scope.urls.login.slice(1))
-            return
-        }
+        if(redirectAnonymous()) return
         var token = $scope.session.token
         $http.defaults.headers.post['X-CSRFToken'] = token;
         $http.defaults.headers.put['X-CSRFToken'] = token;
@@ -114,6 +120,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
 
     $scope.$on('$routeChangeStart', function(event, routeData){
         setHeader('main');
+        redirectAnonymous();
         $scope.showSideBar=false;
     });
 

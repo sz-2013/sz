@@ -2,7 +2,14 @@
     <div style="display:inline-block; height:100%; width:30px;" ng-repeat="(num, c) in map.columns" ng-class-even="gray">
     </div>
 </div> -->
-width: {{gamemap.map_width}}; height: {{gamemap.map_height}}
+<!-- width: {{gamemap.map_width}}; height: {{gamemap.map_height}}
 <ul id="map-mapArea">
     <li ng-repeat="(x, c) in gamemap.columns">{{x}} - {{c.length}}</li>
+</ul> -->
+<ul id="baraja-el" class="baraja-container">
+    <li ng-repeat="box in gamemap.path">
+        <img src="images/1.jpg" alt="image1"/>
+        <h4>Coco Loko</h4>
+        <p>{{box}}</p>
+    </li>
 </ul>

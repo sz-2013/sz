@@ -39,6 +39,18 @@ var Helpers = {
 
 
 angular.module('sz.client.directives', [])
+    .directive('forcedLandscape', function(){
+        return function(scope, element, attrs) {
+            scope.$watch(attrs.forcedLandscape, function(val){
+                if(val) {
+                    //var h = el.height(), w = el.width(), t = 300;
+                    element
+                    //.animate({width: h + 'px', height: w + 'px', marginTop: 0 + 'px'}, t)
+                    .addClass('landscape');
+                }
+            })
+        };
+    })
     .directive('mobileCheck', function() {
         return function(scope, element, attrs) {
             // http://coveroverflow.com/a/11381730/989439
