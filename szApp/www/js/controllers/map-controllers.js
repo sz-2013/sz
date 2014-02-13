@@ -5,8 +5,8 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         var params = $scope.coordinates;
         gameMapService.getMap(params, function(r){
             $rootScope.showLoader = false;
-            $scope.gamemap = r
-            $scope
+            $scope.gamemap = r;
+            console.log($scope.gamemap)
         });
     }
     function _explore(){

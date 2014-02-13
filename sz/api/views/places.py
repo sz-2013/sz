@@ -28,8 +28,10 @@ class PlaceRoot(SzApiView):
         """
         if not item:
             return
+        if not isinstance(item, dict):
+            item = dict(place=item)
         params = dict(
-            place=item['place'], distance=item['distance'], user=user)
+            place=item['place'], distance=item.get('distance'), user=user)
         return serializers.place_detail_serialiser(**params)
 
     def validate_req_params(self, query):
@@ -168,5 +170,6 @@ class GameMapRoot(PlaceRoot):
             map_width=gamemap.get('map_width'),
             map_height=gamemap.get('map_height'),
             columns=columns,
+            path=gamemap.get('path')
         )
         return sz_api_response(data)

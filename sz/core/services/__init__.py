@@ -249,6 +249,7 @@ class GameMapService(FeedService):
             gamemap - [{place:<Place>????, distance: D, azimuth: A},..]
             map_width - value of boxes by x,
             map_height - value of boxes by y,
+            path - [(x, y), (x, y)] - path from last_box to curr_box
         """
         def _get_path(last, curr):
             last_pos = last.get_gamemap_position()
@@ -281,14 +282,13 @@ class GameMapService(FeedService):
         user_last_box = user.last_box or random.choice(places_list)
         user_cur_box = places_list[0]
         last_box = self._make_place_distance_item(user_last_box, params)
-        path = _get_path(user_last_box, user_cur_box)
         data = dict(
             last_box=last_box,
             current_box=self._make_place_distance_item(user_cur_box, params),
             columns=self._make_distance_items_list(params, places_list),
             map_width=places_x[-1] - places_x[0],
             map_height=places_y[-1] - places_y[0],
-            path = path
+            path=_get_path(user_last_box, user_cur_box)
         )
         return data
 
