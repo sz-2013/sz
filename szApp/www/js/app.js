@@ -11,6 +11,7 @@ var szApp = angular.module(
     'ngAnimate', 
     'sz.raphael.directives',
     'navs-directive',
+    'map-directive',
   /*  'leaflet-directive', 
     ,*/
     /*'gamemap-directive',*/

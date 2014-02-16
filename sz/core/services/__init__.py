@@ -255,14 +255,25 @@ class GameMapService(FeedService):
             last_pos = last.get_gamemap_position()
             curr_pos = curr.get_gamemap_position()
 
-            def _get_range(i):
-                pos_list = [last_pos[i], curr_pos[i]]
-                r = xrange(min(pos_list), max(pos_list) + i)
-                return r if min(pos_list) == last_pos[i] else reversed(r)
+            minX = min(places_x)
+            minY = min(places_y)
+            to_ziro_x = reversed(map(lambda x: (x, last_pos[1]),
+                                 xrange(minX, last_pos[0])))
+            to_ziro_y = list(to_ziro_x) + list(
+                reversed(map(lambda y: (minX, y), xrange(minY, last_pos[1]))))
+            to_curr_x = to_ziro_y + map(
+                lambda x: (x, minY), xrange(minX, curr_pos[0]))
+            to_curr_y = to_curr_x + map(lambda y: (curr_pos[0], y),
+                                        xrange(minY, curr_pos[1]))
+            return to_curr_y
+            # def _get_range(i):
+            #     pos_list = [last_pos[i], curr_pos[i]]
+            #     r = xrange(min(pos_list), max(pos_list) + i)
+            #     return r if min(pos_list) == last_pos[i] else reversed(r)
 
-            x_path = map(lambda x: (x, last_pos[1]), _get_range(0))
-            y_path = map(lambda y: (curr_pos[0], y), _get_range(1))
-            return x_path + y_path
+            # x_path = map(lambda x: (x, last_pos[1]), _get_range(0))
+            # y_path = map(lambda y: (curr_pos[0], y), _get_range(1))
+            # return list(set(x_path + y_path))
 
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)

@@ -39,6 +39,30 @@ var Helpers = {
 
 
 angular.module('sz.client.directives', [])
+    .directive('baraja', function(){
+        return function(scope, element, attrs) {
+            scope.$watch(attrs.baraja, function(val){
+                if(val){             
+                    var ul = element.children('ul');
+                    var nav = element.children('nav');
+                    var baraja = ul.baraja();
+                    nav.children(':first-child').click(function(){baraja.previous();})
+                    nav.children(':last-child').click(function(){baraja.next();})
+
+                    baraja.defaults = {
+                        speed : 500,
+                        easing : 'ease-out',
+                        range : 90,
+                        direction : 'left',
+                        origin : { minX : 20, maxX : 80, y : 100 },
+                        center : true,
+                        translation : 60
+                    }
+                }
+            });
+
+        }
+    })
     .directive('forcedLandscape', function(){
         return function(scope, element, attrs) {
             scope.$watch(attrs.forcedLandscape, function(val){

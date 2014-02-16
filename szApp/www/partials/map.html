@@ -1,15 +1,17 @@
-<!-- <div style="heght=300px;">
-    <div style="display:inline-block; height:100%; width:30px;" ng-repeat="(num, c) in map.columns" ng-class-even="gray">
-    </div>
-</div> -->
-<!-- width: {{gamemap.map_width}}; height: {{gamemap.map_height}}
-<ul id="map-mapArea">
-    <li ng-repeat="(x, c) in gamemap.columns">{{x}} - {{c.length}}</li>
-</ul> -->
-<ul id="baraja-el" class="baraja-container">
-    <li ng-repeat="box in gamemap.path">
-        <img src="images/1.jpg" alt="image1"/>
-        <h4>Coco Loko</h4>
-        <p>{{box}}</p>
-    </li>
-</ul>
+<div class="text-center">
+    <map-path-preview path="gamemap.path"></map-path-preview>
+    <!-- <div baraja="gamemap.path" id="map-mapPathParent">
+        <ul id="map-mapPathContainer" class="baraja-container">
+            <li class="map-mapPathCard"
+                ng-init="pic=randomPic()" ng-class="box.place_owner_race" ng-repeat="box in gamemap.path">
+                <img ng-src="../media/baraja/{{pic}}.jpg" alt="image"/>
+                <h4 class="overflow-hidden">{{box.place_name || 'Empy box'}}</h4>
+                <i ng-show='box.is_owner' class="fa fa-check-circle-o fa-2x"></i>
+            </li>
+        </ul>
+        <nav>
+            <span id="map-mapPathPrev">&lt;</span>
+            <span id="map-mapPathNexr">&gt;</span>
+        </nav>
+    </div> -->
+</div>

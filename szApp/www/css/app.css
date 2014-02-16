@@ -1,11 +1,11 @@
-body{
+/*body{
     -webkit-transition: all .3s ease;
     -moz-transition: all .3s ease;
     -ms-transition: all .3s ease;
     -o-transition: all .3s ease;
     transition: all .3s ease;
 }
-
+*/
 .modal-backdrop {
     position: relative;
 }
@@ -17,7 +17,8 @@ body{
 
 html, body, #mainPage{
     font-size: 100%;
-    background-color: #FBFBFB;
+    /*background-color: #FBFBFB;*/
+    background-color: #fff;
 }
 
 a{color:#7f8c8d; }
@@ -321,6 +322,71 @@ header{
     position: absolute;
     bottom: 0;
     left: 0;
+}
+
+/*--------------------------------*/
+#map-mapPathParent{
+    display: inline-block;
+}
+
+#map-mapPathContainer{
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+}
+.map-mapPathCard{
+    border: 5px solid;
+    border-radius: 7px;
+    border-color: #95a5a6;
+    overflow: hidden;
+}
+
+.map-mapPathCard h6{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#map-mapPathContainer.first-child-shadow .map-mapPathCard{
+    box-shadow: none;
+}
+#map-mapPathContainer .map-mapPathCard,
+#map-mapPathContainer.first-child-shadow .map-mapPathCard:first-child{
+    box-shadow: 0 0 5px 2px rgba(0,0,0,.3);
+}
+
+.map-mapPathCard img{
+    width:100%;
+}
+
+.map-mapPathCard.amadeus{
+    border-color:#2980b9;
+}
+.map-mapPathCard.futuri{
+    border-color: #58c300;
+}
+.map-mapPathCard.united{
+    border-color: #fc7b3a;
+}
+.map-mapPathCard.is_owner{
+    border-color: #FFBA00
+}
+
+.mapbox-isowner-label{
+    color: #ffd700;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.mapbox-end-label, .mapbox-start-label{
+    color: #95a5a6;
+    position: absolute;
+    top: -1px;
+    right: 4px;   
+}
+
+.mapbox-start-label{
+    color: green;
 }
 
 /*--------------------------------*/

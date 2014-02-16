@@ -1,4 +1,12 @@
 'use strict';
+function clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
 var urls = {
     newsfeed :'#/feed',
     search :'#/',
@@ -54,14 +62,21 @@ function objPop(obj) {
   } 
 }
 
+
+function random(min, max){
+    var min = min || 0;
+    var max = max || 1
+    if(min) var max = max - min;
+    var max = max + 1;
+    return Math.floor(min + Math.random() * max)
+}
+
 function randomSets(r){
-    function random(){
-        return Math.floor(4 + Math.random() * 5)
-    }
-    r['fortune'] = random() 
-    r['agillity'] = random()
-    r['strength'] = random()
-    r['intellect'] = random()
+    
+    r['fortune'] = random(4, 9) 
+    r['agillity'] = random(4, 9)
+    r['strength'] = random(4, 9)
+    r['intellect'] = random(4, 9)
     return r
 }
 
