@@ -1,7 +1,6 @@
 <div class="text-center " >
-  <!--   <map-path-preview  path="gamemap.path" sz-in-center="mapInCenter"
-        class="animate-from-right" ng-show="showGamePath" ></map-path-preview> -->
-    <game-map columns='gamemap.columns' width='gamemap.map_width' height='gamemap.map_height'
-        path="gamemap.path" ismobile="is_mobile"
+    <map-path-preview class="animate-from-right" path="gameMap.path"
+        sz-in-center="mapInCenter" ng-show="showGamePath" ></map-path-preview>
+    <game-map center='gameMap.curr.place_gamemap_position' points='gameMap.points' path='gameMap.path'
         class="animate-from-left" ng-show="showGameMap"></game-map>
 </div>

@@ -1,9 +1,9 @@
 function MapController($scope, gameMapService, $rootScope, placeService, $rootScope, $timeout){
     $rootScope.showLoader = false;
     
-    $scope.showGameMap = true;
+    $scope.showGameMap = false;
     $scope.showGamePath = false;
-
+    $scope.gameMap = {}
     $scope.$on('setGameMap', function(e, val){
         var t = 500;
         if(val){
@@ -27,34 +27,20 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     })
     function _getMap(){
         $rootScope.showLoader = true;
+        $scope.showGameMap = true;
         var params = $scope.coordinates;
         gameMapService.getMap(params, function(r){
-            var path = r.path;
-            var newpath = new Array;
-            for (var i = path.length - 1; i >= 0; i--) {
-                var pos = path[i];
-                var boxes = r.columns[pos[0].toString()].filter(function(b){
-                    return b.place_gamemap_position[1] == pos[1]});
-                var box = boxes.length ? clone(boxes[0]) : {place_gamemap_position: pos};
-                if(boxes.length){
-                    box.place_owner_race = $scope.races[Math.floor(Math.random() * 3)].name;
-                    box.is_owner = (Math.floor(Math.random() * 10)===1);
-                }
-                newpath.push(box)
-            };
-            for (var i = r.map_width; i > 0; i--) {
-                var c = r.columns[i];
-                for (var j = c.length - 1; j >= 0; j--) {
-                    var box = c[j];
-                    box.place_owner_race = $scope.races[Math.floor(Math.random() * 3)].name;
-                    box.is_owner = (Math.floor(Math.random() * 10)===1);
-                    c[j] = box;
-                };
-            };
-            r.path = newpath;
-            //f(r.path.length) $scope.showGamePath = true;
-            $scope.gamemap = r;
-            $rootScope.showLoader = false;
+            $scope.gameMap.points = r;
+
+            gameMapService.getPath(params, function(r){
+                $scope.gameMap.path = r.path;
+                $scope.gameMap.curr = r.currentBox;
+                $scope.gameMap.prev = r.prevBox;
+                //$scope.showGamePath = true; $scope.showGameMap = false;
+                $scope.showGameMap = false; $scope.showGameMap = true;
+                //if($scope.gameMap.path.length){$scope.showGamePath = true; $scope.showGameMap = false;} else {$scope.showGameMap = true }
+                $rootScope.showLoader = false;
+            })
         });
     }
     function _explore(){
@@ -71,6 +57,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             }
         );
     }
+
     $scope.$watch('coordinates', function(coordinates){
         //if(coordinates) _explore()
         if(coordinates) _getMap()

@@ -118,7 +118,7 @@ function createCard( cont, box, data, extra ){
     return el
 }
 
-
+var map;
 
 angular.module('map-directive', [])
     .directive('mapPathPreview', [function(){
@@ -128,7 +128,7 @@ angular.module('map-directive', [])
             // priority: 1,
             // terminal: true,
             scope: {
-                path: '=path'
+                path: '=path',                
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
@@ -188,11 +188,9 @@ angular.module('map-directive', [])
             // priority: 1,
             // terminal: true,
             scope: {
-                'columns': '=columns',
-                'width': '=width',
-                'height': '=height',
+                'center': '=center',
                 'path': '=path',
-                'ismobile': '=ismobile'
+                'points': '=points',
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
@@ -203,23 +201,15 @@ angular.module('map-directive', [])
             // transclude: true,
             // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
-                var map;
-                var path;
+                
+                //var path;
                 var elem = element[0];
                 function _initCont(){
                     elem.style.display = 'block';
-                    elem.style.height = document.getElementById('mainArea').style.height;
+                    elem.style.height = document.getElementById('mainArea').style.height || '314px';
                 }
 
-                function _init(){
-                    _initCont()
-                    map = L.szMap(elem.getAttribute('id'), gm, [8, 8]);
-                    console.log(map)
-                    var center = map.gm.latlng2gm( map.getCenter() );
-                    path = map.gm.generatePath( [center.x, center.y] )
-
-                    doPath()
-
+                function _initClick(){
                     map.on('click', function(e){
                         if ( e.originalEvent.target.localName == 'circle' ) return
                         var gPoint = map.gm.latlng2gm(e.latlng);
@@ -232,19 +222,29 @@ angular.module('map-directive', [])
                         inner.addEventListener( 'webkitTransitionEnd', function( e ) {
                             L.DomUtil.removeClass(inner, 'gmtile-inner-wavein');
                         }, false );
-                    });
+                    });                    
+                }
+
+                function _init(){
+                    _initCont()
+                    map = L.szMap(
+                        elem.getAttribute('id'),
+                        $scope.points,
+                        $scope.center);
+                    //doPath()
                 }
 
                 function doPath(){
+                    var center = map.gm.latlng2gm( map.getCenter() );
+                    var path = map.gm.generatePath( [center.x, center.y] )
                     var pathLen = path.length;
                     for (var i = 0; i < pathLen; i++) {
                         var point =  map.gm.pathPoint(i, path);
-                    };                
+                    }; 
+                    _initClick();               
                 }
 
-                _init()
-                /*$scope.$watch('columns', function(val){
-                    if(val) _init(); });*/
+                $scope.$watch('points', function(val){if(val) _init(); });
                 
             }
         };

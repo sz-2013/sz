@@ -61,6 +61,10 @@ class GameMapRequestForm(PositionRequestForm):
     pass
 
 
+class GameMapPathRequestForm(PositionRequestForm):
+    pass
+
+
 class MessagePhotoPreviewRequestForm(forms.Form):
     photo = forms.ImageField(required=True)
     photo_width = forms.FloatField(required=True)

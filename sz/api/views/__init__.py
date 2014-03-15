@@ -94,6 +94,9 @@ class ApiRoot(SzApiView):
                 # 'messages-search': reverse(
                 #    'message-search', request=request),
             },
-            # 'gamemap': reverse('gamemap', request=request),
+            'gamemap': {
+                'map': reverse('gamemap', request=request),
+                'path': reverse('gamemap-path', request=request),
+            },
             # 'city-nearest': reverse('city-nearest', request=request),
         })

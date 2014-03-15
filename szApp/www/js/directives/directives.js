@@ -58,7 +58,7 @@ angular.module('sz.client.directives', [])
             function setWindow(){
                 var margin = 8;
                 element[0].style.height = window.innerHeight - margin*2 + 'px';
-                
+
                 var loaderI = document.getElementById('loader').getElementsByTagName('i')[0]
                 if ( loaderI ) loaderI.style.top = (window.innerHeight - $('#loader i').height())/2 + 'px'
             }            

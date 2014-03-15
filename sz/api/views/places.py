@@ -153,23 +153,31 @@ class PlaceInstanceMessages(SzApiView):
 
 
 class GameMapRoot(PlaceRoot):
+    """For example,[map
+    (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082).
+    (I need position for a distance calculate)"""
     form = forms.GameMapRequestForm
 
     def get(self, request, format=None):
         params = self.validate_req_params(request.QUERY_PARAMS)
         user = request.user
         gamemap = gamemap_service.get_gamemap(user, **params)
-        columns = {}
-        for item in gamemap.get('columns', []):
-            x = str(item['place'].get_gamemap_position()[0])
-            c = columns.get(x, [])
-            columns[x] = c + [self._serialize_item(item, user)]
+        data = map(lambda item: self._serialize_item(item, user), gamemap)
+        return sz_api_response(data)
+
+
+class GameMapPath(PlaceRoot):
+    """For example,[new position
+    (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082)."""
+    form = forms.GameMapPathRequestForm
+
+    def get(self, request, format=None):
+        params = self.validate_req_params(request.QUERY_PARAMS)
+        user = request.user
+        gamemap = gamemap_service.get_gamemap_path(user, **params)
         data = dict(
-            last_box=self._serialize_item(gamemap.get('last_box'), user),
+            prev_box=self._serialize_item(gamemap.get('prev_box'), user),
             current_box=self._serialize_item(gamemap.get('current_box'), user),
-            map_width=gamemap.get('map_width'),
-            map_height=gamemap.get('map_height'),
-            columns=columns,
             path=gamemap.get('path')
         )
         return sz_api_response(data)

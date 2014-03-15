@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 import os
-import datetime
+# import datetime
 import math
 import random
 from PIL import Image, ImageDraw
-from django.utils import timezone
+# from django.utils import timezone
 from django.db.models import Max
 from django.core.files import File
 from django.db import IntegrityError
 from sz import settings
-from sz.settings import LEBOWSKI_MODE_TEST
+# from sz.settings import LEBOWSKI_MODE_TEST
 from sz.core.services import parameters
 from sz.core.services.parameters import names as params_names
 from sz.core.gis import venue
-from sz.core import models, queries, gis as gis_core, utils
+from sz.core import models, queries, gis as gis_core
 
 
 class FeedService:
@@ -235,7 +235,25 @@ class GameMapService(FeedService):
 
     def get_gamemap(self, user, **kwargs):
         """Return a square map of the city
-        around user in limit: current box, last box
+
+        Args:
+            **kwargs:
+                latitude - the point latitude
+                longitude  - the point longitude
+                user - <User>, who did it request
+
+        Return:
+            list of places with distance
+        """
+        params = parameters.PlaceSearchParametersFactory.create(
+            kwargs, self.city_service)
+        places_list = filter(
+            lambda p: p.gamemap_position,
+            queries.search_places(**params.get_db_params()))
+        return self._make_distance_items_list(params, places_list)
+
+    def get_gamemap_path(self, user, **kwargs):
+        """Return a path between last and current user position
 
         Args:
             **kwargs:
@@ -246,62 +264,47 @@ class GameMapService(FeedService):
         Return:
             last_box - a last box, where the user did something,
             current_box - a current user box,
-            gamemap - [{place:<Place>????, distance: D, azimuth: A},..]
-            map_width - value of boxes by x,
-            map_height - value of boxes by y,
             path - [(x, y), (x, y)] - path from last_box to curr_box
         """
-        def _get_path(last, curr):
-            last_pos = last.get_gamemap_position()
-            curr_pos = curr.get_gamemap_position()
+        def _get_path(prev, curr):
+            end = prev.get_gamemap_position()
+            start = curr.get_gamemap_position()
 
-            minX = min(places_x)
-            minY = min(places_y)
-            to_ziro_x = reversed(map(lambda x: (x, last_pos[1]),
-                                 xrange(minX, last_pos[0])))
-            to_ziro_y = list(to_ziro_x) + list(
-                reversed(map(lambda y: (minX, y), xrange(minY, last_pos[1]))))
-            to_curr_x = to_ziro_y + map(
-                lambda x: (x, minY), xrange(minX, curr_pos[0]))
-            to_curr_y = to_curr_x + map(lambda y: (curr_pos[0], y),
-                                        xrange(minY, curr_pos[1]))
-            return to_curr_y
-            # def _get_range(i):
-            #     pos_list = [last_pos[i], curr_pos[i]]
-            #     r = xrange(min(pos_list), max(pos_list) + i)
-            #     return r if min(pos_list) == last_pos[i] else reversed(r)
+            def _compare(a, b):
+                if a > b:
+                    return -1
+                if a < b:
+                    return 1
+                return 0
 
-            # x_path = map(lambda x: (x, last_pos[1]), _get_range(0))
-            # y_path = map(lambda y: (curr_pos[0], y), _get_range(1))
-            # return list(set(x_path + y_path))
+            def _get(_path=None):
+                if _path is None:
+                    _path = [start]
+                last = _path[-1]
+                next_x = _compare(last[0], end[0]) + last[0]
+                next_y = start[1]
+                if next_x == end[0]:
+                    next_y = _compare(last[1], end[1]) + last[1]
+                _path.append([next_x, next_y])
+                if next_x == end[0] and next_y == end[1]:
+                    return _path
+                return _get(_path)
+
+            return _get()
 
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
-        # latitude = params.get(params_names.LATITUDE)
-        # longitude = params.get(params_names.LONGITUDE)
-        # city_id = params.get(params_names.CITY_ID)
         user = models.User.objects.get(email=user)
-        # radius_from_last_box = gis_core.distance(
-        #     longitude, latitude, last_box.longitude(), last_box.latitude())
-        # params['radius'] = radius_from_last_box
         places_list = filter(
             lambda p: p.gamemap_position,
             queries.search_places(**params.get_db_params()))
-        places_positions = [p.get_gamemap_position() for p in places_list]
-        places_x = sorted(map(lambda pos: pos[0], places_positions))
-        places_y = sorted(map(lambda pos: pos[1], places_positions))
-        user_last_box = user.last_box or random.choice(places_list)
-        user_cur_box = places_list[0]
-        last_box = self._make_place_distance_item(user_last_box, params)
-        data = dict(
-            last_box=last_box,
-            current_box=self._make_place_distance_item(user_cur_box, params),
-            columns=self._make_distance_items_list(params, places_list),
-            map_width=places_x[-1] - places_x[0],
-            map_height=places_y[-1] - places_y[0],
-            path=_get_path(user_last_box, user_cur_box)
+        prev = user.last_box or random.choice(places_list)
+        curr = places_list[0]
+        return dict(
+            path=_get_path(prev, curr),
+            prev_box=self._make_place_distance_item(prev, params),
+            current_box=self._make_place_distance_item(curr, params),
         )
-        return data
 
 
 class MessageService(FeedService):

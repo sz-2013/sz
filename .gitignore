@@ -18,6 +18,7 @@ szApp/www/libs/angularjs
 szApp/www/libs/BookBlock
 szApp/www/libs/IconHoverEffects
 szApp/www/libs/jquery
+szApp/www/libs/raphael
 szApp/www/img
 szApp/platforms
 node_modules
