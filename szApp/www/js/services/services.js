@@ -3,7 +3,7 @@
 
 var szServices = angular.module('sz.client.services', ['ngResource']);
 
-var ip = '192.168.0.105:8080'
+var ip = '192.168.0.104:8080'
 //var ip = '91.142.158.33:8080'
 var apiIp = (window.location.protocol=="http:") ? 
     window.location.origin : ('http://' + ip);

@@ -1,3 +1,67 @@
+/*-----------FromLeft---------*/
+.animate-from-left.ng-hide-add.ng-hide-add-active,
+.animate-from-left.ng-hide-remove {
+    -webkit-transform: translate(-500px, 100px) rotate(-70deg);
+    -moz-transform: translate(-500px, 100px) rotate(-70deg);
+    -ms-transform: translate(-500px, 100px) rotate(-70deg);
+    -o-transform: translate(-500px, 100px) rotate(-70deg);
+    transform: translate(-500px, 100px) rotate(-70deg);
+    opacity: 0;
+}
+ 
+.animate-from-left.ng-hide-remove.ng-hide-remove-active,
+.animate-from-left.ng-hide-add {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+    opacity: 1;
+}
+
+
+.animate-from-left.ng-hide-add,
+.animate-from-left.ng-hide-remove{
+    -webkit-transition: all .6s ease;
+    -moz-transition: all .6s ease;
+    -ms-transition: all .6s ease;
+    -o-transition: all .6s ease;
+    transition: all .6s ease;
+    display:block!important;
+}
+
+/*-----------FromRight---------*/
+.animate-from-right.ng-hide-add.ng-hide-add-active,
+.animate-from-right.ng-hide-remove {
+    -webkit-transform: translate(500px, 100px) rotate(70deg);
+    -moz-transform: translate(500px, 100px) rotate(70deg);
+    -ms-transform: translate(500px, 100px) rotate(70deg);
+    -o-transform: translate(500px, 100px) rotate(70deg);
+    transform: translate(500px, 100px) rotate(70deg);
+    opacity: 0;
+}
+ 
+.animate-from-right.ng-hide-remove.ng-hide-remove-active,
+.animate-from-right.ng-hide-add {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+    opacity: 1;
+}
+
+
+.animate-from-right.ng-hide-add,
+.animate-from-right.ng-hide-remove{
+    -webkit-transition: all .6s ease;
+    -moz-transition: all .6s ease;
+    -ms-transition: all .6s ease;
+    -o-transition: all .6s ease;
+    transition: all .6s ease;
+    display:block!important;
+}
+
 /*-----------SpreadCenter---------*/
  
 .animate-spread-center.ng-hide-add.ng-hide-add-active,

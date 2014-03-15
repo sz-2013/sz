@@ -14,6 +14,10 @@ static/*
 sz/passwords.py
 sz-app
 _szApp
-szApp/www/libs
+szApp/www/libs/angularjs
+szApp/www/libs/BookBlock
+szApp/www/libs/IconHoverEffects
+szApp/www/libs/jquery
+szApp/www/img
 szApp/platforms
 node_modules

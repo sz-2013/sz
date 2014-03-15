@@ -41,15 +41,23 @@ var urls = {
 
 }
 
+var navigationPaths = {
+    mainTL: '',
+    mainTR: '',
+    mainBL: 'partials/navs/navigation/main/menu.html',
+    mainBR: 'partials/navs/navigation/main/score.html',
+    mapbacktopath: 'partials/navs/navigation/map/backtopath.html',
+}
+
 
 var partials = {
     'regConfirm':'partials/registration-confirmation.html',
 }
 
-var pageHeaders = {
+/*var pageHeaders = {
     'main': 'main-header',
     'messageAdd': 'messageadd-header'
-}
+}*/
 
 function objPop(obj) {
   for (var key in obj) {
@@ -84,7 +92,7 @@ function randomSets(r){
 function MasterPageController($scope, $cookies, $http, $location, $timeout, sessionService, staticValueService, geolocation) {
     $scope.$on("setShowLoader", function(e, val){$scope.showLoader=val});
     $scope.showContent = true;
-    $scope.showFooter = false;
+    $scope.showFooter = true;
     $scope.showHeder = true;
     $scope.showMainPage = true;
     $scope.eventstart = false;  
@@ -126,18 +134,19 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         $http.defaults.headers.put['X-CSRFToken'] = token;
     });
 
-    $scope.pageHeaders = pageHeaders;
+    /*$scope.pageHeaders = pageHeaders;
     function setHeader(header){$scope.currHeader = 'partials/navs/headers/' + $scope.pageHeaders[header] + '.html'}
-    $scope.$on("setHeader", function(e, header){setHeader(header)});
+    $scope.$on("setHeader", function(e, header){setHeader(header)});*/
 
     $scope.logout = function(){$scope.session.$logout()}
     $scope.sendMessage = function(){$scope.$broadcast('sendMessage');}
 
-    $scope.$on('$routeChangeStart', function(event, routeData){
-        setHeader('main');
-        redirectAnonymous();
-        $scope.showSideBar=false;
-    });
+
+
+    /*$scope.$on('setShowHeaders', function(e, val){
+       $scope.showHeder = val;
+        $scope.showFooter = val; 
+    })*/
 
     var badges = function(){
         var tmChange = 1000;
@@ -176,12 +185,70 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
             }
         }
     }
-    $scope.badges = badges()
+    $scope.badges = badges();
+
+
+    var navigation = function(){
+        var paths = navigationPaths
+        return {
+            currTL: '',
+            currTR: '',
+            currBL: '',
+            currBR: '',
+            hideAll: function(){
+                this.setTL()
+                this.setTR()
+                this.setBL()
+                this.setBR()
+            },
+            setTL: function(val){
+                this.currTL = val ? paths[val] : ''
+            },
+            setTR: function(val){
+                this.currTR = val ? paths[val] : ''
+            },
+            setBL: function(val){
+                this.currBL = val ? paths[val] : ''
+            },
+            setBR: function(val){
+                this.currBR = val ? paths[val] : ''
+            },
+            setNormal: function(){
+                this.hideAll();
+                this.setBR('mainBR')
+                this.setBL('mainBL')
+            }
+        }
+    }
+
+    $scope.navigation = navigation();
+    $scope.$on('navigation-hideall', function(){$scope.navigation.hideAll()})
+    $scope.$on('navigation-setTL', function(e, val){$scope.navigation.setTL(val)})
+    $scope.$on('navigation-setTR', function(e, val){$scope.navigation.setTR(val)})
+    $scope.$on('navigation-setBL', function(e, val){$scope.navigation.setBL(val)})
+    $scope.$on('navigation-setBR', function(e, val){$scope.navigation.setBR(val)})
+    $scope.$on('navigation-setNormal', function(e, val){$scope.navigation.setNormal()})
+
+    $scope.$on('$routeChangeStart', function(event, routeData){
+        /*setHeader('main');*/
+        redirectAnonymous();
+       /* $scope.showHeder = true;
+        $scope.showFooter = true;*/
+        $scope.navigation.setNormal()
+    });
+
+
+    $scope.map_setHideGameMapShowPath = function(){
+        $scope.$broadcast('setGameMap', false)
+    }
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
 
-function HomeController($scope){}
+function HomeController($scope){
+    $scope.$emit('setShowHeaders', false)
+}
 
 
 
+function MapJSController($scope){}

@@ -32,83 +32,59 @@
         <script src="libs/angularjs/1.2.7/angular-animate.min.js"></script>
 
         <link rel="stylesheet" href="libs/font-awesome/css/font-awesome.css" >
-        <link rel="stylesheet" href="libs/sidebar/sideBarComponents.css">    
+        <!-- <link rel="stylesheet" href="libs/sidebar/sideBarComponents.css">     -->
 
-        <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.css">
+        <!-- <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.css"> -->
 
         <link rel="stylesheet" href="libs/Baraja/Baraja/css/baraja.css">
+        <script src="libs/Baraja/Baraja/js/modernizr.custom.79639.js" type="text/javascript"></script>
+        <script src="libs/Baraja/Baraja/js/jquery.baraja.js" type="text/javascript"></script>
 
-        <link rel="stylesheet" href="css/footer-to-down.css">
+        <!-- <link rel="stylesheet" href="libs/IconHoverEffects/css/component.css">
+        <script src="libs/IconHoverEffects/js/component.js" type="text/javascript"></script> -->
+        
+
+        <!-- <link rel="stylesheet" href="css/footer-to-down.css"> -->
         <link rel="stylesheet" href="css/nganimate.css">
-        <link rel="stylesheet" href="css/buttons.css">
-        <link rel="stylesheet" href="css/mainnav.css">
+        <!-- <link rel="stylesheet" href="css/buttons.css"> -->
         <link rel="stylesheet" href="css/app.css">
+
 
         <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
         <title>ShmotZhmot</title>
     </head>
     <body ng-controller="MasterPageController" mobile-check forced-landscape="isForcedLandscape">
-        <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
-        <div id="mainPage" class="st-container animate-fall-left" ng-show="showMainPage">
-            <!-- content push wrapper -->
-            <div class="st-pusher"> 
-                <nav class="st-menu st-effect-8 dark-nav" id="mainnav">
-                <!-- ng-include src="'partials/navs/mainnav/mainnav.html'" -->
-                    <div class="dark-nav-header">
-                        <h2 class="navbar-brand"> <a href={{url.user}}>{{session.email}}</a> </h2>
-                    </div>
-                    <ul>
-                        <li><a href="{{urls.map}}">
-                            World</a>
-                        <li><a href={{url.newsfeed}}>
-                            News Feed <span class="badge pull-right">42</span>
-                        </a></li>
-                        <li><a href={{url.search}}>
-                            Search
-                        </a></li>
-                        <li><a href="">
-                            Events
-                        </a><li>                        
-                        <li><a>Blagoweschensk</a></li>
-                        <li><a ng-click="logout()">Exit</a></li>
-                    </ul>                                       
-                </nav>
+        <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>        
+        
+        <div id="mainArea" 
+            ng-show="showContent" ng-view sz-scroll-detect sz-set-window> </div><!-- /ng-view -->
 
-                <div class="st-content">
-                    <div id="wrap">
-                        <header class="container-inn text-center"  ng-show="showHeder">
-                            <sz-side-bar ismobile="ismobile" show="showSideBar" steffect="'st-effect-8'"></sz-side-bar>
-                            <a href="#" class="navbar-brand">ShmotZhmot</a>
-                            <span ng-include src="currHeader"></span>
-                        </header><!-- /header -->
+        <div class="left-part header navigation" ng-include src="navigation.currTL" ng-click="mapSetHideGameMapShowPath">
+            <!-- <a><i class="fa fa-repeat fa-lg"></i></a> -->
+        </div>
+        <div class="right-part header navigation" ng-include src="navigation.currTR">
+            <!-- <a><i class="fa fa-plus fa-lg"></i></a> -->
+        </div>
+        
 
-                        <div class="clearfix container-inn" id="main" 
-                            ng-show="showContent" ng-view sz-scroll-detect> </div><!-- /ng-view -->
 
-                        <div class="animate-spread-center" id="badgeArea"
-                            ng-click="badges.hideBadge()" ng-show="badges.show"  sz-badges>
-                            <div class="media sz-badge">
-                                <div class="pull-left">
-                                    <i class="fa fa-star fa-5x"></i>
-                                </div>
-                                <div class="media-body">
-                                    <h2 class="media-heading">{{badges.current.header}}</h2>
-                                    <p>{{badges.current.body}}</p>
-                                </div>
-                            </div>
-                        </div><!-- /#badgeArea -->
-                    </div><!-- /#wrap -->
+                    
+        <div class="left-part footer navigation" ng-include src="navigation.currBL"></div>
 
-                    <footer class="container-inn" ng-show="showFooter">
-                        <h3>Footer</h3>
-                    </footer><!-- footer -->
-                </div><!-- /.st-content -->
-            </div><!-- /.st-pusher -->
-        </div><!-- /.st-container -->
- <!--        <div id="subPage">
-            <h1>Sub Page</h1>
-            <button ng-click="showMainPage=true">{- - -Back</button>
-        </div> -->
+        <div class="right-part footer navigation" ng-include src="navigation.currBR"> </div>
+
+        <div class="animate-spread-center" id="badgeArea"
+            ng-click="badges.hideBadge()" ng-show="badges.show"  sz-badges>
+            <div class="media sz-badge">
+                <div class="pull-left">
+                    <i class="fa fa-star fa-5x"></i>
+                </div>
+                <div class="media-body">
+                    <h2 class="media-heading">{{badges.current.header}}</h2>
+                    <p>{{badges.current.body}}</p>
+                </div>
+            </div>
+        </div><!-- /#badgeArea -->
 
         <!-- <script type="text/javascript" src="cordova.js"></script> -->
         <script type="text/javascript" src="phonegap.js"></script>
@@ -120,8 +96,56 @@
 
 
         <script src="libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
-        <script src="libs/Baraja/Baraja/js/modernizr.custom.79639.js" type="text/javascript"></script>
-        <script src="libs/Baraja/Baraja/js/jquery.baraja.js" type="text/javascript"></script>
+
+        <script src="libs/LeafletSZMap/lib/gm.js"></script>
+        <script src="libs/LeafletSZMap/lib/points.js"></script>
+        <link rel="stylesheet" href="libs/LeafletSZMap/src/leaflet.css" > 
+        <script src="libs/LeafletSZMap/src/Leaflet.js"></script>
+        <script src="libs/LeafletSZMap/src/core/Browser.js"></script>
+        <script src="libs/LeafletSZMap/src/core/Util.js"></script>
+        <script src="libs/LeafletSZMap/src/core/Class.js"></script>
+        <script src="libs/LeafletSZMap/src/core/Events.js"></script>
+        <script src="libs/LeafletSZMap/src/core/Handler.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/DomUtil.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/DomEvent.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/DomEvent.Pointer.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/Draggable.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/PosAnimation.js"></script>
+        <script src="libs/LeafletSZMap/src/dom/PosAnimation.Timer.js"></script>
+        <script src="libs/LeafletSZMap/src/geometry/Bounds.js"></script>
+        <script src="libs/LeafletSZMap/src/geometry/LineUtil.js"></script>
+        <script src="libs/LeafletSZMap/src/geometry/Point.js"></script>
+        <script src="libs/LeafletSZMap/src/geometry/PolyUtil.js"></script>
+        <script src="libs/LeafletSZMap/src/geometry/Transformation.js"></script>
+
+
+        <script src="libs/LeafletSZMap/src/geo/LatLng.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/LatLngBounds.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/projection/Projection.LonLat.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/projection/Projection.Mercator.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/projection/Projection.SphericalMercator.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/crs/CRS.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/crs/CRS.Earth.js"></script>
+        <script src="libs/LeafletSZMap/src/geo/crs/CRS.EPSG3857.js"></script>
+
+        <script src="libs/LeafletSZMap/src/map/Map.js"></script>
+        <script src="libs/LeafletSZMap/src/map/handler/Map.Drag.js"></script>
+
+        <script src="libs/LeafletSZMap/src/layer/Layer.js"></script>
+        <script src="libs/LeafletSZMap/src/layer/LayerGroup.js"></script>
+        <script src="libs/LeafletSZMap/src/layer/tile/GridLayer.js"></script>
+        <script src="libs/LeafletSZMap/src/layer/tile/TileLayer.js"></script>
+        <script src="libs/LeafletSZMap/src/layer/vector/Renderer.js"></script>
+        <script src="libs/LeafletSZMap/src/layer/vector/SVG.js"></script>
+
+        <script src="libs/LeafletSZMap/src/map/GM.js"></script>
+        <script src="libs/LeafletSZMap/src/map/pathPoint.js"></script> 
+
+        <!-- <script src="libs/mapjs/mapjs.js" type="text/javascript"></script>
+        <script src="libs/mapjs/browser.js" type="text/javascript"></script>
+        <script src="libs/mapjs/domevent.js" type="text/javascript"></script>
+        <script src="libs/mapjs/point.js" type="text/javascript"></script>
+        <script src="libs/mapjs/init.js" type="text/javascript"></script> -->
 
         <script src="libs/raphael/2.1.2/raphael-min.js"></script>
     
@@ -131,8 +155,8 @@
         <script src="js/services/phonegap-servive.js"></script>
 
         <script src="js/directives/directives.js"></script>
-        <script src="js/directives/navs-directive.js"></script>
-        <script src="js/directives/raphael-directive.js"></script>
+        <!-- <script src="js/directives/navs-directive.js"></script> -->
+        <!-- <script src="js/directives/raphael-directive.js"></script> -->
         <script src="js/directives/map-directive.js"></script>
         
         <script src="js/controllers/controllers.js"></script>

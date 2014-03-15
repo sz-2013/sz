@@ -1,5 +1,5 @@
 var paperHelper = function($scope){
-    $scope.$on('$routeChangeStart', function(event, routeData){if($scope.paper)$scope.paper.remove();});
+    if($scope) $scope.$on('$routeChangeStart', function(event, routeData){if($scope.paper)$scope.paper.remove();});
     function _isSafeToApply() {
         var phase = $scope.$root.$$phase;
         return !(phase === '$apply' || phase === '$digest');
@@ -111,10 +111,6 @@ angular.module('sz.raphael.directives', [])
                 }
                 $(window).resize(function(){setPaper();})
 
-                /*box.addEventListener( 'webkitTransitionEnd', 
-                    function( event ) { alert( targetElement.getBoundingClientRect().top ); }, false );*/
-
-
                 function clearPaper(){
                     facesList.forEach(function(f){f.remove()});
                     facesList.length = 0;
@@ -123,12 +119,7 @@ angular.module('sz.raphael.directives', [])
                 $scope.$watch('start', function(val){
                     if(val===true) setPaper();
                     if(val===false) clearPaper();
-                })
-
-                /*$scope.$watch('src', function(val){//change all face.src
-                    if(val!=undefined&&facesList.length)
-                        facesList.forEach(function(f){f.attr('src', val)})                
-                }, true);*/
+                });
 
                 $scope.$watch('issend', function(newval, oldval){
                     if(oldval!==undefined&&newval===undefined){

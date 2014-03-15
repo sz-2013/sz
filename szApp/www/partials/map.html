@@ -1,17 +1,7 @@
-<div class="text-center">
-    <map-path-preview path="gamemap.path"></map-path-preview>
-    <!-- <div baraja="gamemap.path" id="map-mapPathParent">
-        <ul id="map-mapPathContainer" class="baraja-container">
-            <li class="map-mapPathCard"
-                ng-init="pic=randomPic()" ng-class="box.place_owner_race" ng-repeat="box in gamemap.path">
-                <img ng-src="../media/baraja/{{pic}}.jpg" alt="image"/>
-                <h4 class="overflow-hidden">{{box.place_name || 'Empy box'}}</h4>
-                <i ng-show='box.is_owner' class="fa fa-check-circle-o fa-2x"></i>
-            </li>
-        </ul>
-        <nav>
-            <span id="map-mapPathPrev">&lt;</span>
-            <span id="map-mapPathNexr">&gt;</span>
-        </nav>
-    </div> -->
+<div class="text-center " >
+  <!--   <map-path-preview  path="gamemap.path" sz-in-center="mapInCenter"
+        class="animate-from-right" ng-show="showGamePath" ></map-path-preview> -->
+    <game-map columns='gamemap.columns' width='gamemap.map_width' height='gamemap.map_height'
+        path="gamemap.path" ismobile="is_mobile"
+        class="animate-from-left" ng-show="showGameMap"></game-map>
 </div>

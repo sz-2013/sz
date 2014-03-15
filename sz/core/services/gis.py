@@ -52,3 +52,12 @@ class BlagoveshchenskCityService:
 
     def search(self, query):
         return [{"id": 2026609}, ]
+
+
+class NYCityService:
+    def get_city_by_position(self, longitude, latitude):
+        return {"id": 6332163}
+
+    def search(self, query):
+        return [{"id": 6332163}, ]
+

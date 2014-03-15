@@ -7,11 +7,12 @@ from sz.core import services, models
 from sz.core.services import morphology, gis
 from sz.settings import LEBOWSKI_MODE_TEST
 
-if LEBOWSKI_MODE_TEST:
-    city_service = gis.SZCityService()
-else:
-    city_service = gis.GeonamesCityService()
+# if LEBOWSKI_MODE_TEST:
+#     city_service = gis.SZCityService()
+# else:
+#     city_service = gis.GeonamesCityService()
 # city_service = gis.BlagoveshchenskCityService()
+city_service = gis.NYCityService()
 place_service = services.PlaceService(city_service)
 gamemap_service = services.GameMapService(city_service)
 categorization_service = morphology.CategorizationService(

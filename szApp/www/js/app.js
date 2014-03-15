@@ -9,8 +9,8 @@ var szApp = angular.module(
     'ngRoute', 
     'ngCookies', 
     'ngAnimate', 
-    'sz.raphael.directives',
-    'navs-directive',
+    /*'sz.raphael.directives',*/
+    /*'navs-directive',*/
     'map-directive',
   /*  'leaflet-directive', 
     ,*/
@@ -26,6 +26,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
         .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
         .when('/map', {templateUrl: 'partials/map.html', controller: MapController})
+        .when('/mapjs', {templateUrl: 'partials/mapjs.html', controller: MapJSController})
         /*
         
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})
