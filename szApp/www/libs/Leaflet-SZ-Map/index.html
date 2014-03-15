@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="lib/gm.js"></script>
+        <script src="lib/points.js"></script>
+        <script src="lib/raphael/2.1.2/raphael-min.js"></script>
+
+        <link rel="stylesheet" href="src/leaflet.css" >        
+        <script src="src/Leaflet.js"></script>
+        <script src="src/core/Browser.js"></script>
+        <script src="src/core/Util.js"></script>
+        <script src="src/core/Class.js"></script>
+        <script src="src/core/Events.js"></script>
+        <script src="src/core/Handler.js"></script>
+        <script src="src/dom/DomUtil.js"></script>
+        <script src="src/dom/DomEvent.js"></script>
+        <!-- <script src="src/dom/DomEvent.DoubleTap.js"></script> -->
+        <script src="src/dom/DomEvent.Pointer.js"></script>
+        <script src="src/dom/Draggable.js"></script>
+        <script src="src/dom/PosAnimation.js"></script>
+        <script src="src/dom/PosAnimation.Timer.js"></script>
+        <script src="src/geometry/Bounds.js"></script>
+        <script src="src/geometry/LineUtil.js"></script>
+        <script src="src/geometry/Point.js"></script>
+        <script src="src/geometry/PolyUtil.js"></script>
+        <script src="src/geometry/Transformation.js"></script>
+
+
+        <script src="src/geo/LatLng.js"></script>
+        <script src="src/geo/LatLngBounds.js"></script>
+        <script src="src/geo/projection/Projection.LonLat.js"></script>
+        <script src="src/geo/projection/Projection.Mercator.js"></script>
+        <script src="src/geo/projection/Projection.SphericalMercator.js"></script>
+        <script src="src/geo/crs/CRS.js"></script>
+        <script src="src/geo/crs/CRS.Earth.js"></script>
+        <script src="src/geo/crs/CRS.EPSG3857.js"></script>
+
+        <script src="src/map/Map.js"></script>
+        <script src="src/map/handler/Map.Drag.js"></script>
+
+        <script src="src/layer/Layer.js"></script>
+        <script src="src/layer/LayerGroup.js"></script>
+        <script src="src/layer/tile/GridLayer.js"></script>
+        <script src="src/layer/tile/TileLayer.js"></script>
+        <script src="src/layer/vector/Renderer.js"></script>
+        <script src="src/layer/vector/SVG.js"></script>        
+
+        <script src="src/map/GM.js"></script>        
+        <script src="src/map/pathPoint.js"></script>        
+    </head>
+    <body>
+        
+        <div id="map" style="height:500px;"></div>
+
+        <script type="text/javascript">
+          
+
+            var map = L.szMap('map', gm, [8, 8]);
+            var center = map.gm.latlng2gm( map.getCenter() );
+            var path = map.gm.generatePath( [center.x, center.y] )
+            var pathLen = path.length;
+
+            function doPath(){
+                for (var i = 0; i < pathLen; i++) {
+                    var point =  map.gm.pathPoint(i, path);
+                };                
+            }
+
+            var gPoint
+            map.on('click', function(e){
+                gPoint = map.gm.latlng2gm(e.latlng);
+                var tile = map.gm.getTile(gPoint.x, gPoint.y);
+                var inner = tile.getElementsByClassName('gmtile-inner')[0];
+                var gBox = tile._gBox;
+                if( gBox.owner == 'nobody' ) return
+
+                L.DomUtil.addClass(inner, 'gmtile-inner-wavein');
+                inner.addEventListener( 'webkitTransitionEnd', function( e ) {
+                    L.DomUtil.removeClass(inner, 'gmtile-inner-wavein');
+                }, false );
+            });
+
+        </script>
+    </body>
+</html>
