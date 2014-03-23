@@ -8,11 +8,11 @@ body{
 }
 
 */
-#mainArea { 
+#mainArea {
     position: relative;
     top:0;
     overflow-y: scroll;
-    overflow-x: scroll;    
+    overflow-x: scroll;
     text-align: center;
 }
 
@@ -33,24 +33,24 @@ body{
 .navigation{
     display: inline-block;
     background-color: transparent;
-    z-index: 300;    
+    z-index: 300;
     margin-right: 8px;
     margin-left: 8px;
-} 
+}
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
 body {
-    font-family: 'Lato', sans-serif;    
+    font-family: 'Lato', sans-serif;
 }
 
 
 html{
-    background-color: #9ACD32;    
+    background-color: #f6f6f6;
 }
 
-.navigation a{    
+.navigation a, .circle-btn{
     border: 2px solid #fff;
-    border-radius: 30px;    
+    border-radius: 30px;
     width:20px;
     height:20px;
     padding: 10px;
@@ -61,7 +61,7 @@ html{
 
 .navigation a:hover{
    /* box-shadow:
-        0 2px 1px rgba(255, 255, 255, 0.2), 
+        0 2px 1px rgba(255, 255, 255, 0.2),
         inset 0 2px 1px rgba(255, 255, 255, 0.2);*/
 }
 
@@ -72,7 +72,7 @@ html{
     font-style: normal;
 }
 
-.navigation a, .navigation span{
+.navigation a, .navigation span, .circle-btn{
     color: rgba(255, 255, 255, 0.8);
     text-shadow: 2px -2px 1px rgba(0, 0, 0, 0.15);
     cursor: pointer;
@@ -128,7 +128,7 @@ html{
     padding: 1em;
     border:3px solid;
     box-shadow:
-        0 2px 1px rgba(0, 0, 0, 0.2), 
+        0 2px 1px rgba(0, 0, 0, 0.2),
         inset 0 2px 1px rgba(0, 0, 0, 0.2);
     border-radius:0.7em;
     display: inline-block;
@@ -151,162 +151,32 @@ html{
 .left-part{
     float:left;
 }
-.right-part{    
+.right-part{
     float:right;
 }
-
-
-/*--------------------------------*/
-#map-mapPathParent{
-    display: inline-block;
-}
-
-#map-mapPathContainer{
-    width: 120px;
-    height: 120px;
-    margin-bottom: 40px;
-}
-
-#gamemap{
-    list-style: none;
-    white-space: nowrap;
-}
-
-.gamemap-column{
-    width: 83px;
-    min-height: 83px;
-    display: inline-block;
-}
-/*
-.gamemap-box{
-    width:116px;
-    height:116px;
-    border: 4px solid;
-}
-*/
-#gamemap .map-mapPathCard{
-    position: relative;
-    cursor: pointer;
-    width:75px;
-    height:75px;
-}
-
-.map-mapPathCard{
-    width:116px;
-    height:116px;
-    border: 4px solid;
-    border-radius: 7px;
-    border-color: #95a5a6;
-    overflow: hidden;
-}
-
-.map-mapPathCard-bottom{
-    position: absolute;
-    bottom: 0;
-    left:0;
-    height: 0;
-    width: 100%;
-    background-color: rgba(255, 255, 255, 0.6);
-    z-index: 3;
-    height: 1em;
-    padding: 0.3em 0;
-    text-align: center;
-    opacity: 0;
-}
-
-.map-mapPathCard h5{
-    margin: 0;
-    font-size: 0.8em;
-    font-style: normal;
-    font-weight: normal;
-}
-
-#map-mapPathContainer.first-child-shadow .map-mapPathCard{
-    box-shadow: none;
-}
-#map-mapPathContainer .map-mapPathCard,
-#map-mapPathContainer.first-child-shadow .map-mapPathCard:first-child,
-#gamemap .map-mapPathCard{
-    box-shadow:
-        0 0 5px 2px rgba(0,0,0,.15),
-        inset 2px -2px 1px rgba(0, 0, 0, 0.6);;
-}
-
-.map-mapPathCard img{
-    width:100%;
-    height: 100%;
-}
-
-.map-mapPathCard.amadeus .map-mapPathCard-bottom,
-.map-mapPathCard.futuri .map-mapPathCard-bottom,
-.map-mapPathCard.united .map-mapPathCard-bottom{
-    opacity: 1;
-}
-
-.map-mapPathCard.amadeus{
-    border-color:#8A2BE2;
-}
-.map-mapPathCard.amadeus .mapbox-owner-label{
-    border-top-color: #8A2BE2;
-}
-.map-mapPathCard.futuri {
-    border-color: #DAA520;
-}
-.map-mapPathCard.futuri .mapbox-owner-label{
-    border-top-color: #DAA520;
-}
-.map-mapPathCard.united {
-    border-color: #2980b9;
-}
-.map-mapPathCard.united .mapbox-owner-label{
-    border-top-color: #2980b9;
-}
-
-.mapbox-owner-label{
-    top:0;
-    left:0;
-    width:0;
-    height:0;
-    position: absolute;    
-    color:white;
-    border-top: 45px solid;
-    border-top-color: transparent;
-    border-right: 45px solid transparent;
-    font-size: 0.9em;
-}
-.mapbox-owner-label i{
-    position: absolute;
-    top:-45px;
-    left:0;
-}
-
-.mapbox-owner-label.mapbox-isowner-label{
-    color:#FFD700;
-}
-
-.mapbox-end-label, .mapbox-start-label{
-    color: #95a5a6;
-    position: absolute;
-    top: -1px;
-    right: 4px;   
-}
-
-.mapbox-start-label{
-    color: green;
-}
-
 
 #raphaelGameMap-Svg{
     z-index: 300;
 }
 
 /*--------------------------------*/
+.btn{
+    background-color: transparent;
+    border-color: transparent;
+}
+
 
 .circle-btn{
     width:40px;
     height: 40px;
     border-radius:20px;
     margin: 0 5px;
+    background-color: rgba(40,40,40,0.1);
+    border: 2px solid rgba(154, 205, 50, 0.3);
+}
+
+.circle-btn:hover, .circle-btn:active{
+    background-color: transparent;
 }
 
 .display-block{

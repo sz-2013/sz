@@ -6,12 +6,12 @@ L.GM.prototype.pushPPoint = function(x, y, i, shift) { //x in gamemap, y in game
         is_end: false,
         is_start: false,
         thisI: newi,
-        pre: this.ppoints[i] 
+        pre: this.ppoints[i]
     });
     this.ppoints.forEach(function(p){
         if(p.i>i || (p.i==i && shift)){
-            p.i = p.i + 1  
-        } 
+            p.i = p.i + 1
+        }
     }) //update all indexes
     this.ppoints.splice(newi, 0, point)
     this._updatePConnections()
@@ -32,7 +32,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         'fill'         : '#f1c40f',
         'fill-opacity' : .8,
         'r'            : gm._getTileSize()/4,
-    }         
+    }
     if(is_start){
         options.stroke = '#009900';
         options.fill = '#66CC00';
@@ -54,7 +54,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         })
     }
 
-    function _create_el(){                        
+    function _create_el(){
         function _dragger(x, y, e){
             this.ox = this.attr("cx");
             this.oy = this.attr("cy");
@@ -95,7 +95,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
             }
         }
 
-        function _up(e){            
+        function _up(e){
             var self = this;
             if( _canMove(self) ){
                 var gp = gm._getGP(this);
@@ -107,14 +107,14 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
                 this.animate({cx: center.x, cy: center.y}, 300, 'bounce', function(){
                     gm._fixPConnections();
                     _showhideConn(true);
-                });                
+                });
             } else{
                 _showhideConn(true, {stroke: options.stroke})
             }
             gm._outDrag()
         }
 
-        
+
         var point  = gm._map.paper.circle(pos.x, pos.y);
         point.attr(options);
         if(!is_start&&!is_end) point.drag(_move, _dragger, _up);
@@ -126,16 +126,16 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
     point.GP = {x: GP[0], y: GP[1]};
 
     return point;
-    
+
 }
-L.GM.prototype.pathPoint = function(i, path){ 
+L.GM.prototype.pathPoint = function(i, path){
     var pre = this.ppoints[i-1];
     var point = this._pathPoint({
         gp: path[i],
         is_end: i === path.length - 1,
         is_start: i === 0,
         thisI: i,
-        pre: pre 
+        pre: pre
     });
     this.ppoints[i] = point
     if(pre) this.setConnection(pre, point)
@@ -161,17 +161,17 @@ L.GM.prototype._markBox = function(){
     if(pnt._gp === undefined) pnt._gp = gp
     if(pnt._gp.x == gp.x && pnt._gp.y == gp.y) return true
     pnt._gp = gp;
-    var pregp = gm._getGP(gm.ppoints[pnt.i-1]);            
+    var pregp = gm._getGP(gm.ppoints[pnt.i-1]);
     var nextgp = gm._getGP(gm.ppoints[pnt.i+1]);
     var x = gp.x, y = gp.y;
     if( _comparePos(pregp.x, gp.x) ){
         if(pregp.x > gp.x) var x = gp.x + 1
         else var x = gp.x - 1
-    } else { 
+    } else {
         if( _comparePos(nextgp.x, gp.x) ){
             if(nextgp.x > gp.x) var x = gp.x + 1;
             else var x = gp.x - 1
-        } 
+        }
     }
     if( _comparePos(pregp.y, gp.y) ){
         console.log(1)
@@ -194,6 +194,6 @@ L.GM.prototype._markBox = function(){
         if(y!=gp.y&&pregp.y<nextgp.y&&gp.y<pregp.y) var shift = false;
         if(y!=gp.y&&pregp.y<nextgp.y&&gp.y>pregp.y) var shift = true;
         gm.pushPPoint(x, y, newi, shift)
-    } 
+    }
     return true
 }*/

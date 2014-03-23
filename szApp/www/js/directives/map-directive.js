@@ -4,7 +4,7 @@
  *
  * Licensed under the MIT license.
  * http://www.opensource.org/licenses/mit-license.php
- * 
+ *
  * Copyright 2012, Codrops
  * http://www.codrops.com
  */
@@ -52,7 +52,7 @@ GameMapHelper.prototype = {
         }
 
         var styleCSS = '';
-        
+
         prop === 'transform' ?
             styleCSS = {
                 '-webkit-transition' : '-webkit-transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
@@ -93,7 +93,7 @@ GameMapHelper.prototype = {
             if( fncomplete ) {
 
                 fncomplete.call();
-                
+
             }
 
         }
@@ -106,14 +106,14 @@ function createCard( cont, box, data, extra ){
     var pic = random(1, 56);
     var data = data || '';
     var extra = extra || '';
-    var el = '<' + cont + ' ' + data + '  class="map-mapPathCard ' + box.place_owner_race + (box.is_owner ? ' is_owner' : '') +'">' + 
+    var el = '<' + cont + ' ' + data + '  class="map-mapPathCard ' + box.place_owner_race + (box.is_owner ? ' is_owner' : '') +'">' +
                 '<img src="../media/baraja/'+ pic +'.jpg" alt="image"/>'+
                 '<div class="map-mapPathCard-bottom"><h5 class="overflow-hidden">' + (box.place_name || 'Emypy box') + '</h5></div>'+
-                (box.place_owner_race ? 
+                (box.place_owner_race ?
                     ('<div class="mapbox-owner-label' + (box.is_owner ? ' mapbox-isowner-label': '') + '">' +
                         '<i class="fa fa-check-circle-o fa-2x"></i>' +
-                    '</div>') : '') +  
-                extra +                                   
+                    '</div>') : '') +
+                extra +
              '</' + cont + '>';
     return el
 }
@@ -128,13 +128,13 @@ angular.module('map-directive', [])
             // priority: 1,
             // terminal: true,
             scope: {
-                path: '=path',                
+                path: '=path',
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
             restrict: 'E', // E = Element, A = Attribute, C = Class, M = Comment
-            template: 
-                '<div id="map-mapPathParent">'+
+            template:
+                /*'<div id="map-mapPathParent">'+
                     '<ul id="map-mapPathContainer" class="baraja-container first-child-shadow">'+
                     '</ul>'+
                     '<nav class="text-center">'+
@@ -148,32 +148,45 @@ angular.module('map-directive', [])
                             '<i class="fa fa-chevron-right fa-2x"></i>'+
                         '</button>'+
                     '</nav>'+
+                '</div>',*/
+                '<div class="simpleSlider">' +
+                    '<nav>' +
+                        '<button class="btn circle-btn" ng-click="slider.spreadNav()">' +
+                            '<i class="fa fa-times"></i>' +
+                        '</button>' +
+                        '<button class="btn circle-btn">' +
+                            '<i class="fa fa-ellipsis-h"></i>' +
+                        '</button>' +
+                        '<button class="btn circle-btn" ng-click="showGameMap()">' +
+                            '<i class="fa fa-cogs"></i>' +
+                        '</button>' +
+                    '</nav>' +
+                    '<ul class="simpleSlider-container gamemap-item">' +
+                    '</ul>' +
                 '</div>',
             // templateUrl: '',
             replace: true,
             transclude: true,
             // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
-                $scope.prevPathBox = function(){$scope.baraja.previous();}
-                $scope.nextPathBox = function(){$scope.baraja.next();}
+                var startLabel = 'mapbox-start-label';
+                var endLabel = 'mapbox-end-label';
+                $scope.slider = new simpleSlider( element[0] )
+                var points;
+
                 $scope.showGameMap = function(){
+                    $scope.slider.spreadNav()
                     $scope.$emit('setGameMap', true)
                 }
-                var startLabel = 'mapbox-start-label';
-                var endLabel = 'mapbox-end-label'
-                var ul = element.children('ul')
-
 
                 function init(){
-                    for (var i = $scope.path.length - 1; i >= 0; i--) {
-                        var box = $scope.path[i];
-                        var pic = random(1, 56);
-                        var extra = ( (i === 0 || i === $scope.path.length - 1) ? '<i class="fa fa-bookmark ' + ( i === 0 ? startLabel : endLabel) + '"></i>' : '');
-                        var el = createCard( 'li', box, null, extra );
-                        ul.prepend(el);
-                    };
-
-                    $scope.baraja = ul.baraja();
+                    points = $scope.path.map(function(gBox){
+                        var el = '<div>' +
+                                    '<img src="' + gBox.castle.img + '" >' +
+                                 '</div>';
+                        el._gBox = gBox;
+                        $scope.slider.update( el,gBox )
+                    })
                     $scope.$emit('setMapInCenter', true)
                 }
 
@@ -201,7 +214,7 @@ angular.module('map-directive', [])
             // transclude: true,
             // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
-                
+
                 //var path;
                 var elem = element[0];
                 function _initCont(){
@@ -222,7 +235,7 @@ angular.module('map-directive', [])
                         inner.addEventListener( 'webkitTransitionEnd', function( e ) {
                             L.DomUtil.removeClass(inner, 'gmtile-inner-wavein');
                         }, false );
-                    });                    
+                    });
                 }
 
                 function _init(){
@@ -240,12 +253,12 @@ angular.module('map-directive', [])
                     var pathLen = path.length;
                     for (var i = 0; i < pathLen; i++) {
                         var point =  map.gm.pathPoint(i, path);
-                    }; 
-                    _initClick();               
+                    };
+                    _initClick();
                 }
 
                 $scope.$watch('points', function(val){if(val) _init(); });
-                
+
             }
         };
     }]);;

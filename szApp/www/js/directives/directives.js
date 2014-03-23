@@ -61,7 +61,7 @@ angular.module('sz.client.directives', [])
 
                 var loaderI = document.getElementById('loader').getElementsByTagName('i')[0]
                 if ( loaderI ) loaderI.style.top = (window.innerHeight - $('#loader i').height())/2 + 'px'
-            }            
+            }
             scope.$watch('session', function(val){
                 if(val!==undefined) setWindow()
             })
@@ -96,7 +96,7 @@ angular.module('sz.client.directives', [])
     .directive('szScrollDetect', function($window) {
         //Show bottom shadow to header when check scroll in window
         return function(scope, element, attrs) {
-            var cl = "header-shadow", header = $("header") 
+            var cl = "header-shadow", header = $("header")
             angular.element(element).bind("scroll", function() {
                 if(element.scrollTop()) header.addClass(cl)
                 else header.removeClass(cl)
@@ -123,8 +123,8 @@ angular.module('sz.client.directives', [])
             function setMenu(){
                 $("textarea").blur()
                 element.find('.dark-nav').find('ul').css('maxHeight', $(window).height()-darkNavTop)
-                element.modal({show: true});                 
-                document.addEventListener("backbutton", resetMenu, false);                    
+                element.modal({show: true});
+                document.addEventListener("backbutton", resetMenu, false);
             }
 
             scope.$watch(attrs.szModal, function(val){
@@ -134,7 +134,7 @@ angular.module('sz.client.directives', [])
         };
     })
     .directive('szMessageAddBox', function(camera) {
-        //Set optimal  heigth for message box and set 
+        //Set optimal  heigth for message box and set
         //focus to textarea when place was selected
         return function(scope, element, attrs) {
             var min = 250, keybowrdWidth = 500, h = $(window).height()-keybowrdWidth;
@@ -153,7 +153,7 @@ angular.module('sz.client.directives', [])
                             var photo = Helpers.dataURItoBlob(src);
                             helper.setImagePreviw(src,  String(Math.random()).slice(2, 12) + '.png', photo)
                         },
-                        Helpers.failHandler, isLibrary);                
+                        Helpers.failHandler, isLibrary);
             }
         }
     })
@@ -166,7 +166,7 @@ angular.module('sz.client.directives', [])
 
             scope.$watch(attrs.szFileModel, function() {
                 var el = element[0];
-                angular.element(el).bind('change', function(){                    
+                angular.element(el).bind('change', function(){
                     if (angular.isUndefined(el.files))
                     {throw new Error("This browser does not support HTML5 File API.");}
                     if (el.files.length == 1){
@@ -177,8 +177,8 @@ angular.module('sz.client.directives', [])
                                 return function(e) {
                                     scope.$apply(function(){
                                         helper.setImagePreviw(e.target.result, escape(photo.name), photo)
-                                    }); 
-                                    
+                                    });
+
                                 };
                             })(photo);
                             reader.readAsDataURL(photo);
@@ -214,10 +214,9 @@ angular.module('sz.client.directives', [])
             })
             /*function hideAchive(){
                 scope.showAchive = false
-            } 
+            }
             scope.$watch(attrs.ngShow, function(val){
                 if(val)$timeout(hideAchive, attrs.timeout);
             });*/
         };
     })
-    

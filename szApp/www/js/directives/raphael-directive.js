@@ -19,14 +19,14 @@ var paperHelper = function($scope){
                 x = box.left + scrollLeft - clientLeft;
             return { y: Math.round(y), x: Math.round(x), width:box.width, height: box.height}
         },
-        mouse:function(e){            
+        mouse:function(e){
             var documentScroll = document.documentElement && document.documentElement.scrollTop;
             var top =  (documentScroll!==undefined) ? documentScroll : document.body.scrollTop;
             if($scope.ismobile) var e = e.touches.item(0);
             var position = this.position($scope.svg)
             var mouse = {
                 x: e.clientX - position.x,
-                y: e.clientY - position.y + top 
+                y: e.clientY - position.y + top
             }
             return mouse
         },
@@ -37,7 +37,7 @@ var paperHelper = function($scope){
                 $scope.$apply(fn);
             }
         }
-    }    
+    }
 }
 
 
@@ -84,7 +84,7 @@ angular.module('sz.raphael.directives', [])
                 var helper = paperHelper($scope);
                 var facesList = new Array;
                 var parent = document.getElementById($scope.parent)
-                var targetElement = document.getElementById($scope.target);                  
+                var targetElement = document.getElementById($scope.target);
                 $scope.paper = Raphael(parent, $(parent).width(), $(parent).height());
                 $("svg").attr("id","raphaelAddFace-Svg").css({position:'absolute'});
                 $scope.svg = document.getElementById('raphaelAddFace-Svg')
@@ -96,18 +96,18 @@ angular.module('sz.raphael.directives', [])
                     var elements = $scope.paper.getElementsByPoint(mouse.x, mouse.y);
                     if(elements.length) return
                     var f = photoFace(mouse.x, mouse.y)
-                    facesList.push(f)                        
+                    facesList.push(f)
                     /*f.doAction()*/
-                  /*  e.stopPropagation();                        
+                  /*  e.stopPropagation();
                     e.preventDefault();*/
-                });                      
+                });
 
-                function setPaper(){                    
+                function setPaper(){
                     var box = helper.position(targetElement)
                     if(box.y<0)return
                     $scope.paper.setSize(box.width, box.height)
                     var targetPos = $(targetElement).position()
-                    $($scope.svg).css({left: targetPos.left + 'px', top: targetPos.top + 'px'})                    
+                    $($scope.svg).css({left: targetPos.left + 'px', top: targetPos.top + 'px'})
                 }
                 $(window).resize(function(){setPaper();})
 
@@ -153,7 +153,7 @@ angular.module('sz.raphael.directives', [])
                             newW = face.attr('width') + step, newH = face.attr('height') + step,
                             newX = oldX - step/2, newY = oldY - step/2;
                         face.animate({width:newW, height:newH, x:newX, y:newY}, face.t, "backIn");
-                    };  
+                    };
 
                     function canEnlarge(){
                         var left = face.attr('x'), right = face.attr('x') + face.attr('width'),
@@ -169,7 +169,7 @@ angular.module('sz.raphael.directives', [])
                                 facesList.slice(i, 1)
                                 break
                             }
-                        };                                                
+                        };
                         face.remove()
                     }
 
@@ -182,7 +182,7 @@ angular.module('sz.raphael.directives', [])
                         face.animate({x:newX, y:newY});
                     }
 
-                    face.stopAction = function(e){                        
+                    face.stopAction = function(e){
                         //e.stopPropagation()
                         if (face.action!==undefined) {
                             $interval.cancel(face.action);
@@ -212,20 +212,20 @@ angular.module('sz.raphael.directives', [])
                     }
 
                     face.drag(function(dx,dy,x,y,e){moveFace(dx, dy, e)});
-                    
+
 
                     if($scope.ismobile){
                         face.touchstart(function(e){face.doAction(e)});
                         face.touchend(function(e){face.stopAction(e)});
                     }
-                    else{                        
+                    else{
                         face.mousedown(function(e){face.doAction(e)});
                         face.mouseup(function(e){face.stopAction(e)});
-                    }                    
+                    }
                     return face
                 }
 
-                
+
             }
         };
     })

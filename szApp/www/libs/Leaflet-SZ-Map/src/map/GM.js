@@ -1,24 +1,5 @@
-var gameBox = function(options){
-    this.name = options.name || 'Empty box',
-    this.pos = options.pos;
-    var ownerArr = ['neutral', 'negative', 'positive', 'nobody']
-    this.owner = ownerArr[Math.floor(Math.random()*ownerArr.length)]
-    if( Math.floor(Math.random()*10) == 1) this.owner = 'own'
-    this.castle = {
-        img: this.owner !== 'nobody' ? 'img/' + Math.floor(Math.random()*10 + 1) + '.png' : ''
-    }
-}
-
-gameBox.prototype.toString = function() {
-    //return this.name
-    return [this.name, '<br>',
-            'x: ', this.pos[0], ';',
-            'y: ', this.pos[1]].join('')
-};
-
-
 L.GM = L.Class.extend({
-    options: {        
+    options: {
         zero: {x: 20971, y: 20971}
     },
 
@@ -48,12 +29,7 @@ L.GM = L.Class.extend({
 
     getGameBox: function (point){
         var pos = this.project2gm(point);
-        var f = this.points.filter(function(p){
-            return p.place_gamemap_position[0] == pos.x && p.place_gamemap_position[1] == pos.y});        
-        var options = f.length ? f[0] : new Object;
-        options.pos = [pos.x, pos.y]
-        var box = new gameBox( options );
-        return box
+        return getGameBox([pos.x, pos.y], this.points) //gameBox.js function
     },
 
     getTile: function (x, y){ //game x, y; -> tile
@@ -62,7 +38,7 @@ L.GM = L.Class.extend({
             if(tiles.hasOwnProperty(key)){
                 var pos = tiles[key]._gBox.pos;
                 if(pos[0] == x && pos[1] == y) return tiles[key]
-            }            
+            }
         }
     },
 
@@ -77,7 +53,7 @@ L.GM = L.Class.extend({
     generatePath: function(start){
         var start = start || this.getRandomGP(), end = this.getRandomGP();
         //var start = start, end = [start[0] + 8, start[1]];
-        //var start = start, end = [start[0] - 8, start[1]];        
+        //var start = start, end = [start[0] - 8, start[1]];
         function _getPath(_path){
             function _compare(a, b){return a > b ? -1 : a < b ? 1 : 0}
             var _path = _path || [start],
@@ -85,7 +61,7 @@ L.GM = L.Class.extend({
                 next_x = _compare(last[0], end[0]) + last[0],
                 next_y = start[1];
             if(next_x == end[0]) var next_y = _compare(last[1], end[1]) + last[1];
-            _path.push([next_x, next_y]); 
+            _path.push([next_x, next_y]);
             return (next_x == end[0] && next_y == end[1]) ? _path : _getPath(_path)
         }
         var path = _getPath();
@@ -95,9 +71,9 @@ L.GM = L.Class.extend({
     },
 
     //convert methods
-    project2gm: function (point){ //(Point)  to gamemap x, y 
+    project2gm: function (point){ //(Point)  to gamemap x, y
         if(point.x > this.zero.x*this._getTileSize()) var point = this._minimalPoint(point)
-        return {x: point.x - this.zero.x, y: this.zero.y - point.y} 
+        return {x: point.x - this.zero.x, y: this.zero.y - point.y}
     },
 
     gm2project: function (x, y){ //game x, y to LeafletProject x, y
@@ -162,10 +138,10 @@ L.GM.prototype.pathConnection = function(obj1, obj2, line, bg) {
         line = obj1;
         obj1 = line.from;
         obj2 = line.to;
-    }    
+    }
     var bb1 = obj1.getBBox(),
         bb2 = obj2.getBBox();
-        
+
     var p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
         {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
         {x: bb1.x - 1, y: bb1.y + bb1.height / 2},
@@ -201,7 +177,7 @@ L.GM.prototype.pathConnection = function(obj1, obj2, line, bg) {
         x3 = [0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
         y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
     var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
-    
+
     if (line && line.line) {
         line.bg && line.bg.attr({path: path});
         line.line.attr({path: path});

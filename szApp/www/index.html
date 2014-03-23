@@ -42,21 +42,22 @@
 
         <!-- <link rel="stylesheet" href="libs/IconHoverEffects/css/component.css">
         <script src="libs/IconHoverEffects/js/component.js" type="text/javascript"></script> -->
-        
+
 
         <!-- <link rel="stylesheet" href="css/footer-to-down.css"> -->
         <link rel="stylesheet" href="css/nganimate.css">
         <!-- <link rel="stylesheet" href="css/buttons.css"> -->
         <link rel="stylesheet" href="css/app.css">
+        <link rel="stylesheet" href="css/gamemap.css">
 
 
         <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
         <title>ShmotZhmot</title>
     </head>
     <body ng-controller="MasterPageController" mobile-check forced-landscape="isForcedLandscape">
-        <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>        
-        
-        <div id="mainArea" 
+        <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
+
+        <div id="mainArea"
             ng-show="showContent" ng-view sz-scroll-detect sz-set-window> </div><!-- /ng-view -->
 
         <div class="left-part header navigation" ng-include src="navigation.currTL" ng-click="mapSetHideGameMapShowPath">
@@ -65,10 +66,10 @@
         <div class="right-part header navigation" ng-include src="navigation.currTR">
             <!-- <a><i class="fa fa-plus fa-lg"></i></a> -->
         </div>
-        
 
 
-                    
+
+
         <div class="left-part footer navigation" ng-include src="navigation.currBL"></div>
 
         <div class="right-part footer navigation" ng-include src="navigation.currBR"> </div>
@@ -95,60 +96,60 @@
 
 
 
-        <script src="libs/jquery/jquery.autoResize.js" type="text/javascript"></script> 
+        <script src="libs/jquery/jquery.autoResize.js" type="text/javascript"></script>
 
-        
-        <link rel="stylesheet" href="libs/LeafletSZMap/src/leaflet.css" > 
-        <script src="libs/LeafletSZMap/src/Leaflet.js"></script>
-        <script src="libs/LeafletSZMap/src/core/Browser.js"></script>
-        <script src="libs/LeafletSZMap/src/core/Util.js"></script>
-        <script src="libs/LeafletSZMap/src/core/Class.js"></script>
-        <script src="libs/LeafletSZMap/src/core/Events.js"></script>
-        <script src="libs/LeafletSZMap/src/core/Handler.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/DomUtil.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/DomEvent.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/DomEvent.Pointer.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/Draggable.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/PosAnimation.js"></script>
-        <script src="libs/LeafletSZMap/src/dom/PosAnimation.Timer.js"></script>
-        <script src="libs/LeafletSZMap/src/geometry/Bounds.js"></script>
-        <script src="libs/LeafletSZMap/src/geometry/LineUtil.js"></script>
-        <script src="libs/LeafletSZMap/src/geometry/Point.js"></script>
-        <script src="libs/LeafletSZMap/src/geometry/PolyUtil.js"></script>
-        <script src="libs/LeafletSZMap/src/geometry/Transformation.js"></script>
+        <script src="js/gameBox.js" type="text/javascript"></script>
+
+        <script src="js/domHelper.js" type="text/javascript"></script>
+
+        <link rel="stylesheet" href="libs/Leaflet-SZ-Map/src/leaflet.css" >
+        <script src="libs/Leaflet-SZ-Map/src/Leaflet.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/core/Browser.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/core/Util.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/core/Class.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/core/Events.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/core/Handler.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/DomUtil.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/DomEvent.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/DomEvent.Pointer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/Draggable.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/PosAnimation.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/dom/PosAnimation.Timer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geometry/Bounds.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geometry/LineUtil.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geometry/Point.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geometry/PolyUtil.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geometry/Transformation.js"></script>
 
 
-        <script src="libs/LeafletSZMap/src/geo/LatLng.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/LatLngBounds.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/projection/Projection.LonLat.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/projection/Projection.Mercator.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/projection/Projection.SphericalMercator.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/crs/CRS.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/crs/CRS.Earth.js"></script>
-        <script src="libs/LeafletSZMap/src/geo/crs/CRS.EPSG3857.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/LatLng.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/LatLngBounds.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/projection/Projection.LonLat.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/projection/Projection.Mercator.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/projection/Projection.SphericalMercator.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/crs/CRS.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/crs/CRS.Earth.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/geo/crs/CRS.EPSG3857.js"></script>
 
-        <script src="libs/LeafletSZMap/src/map/Map.js"></script>
-        <script src="libs/LeafletSZMap/src/map/handler/Map.Drag.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/map/Map.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/map/handler/Map.Drag.js"></script>
 
-        <script src="libs/LeafletSZMap/src/layer/Layer.js"></script>
-        <script src="libs/LeafletSZMap/src/layer/LayerGroup.js"></script>
-        <script src="libs/LeafletSZMap/src/layer/tile/GridLayer.js"></script>
-        <script src="libs/LeafletSZMap/src/layer/tile/TileLayer.js"></script>
-        <script src="libs/LeafletSZMap/src/layer/vector/Renderer.js"></script>
-        <script src="libs/LeafletSZMap/src/layer/vector/SVG.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/Layer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/LayerGroup.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/tile/GridLayer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/tile/TileLayer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/vector/Renderer.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/layer/vector/SVG.js"></script>
 
-        <script src="libs/LeafletSZMap/src/map/GM.js"></script>
-        <script src="libs/LeafletSZMap/src/map/pathPoint.js"></script> 
+        <script src="libs/Leaflet-SZ-Map/src/map/GM.js"></script>
+        <script src="libs/Leaflet-SZ-Map/src/map/pathPoint.js"></script>
 
-        <!-- <script src="libs/mapjs/mapjs.js" type="text/javascript"></script>
-        <script src="libs/mapjs/browser.js" type="text/javascript"></script>
-        <script src="libs/mapjs/domevent.js" type="text/javascript"></script>
-        <script src="libs/mapjs/point.js" type="text/javascript"></script>
-        <script src="libs/mapjs/init.js" type="text/javascript"></script> -->
+        <link rel="stylesheet" href="libs/simpleSlider/simpleSlider.css" >
+        <script src="libs/simpleSlider/simpleSlider.js"></script>
 
         <script src="libs/raphael/2.1.2/raphael-min.js"></script>
-    
-        <script src="libs/bootstrap/js/bootstrap.min.js"></script>        
+
+        <script src="libs/bootstrap/js/bootstrap.min.js"></script>
 
         <script src="js/services/services.js"></script>
         <script src="js/services/phonegap-servive.js"></script>
@@ -157,7 +158,7 @@
         <!-- <script src="js/directives/navs-directive.js"></script> -->
         <!-- <script src="js/directives/raphael-directive.js"></script> -->
         <script src="js/directives/map-directive.js"></script>
-        
+
         <script src="js/controllers/controllers.js"></script>
         <script src="js/controllers/auth-controllers.js"></script>
         <script src="js/controllers/message-controllers.js"></script>

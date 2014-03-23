@@ -6,7 +6,7 @@ L.TileLayer = L.GridLayer.extend({
 
 	options: {
 		minZoom: 0,
-		maxZoom: 18,		
+		maxZoom: 18,
 		subdomains: 'abc',
 		// errorTileUrl: '',
 		zoomOffset: 0
@@ -39,15 +39,11 @@ L.TileLayer = L.GridLayer.extend({
 	},
 
 	createTile: function (gBox) {
-		if(gBox.pos[0] < 0 || gBox.pos[1] < 0) return 		
+		if(gBox.pos[0] < 0 || gBox.pos[1] < 0) return
 		var tile = document.createElement('div');
-		tile.className = 'gmtile ' + gBox.owner
-		tile.innerHTML = '<div class="gmtile-inner">' + 
-							 '<img src="' + gBox.castle.img + '" >' + 
-			              /*   '<div class="hex">' + 
-			                 	'<div class="hex1"></div>' + 
-			                 	'<div class="hex2"></div>' + 
-			                 '</div>' + */
+		tile.className = 'gmtile'
+		tile.innerHTML = '<div class="gamemap-item ' + gBox.owner + '">' +
+							 '<img src="' + gBox.castle.img + '" >' +
 			             '</div>'
 		return tile;
 	},

@@ -1,6 +1,6 @@
 function MapController($scope, gameMapService, $rootScope, placeService, $rootScope, $timeout){
     $rootScope.showLoader = false;
-    
+
     $scope.showGameMap = false;
     $scope.showGamePath = false;
     $scope.gameMap = {}
@@ -18,7 +18,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             $scope.showGameMap = false;
             /*$timeout(function(){*/
                 $scope.showGamePath = true;
-                $scope.$emit('navigation-setNormal');                
+                $scope.$emit('navigation-setNormal');
             /*}, t);*/
         }
     });
@@ -30,14 +30,14 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         $scope.showGameMap = true;
         var params = $scope.coordinates;
         gameMapService.getMap(params, function(r){
-            $scope.gameMap.points = r;
-
-            gameMapService.getPath(params, function(r){
-                $scope.gameMap.path = r.path;
+            $scope.gameMap.points = r;          //[{place_serializer.data}, {}]
+            gameMapService.getPath(params, function(r){          //r - {path: [[x, y], ...], currentBox: place_serializer.data, prevBox: place_serializer.data}
+                $scope.gameMap.path = r.path.map(function(pos){
+                    return getGameBox(pos, $scope.gameMap.points) //gameBox.js function
+                });
                 $scope.gameMap.curr = r.currentBox;
                 $scope.gameMap.prev = r.prevBox;
-                //$scope.showGamePath = true; $scope.showGameMap = false;
-                $scope.showGameMap = false; $scope.showGameMap = true;
+                $scope.showGamePath = true; $scope.showGameMap = false;
                 //if($scope.gameMap.path.length){$scope.showGamePath = true; $scope.showGameMap = false;} else {$scope.showGameMap = true }
                 $rootScope.showLoader = false;
             })
