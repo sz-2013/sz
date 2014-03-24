@@ -48,15 +48,15 @@ html{
     background-color: #f6f6f6;
 }
 
-.navigation a, .circle-btn{
-    border: 2px solid #fff;
+.navigation a{
+    border: 2px solid rgba(44, 62, 80, 1);
     border-radius: 30px;
     width:20px;
     height:20px;
     padding: 10px;
     box-shadow:  2px -2px 1px rgba(0, 0, 0, 0.15),
         inset 2px -2px 1px rgba(0, 0, 0, 0.15);
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .navigation a:hover{
@@ -72,8 +72,9 @@ html{
     font-style: normal;
 }
 
-.navigation a, .navigation span, .circle-btn{
-    color: rgba(255, 255, 255, 0.8);
+.navigation a, .navigation span{
+    opacity: .6;
+    color: rgba(44, 62, 80, 1);
     text-shadow: 2px -2px 1px rgba(0, 0, 0, 0.15);
     cursor: pointer;
     margin: 0 5px;
@@ -83,9 +84,10 @@ html{
 
 .navigation a:hover,
 .navigation span:hover{
-    color: rgba(255, 255, 255, 1);
+    opacity: 1;
+    /*color: rgba(255, 255, 255, 1);*/
     /*text-shadow: 2px -2px 1px rgba(255, 255, 255, 0.2);*/
-    background-color: transparent;
+    /*background-color: transparent;*/
 }
 
 
@@ -167,12 +169,18 @@ html{
 
 
 .circle-btn{
+    opacity: 1;
     width:40px;
     height: 40px;
     border-radius:20px;
     margin: 0 5px;
-    background-color: rgba(40,40,40,0.1);
-    border: 2px solid rgba(154, 205, 50, 0.3);
+    background-color: rgba(40, 40, 40, 0.1);
+    border: 2px solid rgba(203, 203, 193, 0.3);
+    box-shadow:
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 1px 1px 2px rgba(40,40,40,0.2) ;
 }
 
 .circle-btn:hover, .circle-btn:active{

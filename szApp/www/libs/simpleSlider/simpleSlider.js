@@ -43,30 +43,25 @@ simpleSlider.prototype._initItems = function() {
 
 
 simpleSlider.prototype._initThumb = function() {
+    function _createThumb(index){
+        var li = document.createElement( 'li' );
+        var sameitem = self.items[index];
+        addClass(li, sameitem._gBox.owner)
+        var rotate = 'rotateZ(' + start_angle + step*index + 'deg)';
+        li.style['-webkit-transform'] = rotate;
+        li.style['transform'] = rotate;
+        li.addEventListener( 'click', function(e){self._setActive( sameitem ) });
+        self.thumbElem.appendChild( li );
+    }
     var self = this;
+    var start_angle = 0, itemslen = self.items.length, step = 360 / itemslen;
     if(!this.thumbElem){
         this.thumbElem = document.createElement( 'ul' );
         this.thumbElem.className = 'simpleSlider-thumb';
     } else{
         this.thumbElem.innerHTML = ''
     }
-    var angle = 0, liVal = this.items.length, step = 360 / liVal;
-    while (angle < 360){
-        var li = document.createElement( 'li' );
-        var rotate = 'rotateZ(' + angle + 'deg)';
-        li.style['-webkit-transform'] = rotate;
-        li.style['transform'] = rotate;
-        li.addEventListener( 'click', function(e){
-            var index = self._getIndex( self.thumbItems, this ), itemslen = self.items.length
-            for (var i = 0; i < itemslen; i++) {
-                var item = self.items[i];
-                if( self._getIndex( self.items,  item) == index + 1) break
-                self._setActive( item )
-            };
-        });
-        this.thumbElem.appendChild( li );
-        angle += step
-    }
+    for (var index = 0; index < itemslen; index++) {_createThumb(index)};
     this.elem.insertBefore(this.thumbElem, this.elemUl);
     this.thumbItems = this.thumbElem.getElementsByTagName( 'li' );
     this._setThumb( this.thumbItems[0] )

@@ -6,11 +6,12 @@
     -webkit-box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
         box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
     border-radius: 4px;
+    overflow: hidden;
 }
 
-.simpleSlider-thumb>li:before{
+.simpleSlider-thumb>li:before, .simpleSlider-thumb>li:after,
+.gamemap-item:before, .gamemap-item:after{
     height: 30%;
-    max-height: 10px;
     display: block;
     position: absolute;
     bottom: 0;
@@ -19,11 +20,17 @@
     content: "";
     -webkit-transition: all .2s ease-in;
     transition: all .2s ease-in;
-    border-radius: 0 0 4px 4px;
+    z-index: 3;
+    background-color: transparent;
+}
+
+.simpleSlider-thumb>li:after{
+    bottom: auto;
+    top: 0;
 }
 
 .simpleSlider-thumb>li:hover:before, .simpleSlider-thumb>li.active:before{
-    background-color: rgba(241, 196, 15, 1);
+    background-color: rgba(203, 203, 193, 1);
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
 }
 
@@ -45,7 +52,7 @@
     left:0;
     top:0;
     position: absolute;
-    border: 4px solid rgba(203, 203, 193, 0.3);
+    border: 4px solid rgba(203, 203, 193, 0.4);
     background-color: rgba(40,40,40,0.1);
     border-radius: 6px;
     box-shadow:
@@ -58,18 +65,7 @@
 }
 
 .gamemap-item:before{
-    height: 30%;
-    bottom: 0;
-    left:1px;
-    right:1px;
-    display: block;
-    position: absolute;
-    content: "";
-    -webkit-transition: all .2s ease-in;
-    transition: all .2s ease-in;
-    border-radius: 0 0 6px 6px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
-    z-index: 3;
     -webkit-transform-origin: -20px 0 0;
     transform-origin: -20px 0 0;
     -webkit-transform: rotateZ(30deg);
@@ -77,22 +73,12 @@
 }
 
 .gamemap-item:after{
-    height: 30%;
+    bottom: auto;
     top: 0;
-    left:1px;
-    right:1px;
-    display: block;
-    position: absolute;
-    content: "";
-    -webkit-transition: all .2s ease-in;
-    transition: all .2s ease-in;
-    border-radius: 0 0 6px 6px;
-    z-index: 3;
     -webkit-transform-origin: -15px 40px 0;
     transform-origin: -15px 40px 0;
     -webkit-transform: rotateZ(-30deg);
     transform: rotateZ(-30deg);
-    background-color: transparent;
 }
 
 .gamemap-item.gamemap-item-wavein{
@@ -108,21 +94,25 @@
     box-shadow: none;
 }
 
-.neutral.gamemap-item:before{
-    background-color: #95a5a6;
+.neutral.gamemap-item:before,
+.simpleSlider-thumb>li.neutral{
+    background-color: #b6aea1;
 }
 
-.own.gamemap-item:after{
-    background-color: rgba(241, 196, 15, 1);
+.own.gamemap-item:after,
+.simpleSlider-thumb>li.own:after{
+    background-color: #f2d100;
     box-shadow: 0 -1px 2px 0 rgba(0,0,0,0.2) inset;
 }
 
-.positive.gamemap-item:before, .own.gamemap-item:before{
-    background-color: rgba(22, 167, 157, 1);
+.positive.gamemap-item:before, .own.gamemap-item:before,
+.simpleSlider-thumb>li.positive, .simpleSlider-thumb>li.own{
+    background-color: #8DC900;
 }
 
-.negative.gamemap-item:before{
-    background-color: rgba(231, 81, 45, 1);
+.negative.gamemap-item:before,
+.simpleSlider-thumb>li.negative{
+    background-color: #ea7d24;
 }
 
 
