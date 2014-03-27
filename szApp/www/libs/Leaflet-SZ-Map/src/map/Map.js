@@ -12,7 +12,7 @@ L.Map = L.Evented.extend({
 		zoom: Number,
 		layers: Array,
 		*/
-		zoom: 14, 
+		zoom: 14,
 		fadeAnimation: true,
 		trackResize: true,
 		markerZoomAnimation: true,
@@ -201,7 +201,7 @@ L.Map = L.Evented.extend({
 		}
 
 		this._clearHandlers();
-		
+
 		if (this._loaded) {
 			this.fire('unload');
 		}
@@ -391,7 +391,7 @@ L.Map = L.Evented.extend({
 		return this.layerPointToLatLng(this.mouseEventToLayerPoint(e));
 	},
 
-	
+
 	// map initialization methods
 
 	_initContainer: function (id) {
@@ -451,7 +451,7 @@ L.Map = L.Evented.extend({
 
 	// private methods that modify map state
 
-	_resetView: function (center, zoom, preserveMapOffset, afterZoomAnim) {		
+	_resetView: function (center, zoom, preserveMapOffset, afterZoomAnim) {
 		this._zoom = this.options.zoom;
 		this._initialCenter = center;
 
@@ -677,6 +677,6 @@ L.szMap = function(id, points, center){ //id, [{name:NAME, pos:[x, y]}, ..], [x,
 	}
 	var center = center || map.gm.getRandomGP();
     map.setView( map.gm.gm2latlng( center ) );
-    map.getRenderer();    
+    map.getRenderer();
     return map
 }

@@ -128,27 +128,13 @@ angular.module('map-directive', [])
             // priority: 1,
             // terminal: true,
             scope: {
+                isshow: '=isshow',
                 path: '=path',
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
             restrict: 'E', // E = Element, A = Attribute, C = Class, M = Comment
             template:
-                /*'<div id="map-mapPathParent">'+
-                    '<ul id="map-mapPathContainer" class="baraja-container first-child-shadow">'+
-                    '</ul>'+
-                    '<nav class="text-center">'+
-                        '<button class="btn circle-btn" ng-click="prevPathBox()">'+
-                            '<i class="fa fa-chevron-left fa-2x"></i>'+
-                        '</button>'+
-                        '<button class="btn circle-btn" ng-click="showGameMap()">'+
-                            '<i class="fa fa-cogs fa-2x"></i>'+
-                        '</button>'+
-                        '<button class="btn circle-btn pull-right" ng-click="nextPathBox()">'+
-                            '<i class="fa fa-chevron-right fa-2x"></i>'+
-                        '</button>'+
-                    '</nav>'+
-                '</div>',*/
                 '<div class="simpleSlider">' +
                     '<nav>' +
                         '<button class="btn circle-btn" ng-click="slider.spreadNav()">' +
@@ -171,12 +157,16 @@ angular.module('map-directive', [])
             link: function($scope, element, attrs) {
                 var startLabel = 'mapbox-start-label';
                 var endLabel = 'mapbox-end-label';
-                $scope.slider = new simpleSlider( element[0] )
+                simpleSlider.prototype._update_active_el = function() {
+                    $scope.$emit('setActivePoint', this.active._gBox)
+                };
+
+                $scope.slider = new simpleSlider( element[0], $scope )
                 var points;
 
                 $scope.showGameMap = function(){
                     $scope.slider.spreadNav()
-                    $scope.$emit('setGameMap', true)
+                    $scope.$emit('setGameMap', true);
                 }
 
                 function init(){
@@ -186,11 +176,11 @@ angular.module('map-directive', [])
                                  '</div>';
                         el._gBox = gBox;
                         $scope.slider.update( el,gBox )
-                    })
-                    $scope.$emit('setMapInCenter', true)
+                    });
                 }
 
-                $scope.$watch('path', function(val){if(val) init() })
+                $scope.$watch('path', function(val){if(val) init() });
+                $scope.$watch('isshow', function(val){if(val) $scope.$emit('setMapInCenter', true) });
             }
         };
     }])
@@ -242,22 +232,34 @@ angular.module('map-directive', [])
                     _initCont()
                     map = L.szMap(
                         elem.getAttribute('id'),
-                        $scope.points,
-                        $scope.center);
-                    //doPath()
+                        $scope.points);
+                    console.log(map.gm.gm2layer(13, 10))
                 }
 
-                function doPath(){
-                    var center = map.gm.latlng2gm( map.getCenter() );
-                    var path = map.gm.generatePath( [center.x, center.y] )
-                    var pathLen = path.length;
+                function _doPath(){
+                    var pathLen = $scope.path.length;
                     for (var i = 0; i < pathLen; i++) {
-                        var point =  map.gm.pathPoint(i, path);
+                        var point =  map.gm.pathPoint(i, $scope.path);
                     };
                     _initClick();
+                    map.gm.setView($scope.center.pos)
+                    $scope.$emit('setGameMap', false)
+                }
+
+                function _setCenter(){
+                    var center = map.gm.gm2latlng($scope.center.pos);
+                    map.setView(center);
+                    map.gm.setView($scope.center.pos)
+                    if($scope.path&&!map.gm.ppoints.length) _doPath()
                 }
 
                 $scope.$watch('points', function(val){if(val) _init(); });
+                $scope.$watch('center', function(val){
+                    if(!val || !map) return
+                    var center = map.gm.latlng2gm( map.getCenter() );
+                    var pos = val.pos;
+                    if( (pos[0] != center[0] && pos[1] != center[1])  ) _setCenter()
+                });
 
             }
         };

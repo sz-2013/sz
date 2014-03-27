@@ -1,6 +1,6 @@
 <div class="text-center " >
-    <map-path-preview class="animate-from-right" path="gameMap.path"
+    <map-path-preview class="animate-from-right" isshow="showGamePath" path="gameMap.path"
         sz-in-center="mapInCenter" ng-show="showGamePath" ></map-path-preview>
-    <game-map center='gameMap.curr.place_gamemap_position' points='gameMap.points' path='gameMap.path'
+    <game-map center='activePoint' points='gameMap.points' path='gameMap.path'
         class="animate-from-left" ng-show="showGameMap"></game-map>
 </div>

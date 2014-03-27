@@ -96,12 +96,12 @@ L.GM = L.Class.extend({
         return this.project2gm(point)
     },
 
-    gm2contaiter: function (x, y){ //-> x, y in cont
+    gm2layer: function (x, y){ //-> x, y in layer
         var latlng = this.gm2latlng([x, y]);
         return this._map.latLngToLayerPoint(latlng)
     },
 
-    container2gm: function (x, y){ //-> [x, y]
+    layer2gm: function (x, y){ //-> [x, y]
         var svgTransform = this._map.paper.canvas.style.webkitTransform;
         var normalX = svgTransform ? parseInt(/\((-?\d+)/.exec(svgTransform)[1], 10) : 0;
         var normalY = svgTransform ? parseInt(/, (-?\d+)/.exec(svgTransform)[1], 10) : 0;
@@ -231,6 +231,24 @@ L.GM.prototype._updatePConnections = function(){
         } else if(conn) this.removeConnection(conn)
     }
 }
+
+
+L.GM.prototype.setView = function(pos) { //[x, y]
+    this.clearView();
+    var points = this.ppoints.filter(function(p){
+        var _pos = p._gBox.pos;
+        return pos[0] == _pos[0] && pos[1] == _pos[1]
+    });
+    points.forEach(function(p){p.setView()});
+};
+
+
+L.GM.prototype.clearView = function() {
+    for (var i = this.ppoints.length - 1; i >= 0; i--) {
+        this.ppoints[i].clearView()
+    };
+};
+
 
 L.gm = function (options) {
     return new L.GM(options);

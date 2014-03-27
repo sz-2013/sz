@@ -43,6 +43,7 @@ angular.module('sz.client.directives', [])
         return function(scope, element, attrs) {
             function inCenter(){
                 var incenter = element[0];
+                console.log(incenter.offsetHeight)
                 incenter.style.marginTop = (window.innerHeight - incenter.offsetHeight)/2 + 'px';
             }
             scope.$watch(attrs.szInCenter, function(val){

@@ -16,6 +16,10 @@ simpleSlider.prototype._init = function( elem ) {
 };
 
 
+simpleSlider.prototype._update_active_el = function() {
+};
+
+
 simpleSlider.prototype.spreadNav = function() {
     //spread/shrink nav
     //@BUG: chrome - когда применяется ротэйт такое ощущение что overflow:hidden у контейнера пропадает, в остальных браузерах ок.
@@ -47,14 +51,14 @@ simpleSlider.prototype._initThumb = function() {
         var li = document.createElement( 'li' );
         var sameitem = self.items[index];
         addClass(li, sameitem._gBox.owner)
-        var rotate = 'rotateZ(' + start_angle + step*index + 'deg)';
+        var rotate = 'rotateZ(' + start_angle + step*(index+1) + 'deg)';
         li.style['-webkit-transform'] = rotate;
         li.style['transform'] = rotate;
         li.addEventListener( 'click', function(e){self._setActive( sameitem ) });
         self.thumbElem.appendChild( li );
     }
     var self = this;
-    var start_angle = 0, itemslen = self.items.length, step = 360 / itemslen;
+    var start_angle = 0, itemslen = self.items.length, step = 360 / (itemslen+1);
     if(!this.thumbElem){
         this.thumbElem = document.createElement( 'ul' );
         this.thumbElem.className = 'simpleSlider-thumb';
@@ -215,6 +219,7 @@ simpleSlider.prototype._setActive = function(item) {
     addClass( this._next, 'next' )
     addClass( this._prev, 'prev' )
     this._setThumb()
+    this._update_active_el()
 };
 
 
@@ -238,7 +243,7 @@ simpleSlider.prototype.update = function(elems, _gBox) { //elems - some  array o
         var li = document.createElement( 'li' );
         li._gBox = _gBox;
         if( typeof(el) == 'object' ) li.appendChild( el );
-        else li.innerHTML = el;
+        else li.innerHTML = _gBox.pos;
         self.elemUl.appendChild( li );
     }
 

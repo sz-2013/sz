@@ -4,22 +4,23 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.showGameMap = false;
     $scope.showGamePath = false;
     $scope.gameMap = {}
-    $scope.$on('setGameMap', function(e, val){
+    $scope.$on('setActivePoint', function(e, gBox){
+        $scope.activePoint = gBox;
+    })
+    $scope.$on('setGameMap', function(e, val, nav){
         var t = 500;
         if(val){
             $scope.showGamePath = false;
-            /*$timeout(function(){*/
-                $scope.showGameMap = true;
+            $scope.showGameMap = true;
+            if(!nav){
                 $scope.$emit('navigation-hideall');
                 $scope.$emit('navigation-setTL', 'mapbacktopath');
-            /*}, t);*/
+            }
         }
         else{
             $scope.showGameMap = false;
-            /*$timeout(function(){*/
-                $scope.showGamePath = true;
-                $scope.$emit('navigation-setNormal');
-            /*}, t);*/
+            $scope.showGamePath = true;
+            $scope.$emit('navigation-setNormal');
         }
     });
     $scope.$on('setMapInCenter', function(e, val){
@@ -32,15 +33,15 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         gameMapService.getMap(params, function(r){
             $scope.gameMap.points = r;          //[{place_serializer.data}, {}]
             gameMapService.getPath(params, function(r){          //r - {path: [[x, y], ...], currentBox: place_serializer.data, prevBox: place_serializer.data}
+                $scope.gameMap.curr = r.currentBox;
                 $scope.gameMap.path = r.path.map(function(pos){
                     return getGameBox(pos, $scope.gameMap.points) //gameBox.js function
                 });
-                $scope.gameMap.curr = r.currentBox;
+                $scope.activePoint = $scope.gameMap.curr;
                 $scope.gameMap.prev = r.prevBox;
-                $scope.showGamePath = true; $scope.showGameMap = false;
-                //if($scope.gameMap.path.length){$scope.showGamePath = true; $scope.showGameMap = false;} else {$scope.showGameMap = true }
+                //сначала строим путь на карте, а потом уже отображаем пафпревью
                 $rootScope.showLoader = false;
-            })
+            });
         });
     }
     function _explore(){

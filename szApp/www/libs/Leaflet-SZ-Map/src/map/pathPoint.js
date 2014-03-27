@@ -24,8 +24,9 @@ L.GM.prototype._getGP = function(ppoint){
 L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pre
     var gm = this;
     var paper = this._map.paper;
-    var GP = params.gp, is_end = params.is_end, is_start = params.is_start, thisI = params.thisI, pre = params.pre;
-    var pos = gm.gm2contaiter(GP[0], GP[1]);
+    var gBox = params.gp;
+    var GP = gBox.pos, is_end = params.is_end, is_start = params.is_start, thisI = params.thisI, pre = params.pre;
+    var pos = gm.gm2layer(GP[0], GP[1]);
     var options = {
         'stroke'       : '#f39c12',
         'stroke-width' : 3,
@@ -34,12 +35,12 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         'r'            : gm._getTileSize()/4,
     }
     if(is_start){
-        options.stroke = '#009900';
-        options.fill = '#66CC00';
+        options.stroke = 'rgba(0, 102, 255, 1)';
+        options.fill = 'rgba(0, 80, 255, 1)';
     }
     if(is_end){
-        options.stroke = 'rgb(44, 62, 80)';
-        options.fill = 'rgb(52, 73, 94)';
+        options.stroke = 'rgba(163, 78, 36, 1)';
+        options.fill = 'rgba(198, 54, 5, 1)';
     }
     options['alert-stroke'] = '#8B0000'
 
@@ -102,7 +103,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
                 var inGP = gm.ppoints.filter(function(p){return p.GP.x == gp.x && p.GP.y == gp.y});
                 if( inGP.length ) gp = this.GP;
                 else this.GP = gp;
-                var center = gm.gm2contaiter( gp.x, gp.y );
+                var center = gm.gm2layer( gp.x, gp.y );
                 this.animate({"fill-opacity": this.fo}, 500);
                 this.animate({cx: center.x, cy: center.y}, 300, 'bounce', function(){
                     gm._fixPConnections();
@@ -117,6 +118,16 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
 
         var point  = gm._map.paper.circle(pos.x, pos.y);
         point.attr(options);
+        point._gBox = gBox;
+        point.setView = function(){
+            point.nsw = point.attr('stroke-width');
+            point.nfo = point.attr('fill-opacity');
+            this.animate({'stroke-width': this.nsw*2, 'fill-opacity': 1}, 500, 'bounce');
+        }
+        point.clearView = function(){
+            if(!this.nsw) return
+            this.animate({'stroke-width': this.nsw, 'fill-opacity': this.nfo}, 500, 'bounce');
+        }
         if(!is_start&&!is_end) point.drag(_move, _dragger, _up);
         return point
     }
@@ -137,7 +148,7 @@ L.GM.prototype.pathPoint = function(i, path){
         thisI: i,
         pre: pre
     });
-    this.ppoints[i] = point
+    this.ppoints[i] = point;
     if(pre) this.setConnection(pre, point)
     //this._markBox()
     return point
