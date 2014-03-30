@@ -29,7 +29,11 @@ L.GM = L.Class.extend({
 
     getGameBox: function (point){
         var pos = this.project2gm(point);
-        return getGameBox([pos.x, pos.y], this.points) //gameBox.js function
+        return this.getGameBoxbyPos(pos.x, pos.y)
+    },
+
+    getGameBoxbyPos: function (x, y){
+        return getGameBox([x, y], this.points) //gameBox.js function
     },
 
     getTile: function (x, y){ //game x, y; -> tile
@@ -246,7 +250,28 @@ L.GM.prototype.setView = function(pos) { //[x, y]
 L.GM.prototype.clearView = function() {
     for (var i = this.ppoints.length - 1; i >= 0; i--) {
         this.ppoints[i].clearView()
+        this.ppoints[i].is_center = false;
     };
+};
+
+
+L.GM.prototype.updatePpointsPos = function() {
+    for (var i = this.ppoints.length - 1; i >= 0; i--) {
+        var point = this.ppoints[i];
+        point.updatePos()
+    };
+    this._fixPConnections()
+};
+
+
+
+L.GM.prototype.setPPoints = function() {
+    // empty method
+};
+
+
+L.GM.prototype.moveCenter = function() {
+    // empty method
 };
 
 

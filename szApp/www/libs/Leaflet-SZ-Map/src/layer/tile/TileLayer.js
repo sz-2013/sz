@@ -43,8 +43,8 @@ L.TileLayer = L.GridLayer.extend({
 		var tile = document.createElement('div');
 		tile.className = 'gmtile'
 		tile.innerHTML = '<div class="gamemap-item ' + gBox.owner + '">' +
-							 /*'<img src="' + gBox.castle.img + '" >' +*/
-							 gBox.pos +
+							'<h3>' + gBox.name + '</h3>' +
+							'<img src="' + gBox.castle.img + '" >' +
 			             '</div>'
 		return tile;
 	},

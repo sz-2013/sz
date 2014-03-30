@@ -16,6 +16,15 @@ simpleSlider.prototype._init = function( elem ) {
 };
 
 
+simpleSlider.prototype.empty = function() {
+    if(!this.items||!this.items.length) return
+    this.elemUl.innerHTML = ''
+    this.items = []
+    this.thumbElem.innerHTML = ''
+    this.thumbItems = []
+};
+
+
 simpleSlider.prototype._update_active_el = function() {
 };
 
@@ -73,30 +82,14 @@ simpleSlider.prototype._initThumb = function() {
 
 
 simpleSlider.prototype._initDrag = function() {
-    function getMouse (e) {
-        if(e.changedTouches) var e = e.changedTouches[0];
-        return {x: e.clientX, y: e.clientY}
-    }
-
     var self = this, names = ['active', '_prev', '_next'];
-    var cont = this.elemUl.getBoundingClientRect();
-    var circle = {x: cont.width/2 + cont.left, y: cont.height/2 + cont.top, r: cont.width/2 };
 
-    console.log(this.elemUl)
-    console.log(cont)
-    console.log(circle)
-
-    function inCont( mouse, p ){
-        //@BUG: elemUl перекрывает elemThumb по углам (своим), и поэтому эти места определяются как _in
-        var a = mouse.x - circle.x;
-        var b = mouse.y - circle.y;
-        var c = Math.sqrt( Math.pow(a, 2) + Math.pow(b, 2) );
-        var _in = (c < circle.r)
-        if(_in){
-            console.log(a+';'+b+';'+c+';'+ circle.r)
-            console.log(circle.r - Math.floor(c))
-        }
+    function inCont( mouse ){
+        var cont = self.elemUl.getBoundingClientRect();
+        console.log(mouse)
+        console.log(cont)
         var _in = (mouse.x > cont.left && mouse.x < cont.right) && (mouse.y > cont.top && mouse.y < cont.bottom)
+        console.log(_in)
         return _in
     }
 
@@ -112,6 +105,7 @@ simpleSlider.prototype._initDrag = function() {
         if( !self._inDrag ) return
         var dx = getMouse( e ).x - self.cx;
         names.forEach( function( name ){self[name].style.left = self[name].cx + dx + 'px'} )
+        if( (dx < self.div*-1 || dx > self.div)&&self.pressTimer ) clearTimeout(self.pressTimer)
     }
 
     function fnUp( e ){
@@ -124,7 +118,7 @@ simpleSlider.prototype._initDrag = function() {
         self._clearPosition()
         if( dx < self.div*-1 ) self.next()
         else if( dx > self.div ) self.prev()
-        clearTimeout(self.pressTimer)
+        if(self.pressTimer) clearTimeout(self.pressTimer)
     }
 
     self.elem.addEventListener( 'mousedown', fnDrag )
@@ -134,9 +128,9 @@ simpleSlider.prototype._initDrag = function() {
 
     function touchHandler(event) {
         var mouse = getMouse( event );
-        var _inn = inCont( mouse, event.type == 'touchstart' );
-        console.log(_inn)
-        if(!_inn) return
+        var _in = inCont( mouse );
+        console.log(_in)
+        if(!_in && event.type == 'touchstart' ) return
         var touch = event.changedTouches[0];
 
         var simulatedEvent = document.createEvent("MouseEvent");
@@ -243,7 +237,7 @@ simpleSlider.prototype.update = function(elems, _gBox) { //elems - some  array o
         var li = document.createElement( 'li' );
         li._gBox = _gBox;
         if( typeof(el) == 'object' ) li.appendChild( el );
-        else li.innerHTML = _gBox.pos;
+        else li.innerHTML = el;
         self.elemUl.appendChild( li );
     }
 

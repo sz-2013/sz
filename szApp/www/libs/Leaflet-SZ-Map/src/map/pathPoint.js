@@ -18,9 +18,7 @@ L.GM.prototype.pushPPoint = function(x, y, i, shift) { //x in gamemap, y in game
     this._markBox()
     return point
 };
-L.GM.prototype._getGP = function(ppoint){
-    return ppoint ? this.container2gm( ppoint.attr('cx'), ppoint.attr('cy') ) : null
-}
+
 L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pre
     var gm = this;
     var paper = this._map.paper;
@@ -55,74 +53,47 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         })
     }
 
+    function _dragger(x, y, e){
+        this.ox = this.attr("cx");
+        this.oy = this.attr("cy");
+        this.fo = this.attr("fill-opacity");
+        var self = this;
+        this.connections = gm.pconnections.filter(function(c){return  self == c.to || self == c.from })
+        this.animate({"fill-opacity": .2}, 500);
+        _showhideConn()
+        gm._inDrag()
+    }
+
+    function _move(dx, dy){
+        this.attr({cx: this.ox + dx, cy: this.oy + dy});
+        gm._fixPConnections()
+    }
+
+    function _up(e){
+        var gp = gm.layer2gm( this.attr('cx'), this.attr('cy') ); //позиция {x, y} gamebox на карте, в которой теперь находится кружочек
+        var inGP = gm.getGameBoxbyPos(gp.x, gp.y);
+        var center = gm.gm2layer( inGP.pos[0], inGP.pos[1] );
+        this.animate({"fill-opacity": this.fo}, 500);
+        this.animate({cx: center.x, cy: center.y}, 300, 'bounce', function(){
+            gm._fixPConnections();
+            _showhideConn(true);
+        });
+        this._gBox = inGP
+        console.log(this._gBox)
+        gm.setPPoints()
+        gm._outDrag()
+        if(this.is_center) gm.moveCenter(this)
+    }
+
     function _create_el(){
-        function _dragger(x, y, e){
-            this.ox = this.attr("cx");
-            this.oy = this.attr("cy");
-            this.fo = this.attr("fill-opacity");
-            var self = this;
-            this.connections = gm.pconnections.filter(function(c){return  self == c.to || self == c.from })
-            if(_canMove(self)){
-                this.animate({"fill-opacity": .2}, 500);
-                _showhideConn()
-            } else{
-                _showhideConn(true, {stroke: options['alert-stroke']})
-            }
-            gm._inDrag()
-        }
-
-        function _canMove(pnt){
-            function _can(pos){
-                var nextDiff = gp[pos] - nextgp[pos];
-                if( pregp[pos] == gp[pos] && Math.abs(nextDiff) == 1) return nextDiff
-                var prevDiff = gp[pos] - pregp[pos];
-                if( nextgp[pos] == gp[pos] && Math.abs(prevDiff) == 1) return prevDiff;
-                return 0
-            }
-          /*  var gp = gm._getGP(pnt);
-            var pregp = gm._getGP(gm.ppoints[pnt.i-1]);
-            var nextgp = gm._getGP(gm.ppoints[pnt.i+1]);
-            var canmove = {
-                x: _can('x'), // 1/-1/0
-                y: _can('y')  // 1/-1/0
-            };*/
-            return true
-        }
-
-        function _move(dx, dy){
-            if(_canMove(this)){
-                this.attr({cx: this.ox + dx, cy: this.oy + dy});
-                gm._fixPConnections()
-            }
-        }
-
-        function _up(e){
-            var self = this;
-            if( _canMove(self) ){
-                var gp = gm._getGP(this);
-                var inGP = gm.ppoints.filter(function(p){return p.GP.x == gp.x && p.GP.y == gp.y});
-                if( inGP.length ) gp = this.GP;
-                else this.GP = gp;
-                var center = gm.gm2layer( gp.x, gp.y );
-                this.animate({"fill-opacity": this.fo}, 500);
-                this.animate({cx: center.x, cy: center.y}, 300, 'bounce', function(){
-                    gm._fixPConnections();
-                    _showhideConn(true);
-                });
-            } else{
-                _showhideConn(true, {stroke: options.stroke})
-            }
-            gm._outDrag()
-        }
-
-
-        var point  = gm._map.paper.circle(pos.x, pos.y);
+        var point  = gm._map.paper.circle(0, 0);
         point.attr(options);
         point._gBox = gBox;
         point.setView = function(){
             point.nsw = point.attr('stroke-width');
             point.nfo = point.attr('fill-opacity');
             this.animate({'stroke-width': this.nsw*2, 'fill-opacity': 1}, 500, 'bounce');
+            this.is_center = true;
         }
         point.clearView = function(){
             if(!this.nsw) return
@@ -133,12 +104,19 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
     }
 
     var point = _create_el();
+    point.updatePos = function(){
+        var GP = this._gBox.pos;
+        var pos = gm.gm2layer(GP[0], GP[1]);
+        this.attr({cx: pos.x, cy: pos.y});
+    }
+    point.updatePos()
     point.i = thisI;
-    point.GP = {x: GP[0], y: GP[1]};
 
     return point;
 
 }
+
+
 L.GM.prototype.pathPoint = function(i, path){
     var pre = this.ppoints[i-1];
     var point = this._pathPoint({
@@ -153,58 +131,3 @@ L.GM.prototype.pathPoint = function(i, path){
     //this._markBox()
     return point
 }
-
-L.GM.prototype._markBox = function(){
-    for (var i = this.ppoints.length - 1; i >= 0; i--) {
-        var p = this.ppoints[i];
-        var gp = this._getGP(p); //{x, y}
-        var tile = this.getTile(gp.x, gp.y);
-        if(tile) tile.innerHTML = '<h1>' + p.i + '</h1>'
-    };
-}
-
-
-/*function _canMove(pnt){
-    function _comparePos(a, b){
-        return Math.abs(a-b) > 1
-    }
-    var gp = gm._getGP(pnt);
-    if(pnt._gp === undefined) pnt._gp = gp
-    if(pnt._gp.x == gp.x && pnt._gp.y == gp.y) return true
-    pnt._gp = gp;
-    var pregp = gm._getGP(gm.ppoints[pnt.i-1]);
-    var nextgp = gm._getGP(gm.ppoints[pnt.i+1]);
-    var x = gp.x, y = gp.y;
-    if( _comparePos(pregp.x, gp.x) ){
-        if(pregp.x > gp.x) var x = gp.x + 1
-        else var x = gp.x - 1
-    } else {
-        if( _comparePos(nextgp.x, gp.x) ){
-            if(nextgp.x > gp.x) var x = gp.x + 1;
-            else var x = gp.x - 1
-        }
-    }
-    if( _comparePos(pregp.y, gp.y) ){
-        console.log(1)
-        if( pregp.y > gp.y ) var y = gp.y + 1;
-        else var y = gp.y - 1;
-        var x = pregp.x;
-    } else {
-        if( _comparePos(nextgp.y, gp.y) ){
-            console.log(2)
-            var y = gp.y + 1;
-            var x = nextgp.x;
-        }
-    }
-
-    if(x!=gp.x || y!=gp.y){
-        var shift = true;
-        var newi = pnt.i
-        if(pregp.x == gp.x || (pregp.x > gp.x && x < gp.x)) var shift = false;
-        if(y!=gp.y&&pregp.y>nextgp.y) var shift = true;
-        if(y!=gp.y&&pregp.y<nextgp.y&&gp.y<pregp.y) var shift = false;
-        if(y!=gp.y&&pregp.y<nextgp.y&&gp.y>pregp.y) var shift = true;
-        gm.pushPPoint(x, y, newi, shift)
-    }
-    return true
-}*/

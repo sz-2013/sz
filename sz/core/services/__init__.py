@@ -300,8 +300,8 @@ class GameMapService(FeedService):
             queries.search_places(**params.get_db_params()))
         find_p = lambda p, pos: p.gamemap_position and \
             p.get_gamemap_position() == pos
-        _prev = filter(lambda p: find_p(p, [9, 10]), places_list)
-        _curr = filter(lambda p: find_p(p, [13, 10]), places_list)
+        _prev = []  # filter(lambda p: find_p(p, [9, 10]), places_list)
+        _curr = []  # filter(lambda p: find_p(p, [13, 10]), places_list)
         curr = _curr[0] if _curr else places_list[0]
         prev = _prev[0] if _prev else random.choice(places_list)
         return dict(

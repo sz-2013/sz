@@ -1,125 +1,3 @@
-/**
- * Based on jquery.baraja.js v1.0.0
- * http://www.codrops.com
- *
- * Licensed under the MIT license.
- * http://www.opensource.org/licenses/mit-license.php
- *
- * Copyright 2012, Codrops
- * http://www.codrops.com
- */
-var Modernizr = window.Modernizr;
-var transEndEventNames = {
-    'WebkitTransition' : 'webkitTransitionEnd',
-    'MozTransition' : 'transitionend',
-    'OTransition' : 'oTransitionEnd',
-    'msTransition' : 'MSTransitionEnd',
-    'transition' : 'transitionend'
-};
-var GameMapHelper = function(self){
-    this.self = self;
-}
-GameMapHelper.prototype = {
-    _resetTransition : function( $el ) {
-        $el.css( {
-            '-webkit-transition' : 'none',
-            '-moz-transition' : 'none',
-            '-ms-transition' : 'none',
-            '-o-transition' : 'none',
-            'transition' : 'none'
-        } );
-    },
-    _setOrigin : function( $el, x, y ) {
-
-        $el.css( 'transform-origin' , x + '% ' + y + '%' );
-
-    },
-    _setTransition : function( $el, prop, speed, easing, delay ) {
-        if( !this.self.supportTransitions ) {
-            return false;
-        }
-        if( !prop ) {
-            prop = 'all';
-        }
-        if( !speed ) {
-            speed = this.self.options.speed;
-        }
-        if( !easing ) {
-            easing = this.self.options.easing;
-        }
-        if( !delay ) {
-            delay = 0;
-        }
-
-        var styleCSS = '';
-
-        prop === 'transform' ?
-            styleCSS = {
-                '-webkit-transition' : '-webkit-transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-moz-transition' : '-moz-transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-ms-transition' : '-ms-transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-o-transition' : '-o-transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                'transition' : 'transform ' + speed + 'ms ' + easing + ' ' + delay + 'ms'
-            } :
-            styleCSS = {
-                '-webkit-transition' : prop + ' ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-moz-transition' : prop + ' ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-ms-transition' : prop + ' ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                '-o-transition' : prop + ' ' + speed + 'ms ' + easing + ' ' + delay + 'ms',
-                'transition' : prop + ' ' + speed + 'ms ' + easing + ' ' + delay + 'ms'
-            }
-
-        $el.css( styleCSS );
-    },
-    _applyTransition : function( $el, styleCSS, fncomplete, force ) {
-        if( this.self.supportTransitions ) {
-
-            if( fncomplete ) {
-
-                $el.on( this.self.transEndEventName, fncomplete );
-
-                if( force ) {
-                    fncomplete.call();
-                }
-
-            }
-            setTimeout( function() { $el.css( styleCSS ); }, 25 );
-
-        }
-        else {
-
-            $el.css( styleCSS );
-
-            if( fncomplete ) {
-
-                fncomplete.call();
-
-            }
-
-        }
-
-    },
-}
-
-
-function createCard( cont, box, data, extra ){
-    var pic = random(1, 56);
-    var data = data || '';
-    var extra = extra || '';
-    var el = '<' + cont + ' ' + data + '  class="map-mapPathCard ' + box.place_owner_race + (box.is_owner ? ' is_owner' : '') +'">' +
-                '<img src="../media/baraja/'+ pic +'.jpg" alt="image"/>'+
-                '<div class="map-mapPathCard-bottom"><h5 class="overflow-hidden">' + (box.place_name || 'Emypy box') + '</h5></div>'+
-                (box.place_owner_race ?
-                    ('<div class="mapbox-owner-label' + (box.is_owner ? ' mapbox-isowner-label': '') + '">' +
-                        '<i class="fa fa-check-circle-o fa-2x"></i>' +
-                    '</div>') : '') +
-                extra +
-             '</' + cont + '>';
-    return el
-}
-
-var map;
-
 angular.module('map-directive', [])
     .directive('mapPathPreview', [function(){
         // Runs during compile
@@ -129,7 +7,8 @@ angular.module('map-directive', [])
             // terminal: true,
             scope: {
                 isshow: '=isshow',
-                path: '=path',
+                ppoints: '=ppoints',
+                center: '=center'
             }, // {} = isolate, true = child, false/undefined = no change
             // controller: function($scope, $element, $attrs, $transclude) {},
             // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
@@ -170,16 +49,32 @@ angular.module('map-directive', [])
                 }
 
                 function init(){
-                    points = $scope.path.map(function(gBox){
+                    var center = $scope.center;
+                    $scope.slider.empty()
+                    points = $scope.ppoints.map(function(gBox){
                         var el = '<div>' +
+                                    '<h3>' + gBox.name + '</h3>' +
                                     '<img src="' + gBox.castle.img + '" >' +
                                  '</div>';
                         el._gBox = gBox;
-                        $scope.slider.update( el,gBox )
+                        $scope.slider.update( el, gBox )
                     });
+                    updateCenter(center)
                 }
 
-                $scope.$watch('path', function(val){if(val) init() });
+                function updateCenter(gBox){
+                    if( gBox.pos.compare($scope.slider.active._gBox) ) return
+                    var item;
+                    for (var i = $scope.slider.items.length - 1; i >= 0; i--) {
+                        var _item = $scope.slider.items[i];
+                        if( gBox.pos.compare(_item._gBox.pos) ) var item = _item;
+                    };
+                    if(!item) return
+                    $scope.slider._setActive(item)
+                }
+
+                $scope.$watch('ppoints', function(val){if(val) init() });
+                $scope.$watch('center', function(val){if(val&&$scope.slider.active) updateCenter(val) });
                 $scope.$watch('isshow', function(val){if(val) $scope.$emit('setMapInCenter', true) });
             }
         };
@@ -204,9 +99,14 @@ angular.module('map-directive', [])
             // transclude: true,
             // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
-
-                //var path;
+                L.GM.prototype.setPPoints = function() {
+                    $scope.$emit('setPPoints', map.gm.ppoints)
+                };
+                L.GM.prototype.moveCenter = function(point) {
+                    $scope.$emit('setActivePoint', point._gBox)
+                };
                 var elem = element[0];
+                var map;
                 function _initCont(){
                     elem.style.display = 'block';
                     elem.style.height = document.getElementById('mainArea').style.height || '314px';
@@ -233,7 +133,6 @@ angular.module('map-directive', [])
                     map = L.szMap(
                         elem.getAttribute('id'),
                         $scope.points);
-                    console.log(map.gm.gm2layer(13, 10))
                 }
 
                 function _doPath(){
@@ -243,13 +142,17 @@ angular.module('map-directive', [])
                     };
                     _initClick();
                     map.gm.setView($scope.center.pos)
+                    $scope.$emit('setPPoints', map.gm.ppoints)
                     $scope.$emit('setGameMap', false)
                 }
 
                 function _setCenter(){
-                    var center = map.gm.gm2latlng($scope.center.pos);
+                    var center = map.gm.gm2latlng($scope.center.pos); //latlng
                     map.setView(center);
                     map.gm.setView($scope.center.pos)
+                    if(map.gm.ppoints.length){
+                        map.gm.updatePpointsPos()
+                    }
                     if($scope.path&&!map.gm.ppoints.length) _doPath()
                 }
 

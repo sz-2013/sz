@@ -1,5 +1,5 @@
 var gameBox = function(options){
-    this.name = options.name || 'Empty box',
+    this.name = options.name || options.place_name || 'Empty box',
     this.pos = options.pos;
 
     var ownerArr = ['neutral', 'negative', 'positive', 'nobody']
