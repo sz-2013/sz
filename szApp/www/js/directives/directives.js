@@ -39,6 +39,14 @@ var Helpers = {
 
 
 angular.module('sz.client.directives', [])
+    .directive('szScroll', function(){
+        return function(scope, element, attrs) {
+            scope.$watch(attrs.szScroll, function(val){
+                if(val===false) addClass(element[0], 'noscroll')
+                if(val===true) removeClass(element[0], 'noscroll')
+            });
+        }
+    })
     .directive('szInCenter', function(){
         return function(scope, element, attrs) {
             function inCenter(){
@@ -218,5 +226,19 @@ angular.module('sz.client.directives', [])
             scope.$watch(attrs.ngShow, function(val){
                 if(val)$timeout(hideAchive, attrs.timeout);
             });*/
+        };
+    })
+    .directive('szRadioBtn', function() {
+        //the directive for a selected place modal window
+        return function(scope, element, attrs) {
+            node2array(element[0].querySelectorAll('[type=radio]')).forEach(function(input){
+                var btnGroup = findParent('[data-toggle="buttons"]', input);
+                var label = findParent('.btn', input);
+                var labels = node2array(btnGroup.getElementsByClassName('btn'))
+                input.onclick = function(){
+                    labels.forEach(function(el){removeClass(el, 'active')})
+                    addClass(label, 'active')
+                }
+            });
         };
     })

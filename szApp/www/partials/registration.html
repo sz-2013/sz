@@ -1,158 +1,148 @@
-<div ng-show="regStage1">
-    <div class="big-bordered-box">
-        <div class="big-bordered-box-inner">
-            <form class="form-group no-margin-bottom" name="general" role="form">
-                <h2 class="text-right">Registration</h2>
+<div ng-show="regStage1" class="content-inner">
+    <form class="form-group" name="general" role="form">
+        <h2 class="page-header">Registration</h2>
 
-                <div class="form-group" id="registration-nonFieldErrors" ng-show="loginAlert.non_field_errors">
-                    <p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
-                </div><!-- #registration-nonFieldErrors -->
+        <div class="form-group" id="registration-nonFieldErrors" ng-show="loginAlert.non_field_errors">
+            <p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
+        </div><!-- #registration-nonFieldErrors -->
 
-                <div class="form-group" id="registration-email" ng-class="{'has-error':isEmailAlert(general.email.$error.maxlength)}">
-                    <div class="input-group" id="registration-email-info">
-                        <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-                        <input class="form-control" id="inputEmail" name="email" ng-disabled="inProgress" ng-maxlength="72" ng-minlength="3" ng-model="user.email" placeholder="Email" required="" type="email">
-                    </div><!-- /#registration-email-info -->
+        <div class="form-group" id="registration-email" ng-class="{'has-error':isEmailAlert(general.email.$error.maxlength)}">
+            <i class="fa fa-envelope-o fa-fw"></i>
+            <input class="form-control" id="inputEmail" name="email" ng-disabled="inProgress" ng-maxlength="72" ng-minlength="3" ng-model="user.email" placeholder="Email" required="" type="email">
 
-                    <div class="text-danger" id="registration-email-alert">
-                        <span ng-repeat="alert in loginAlert.email">{{alert}}<br></span>
-                        <span ng-show="general.email.$error.minlength">{{tmlText.errorsText.email.short}}</span>
-                        <span ng-show="general.email.$error.maxlength">{{tmlText.errorsText.email.long}}</span>
-                    </div><!-- /#registration-email-alert -->
-                </div> <!-- /#registration-email -->
+            <div class="text-danger" id="registration-email-alert">
+                <span ng-repeat="alert in loginAlert.email">{{alert}}<br></span>
+                <span ng-show="general.email.$error.minlength">{{tmlText.errorsText.email.short}}</span>
+                <span ng-show="general.email.$error.maxlength">{{tmlText.errorsText.email.long}}</span>
+            </div><!-- /#registration-email-alert -->
+        </div> <!-- /#registration-email -->
 
-                <div class="form-group" id="registration-pswdAlert" ng-show="loginAlert.password">
-                    <p class="text-danger" ng-repeat="alert in loginAlert.password">{{alert}}</p>
-                </div><!-- /#registration-pswdAlert -->
+        <div class="form-group" id="registration-pswdAlert" ng-show="loginAlert.password">
+            <p class="text-danger" ng-repeat="alert in loginAlert.password">{{alert}}</p>
+        </div><!-- /#registration-pswdAlert -->
 
-                <div class="form-group" id="registration-pswd1" ng-class="{'has-error':isPswdAlert(general.password1.$error.maxlength)}">
-                    <div class="input-group" id="registration-pswd1-info">
-                        <span class="input-group-addon"> <i class="fa fa-key fa-fw"> </i></span>
-                        <input class="form-control ng-pristine ng-invalid ng-invalid-required ng-valid-maxlength ng-valid-minlength" id="inputPassword1" name="password1" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password1" placeholder="Password" required="" type="password">
-                    </div><!-- /#registration-pswd1-info -->
+        <div class="form-group" id="registration-pswd1" ng-class="{'has-error':isPswdAlert(general.password1.$error.maxlength)}">
+            <i class="fa fa-key fa-fw"> </i>
+            <input class="form-control ng-pristine ng-invalid ng-invalid-required ng-valid-maxlength ng-valid-minlength" id="inputPassword1" name="password1" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password1" placeholder="Password" required="" type="password">
 
-                    <div class="text-danger" id="registration-pswd1-alert">
-                        <span ng-repeat="alert in loginAlert.password1">{{alert}}<br></span>
-                        <span ng-show="general.password1.$error.minlength">
-                            {{tmlText.errorsText.password.short}}</span>
-                        <span ng-show="general.password1.$error.maxlength">
-                            {{tmlText.errorsText.password.long}}</span>
-                    </div><!-- /#registration-pswd1-alert -->
-                </div><!-- /#registration-pswd -->
+            <div class="text-danger" id="registration-pswd1-alert">
+                <span ng-repeat="alert in loginAlert.password1">{{alert}}<br></span>
+                <span ng-show="general.password1.$error.minlength">
+                    {{tmlText.errorsText.password.short}}</span>
+                <span ng-show="general.password1.$error.maxlength">
+                    {{tmlText.errorsText.password.long}}</span>
+            </div><!-- /#registration-pswd1-alert -->
+        </div><!-- /#registration-pswd -->
 
-                <div class="form-group" id="registration-pswd2" ng-class="{'has-error': isPswd2Alert()}">
-                    <div class="input-group" id="registration-pswd2-info">
-                        <span class="input-group-addon"> <i class="fa fa-key fa-fw"> </i></span>
-                        <input class="form-control" id="inputPassword2" name="password2" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password2" placeholder="Password again" required="" type="password">
-                    </div><!-- /#registration-pswd2-info -->
+        <div class="form-group" id="registration-pswd2" ng-class="{'has-error': isPswd2Alert()}">
+                <i class="fa fa-key fa-fw"> </i>
+                <input class="form-control" id="inputPassword2" name="password2" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password2" placeholder="Password again" required="" type="password">
 
-                    <div class="text-danger" id="registration-pswd2-alert">
-                        <span ng-repeat="alert in loginAlert.password2">{{alert}}<br></span>
-                        <span ng-show="user.password1!=user.password2">
-                            {{tmlText.errorsText.password.notmatch}}</span>
-                    </div><!-- /#registration-pswd2-alert -->
-                </div>
+            <div class="text-danger" id="registration-pswd2-alert">
+                <span ng-repeat="alert in loginAlert.password2">{{alert}}<br></span>
+                <span ng-show="user.password1!=user.password2">
+                    {{tmlText.errorsText.password.notmatch}}</span>
+            </div><!-- /#registration-pswd2-alert -->
+        </div>
 
-                <div class="form-group" id="registration-genders" ng-class="{'has-error':loginAlert.gender}">   
-                    <label class="control-label">Choose your gender</label>     
+        <div class="form-group" id="registration-genders" ng-class="{'has-error':loginAlert.gender}">
+            <label class="control-label">Choose your gender</label>
 
-                    <p class="help-block">If it is a secret or if you are not sure - choose "Smile".</p>
+            <p class="help-block">If it is a secret or if you are not sure - choose "Smile".</p>
 
-                    <div id="regisstration-genders-alert">
-                        <p class="text-danger" ng-repeat="alert in loginAlert.gender">{{alert}}</p>
-                    </div><!-- /#regisstration-genders-alert -->
+            <div id="regisstration-genders-alert">
+                <p class="text-danger" ng-repeat="alert in loginAlert.gender">{{alert}}</p>
+            </div><!-- /#regisstration-genders-alert -->
 
-                    <div data-toggle="buttons" class="btn-group btn-group-justified" id="registration-genders-options">
-                        <label class="btn btn-default registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=f">
-                            <input id="f" name="options" type="radio">
-                                <i class="fa fa-female"></i>
-                        </label><!-- /.registration-genders-option -->
+            <div data-toggle="buttons" class="btn-group btn-group-justified" id="registration-genders-options" sz-radio-btn>
+                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=f">
+                    <input id="f" name="options" type="radio">
+                        <span><i class="fa fa-female"></i></span>
+                </label><!-- /.registration-genders-option -->
 
-                        <label class="btn btn-default registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=m">
-                            <input id="m" name="options" type="radio">
-                                <i class="fa fa-male"></i>
-                        </label><!-- /.registration-genders-option -->
+                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=m">
+                    <input id="m" name="options" type="radio">
+                        <span><i class="fa fa-male"></i></span>
+                </label><!-- /.registration-genders-option -->
 
-                        <label class="btn btn-default active registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=u">
-                            <input id="u" name="options" type="radio">
-                                <i class="fa fa-smile-o"></i>
-                        </label><!-- /.registration-genders-option -->
-                    </div><!-- /#registration-genders-options -->
-                </div><!-- /#registration-genders -->
+                <label class="btn btn-default circle-btn active registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=u">
+                    <input id="u" name="options" type="radio">
+                        <span><i class="fa fa-smile-o"></i></span>
+                </label><!-- /.registration-genders-option -->
+            </div><!-- /#registration-genders-options -->
+        </div><!-- /#registration-genders -->
 
-                <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race}">   
-                    <label for="radioRace" class="control-label">Choose your race</label>       
+        <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race}">
+            <label for="radioRace" class="control-label">Choose your race</label>
 
-                    <p class="help-block">
-                        A race will determine your characteristics and talents. Be attentively, because you will can not change it in the future.
-                        <a href="urls.wiki"> See more about it on wiki.</a>
-                    </p><!-- /.help-block -->
+            <p class="help-block">
+                A race will determine your characteristics and talents. Be attentively, because you will can not change it in the future.
+                <a href="urls.wiki"> See more about it on wiki.</a>
+            </p><!-- /.help-block -->
 
-                    <div class="text-danger" id="registration-races-alert">
-                        <span ng-repeat="alert in loginAlert.race">{{alert}}</span>
-                    </div><!-- /#registration-races-alert -->
+            <div class="text-danger" id="registration-races-alert">
+                <span ng-repeat="alert in loginAlert.race">{{alert}}</span>
+            </div><!-- /#registration-races-alert -->
 
-                    <div class="btn-group  btn-group-justified " data-toggle="buttons" id="registration-races-options">
-                        <label class="btn btn-default" 
-                        ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races">
-                            <input name="options" type="radio">{{r.name}}                            
-                        </label>
-                    </div><!-- /#registration-races-options -->
+            <div data-toggle="buttons" id="registration-races-options" sz-radio-btn>
+                <label class="btn btn-default circle-btn"
+                ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races">
+                    <input name="options" type="radio"><span><i>{{r.name}}</i></span>
+                </label>
+            </div><!-- /#registration-races-options -->
 
-                    <div ng-show="user.race" class="text-center" id="registration-raceDescription"> 
-                        <img id="registration-raceDescription-blazon" ng-src={{user.race.blazon}}>  
+            <div ng-show="user.race" class="text-center margin-top-nm" id="registration-raceDescription">
+                <div id="registration-raceDescription-blazon" style="background: url({{user.race.blazon}}) 100% 100% no-repeat"></div>
 
-                        <div id="registration-raceDescription-stats">
-                            <div class="pull-left" id="registration-raceDescription-stats-names">
-                                <span>Fortune: </span>
-                                <span>Agillity: </span>
-                                <span>Strength: </span>
-                                <span>Intellect: </span>                        
-                            </div><!-- /#registration-raceDescription-stats-names -->
+                <div id="registration-raceDescription-stats" class="margin-top-nm">
+                    <div class="pull-left" id="registration-raceDescription-stats-names">
+                        <span>Fortune: </span>
+                        <span>Agillity: </span>
+                        <span>Strength: </span>
+                        <span>Intellect: </span>
+                    </div><!-- /#registration-raceDescription-stats-names -->
 
-                            <div class="progress registration-raceDescription-stats-value">
-                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.fortune*10}}
-                                    class="progress-bar progress-bar-success"
-                                    ng-style="{width:user.race.fortune*10+'%'}" role="progressbar">
-                                    <span>{{user.race.fortune}}</span>
-                                </div>
-                            </div><!-- /.registration-raceDescription-stats-value -->
+                    <div class="progress registration-raceDescription-stats-value">
+                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.fortune*10}}
+                            class="progress-bar color1"
+                            ng-style="{width:user.race.fortune*10+'%'}" role="progressbar">
+                            <span>{{user.race.fortune}}</span>
+                        </div>
+                    </div><!-- /.registration-raceDescription-stats-value -->
 
-                            <div class="progress registration-raceDescription-stats-value">
-                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.agillity*10}}
-                                    class="progress-bar progress-bar-info"                      
-                                    ng-style="{width:user.race.agillity*10+'%'}" role="progressbar">
-                                <span>{{user.race.agillity}}</span>
-                            </div><!-- /.registration-raceDescription-stats-value -->
+                    <div class="progress registration-raceDescription-stats-value">
+                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.agillity*10}}
+                            class="progress-bar color2"
+                            ng-style="{width:user.race.agillity*10+'%'}" role="progressbar">
+                        <span>{{user.race.agillity}}</span>
+                    </div><!-- /.registration-raceDescription-stats-value -->
 
-                            </div>
-                            <div class="progress registration-raceDescription-stats-value">
-                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.strength*10}}
-                                    class="progress-bar progress-bar-warning"
-                                    ng-style="{width:user.race.strength*10+'%'}" role="progressbar">
-                                <span>{{user.race.strength}}</span>
-                              </div>
-                            </div><!-- /.registration-raceDescription-stats-value -->
+                    </div>
+                    <div class="progress registration-raceDescription-stats-value">
+                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.strength*10}}
+                            class="progress-bar color3"
+                            ng-style="{width:user.race.strength*10+'%'}" role="progressbar">
+                        <span>{{user.race.strength}}</span>
+                      </div>
+                    </div><!-- /.registration-raceDescription-stats-value -->
 
-                            <div class="progress registration-raceDescription-stats-value">
-                                <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.intellect*10}}
-                                    class="progress-bar progress-bar-danger" 
-                                    ng-style="{width:user.race.intellect*10+'%'}" role="progressbar">
-                                <span>{{user.race.intellect}}</span>
-                              </div>
-                            </div><!-- /.registration-raceDescription-stats-value -->
-                        </div><!-- /#registration-raceDescription-stats -->
-                    </div><!-- /#registration-raceDescription -->
-                </div><!-- /#registration-races -->
-            </form>     
-        </div><!-- /.big-bordered-box-inner -->
-    </div><!-- /.big-bordered-box -->
+                    <div class="progress registration-raceDescription-stats-value">
+                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.intellect*10}}
+                            class="progress-bar color4"
+                            ng-style="{width:user.race.intellect*10+'%'}" role="progressbar">
+                        <span>{{user.race.intellect}}</span>
+                      </div>
+                    </div><!-- /.registration-raceDescription-stats-value -->
+                </div><!-- /#registration-raceDescription-stats -->
+            </div><!-- /#registration-raceDescription -->
+        </div><!-- /#registration-races -->
+    </form>
 
-    <div class="margin-top-sm">
-        <button class="btn btn-primary btn-block" ng-disabled="inProgress" ng-click="registration()" type="submit">Do it!</button>
+    <div class="margin-top-lg">
+        <button class="btn btn-block btn-primary btn-large" ng-disabled="inProgress" ng-click="registration()" type="submit">Do it!</button>
     </div>
 </div>
 
 
-<div ng-include="" ng-show="!regStage1" src="partials.regConfirm">
+<div ng-include ng-show="!regStage1" src="'partials/registration-confirmation.html'">
 </div> <!-- /ng-include regConfirm -->

@@ -35,8 +35,8 @@ var urls = {
         var attrs_and_args = name.split('(')
         var path = attrs_and_args[0]
         var arg = (attrs_and_args.length>1) ? attrs_and_args[1].split(')')[0] : undefined
-        if(typeof(path)==='string')return path.slice(1)
-        if(typeof(path)==='function')return path(arg).slice(1)
+        if(typeof(path)==='string')return this[path].slice(1)
+        if(typeof(path)==='function')return this[path](arg).slice(1)
     }
 
 }
@@ -67,7 +67,7 @@ function objPop(obj) {
     // If the property can't be deleted fail with an error.
     if (!delete obj[key]) { throw new Error(); }
     return result;
-  } 
+  }
 }
 
 
@@ -80,8 +80,8 @@ function random(min, max){
 }
 
 function randomSets(r){
-    
-    r['fortune'] = random(4, 9) 
+
+    r['fortune'] = random(4, 9)
     r['agillity'] = random(4, 9)
     r['strength'] = random(4, 9)
     r['intellect'] = random(4, 9)
@@ -95,7 +95,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.showFooter = true;
     $scope.showHeder = true;
     $scope.showMainPage = true;
-    $scope.eventstart = false;  
+    $scope.eventstart = false;
     $scope.urls = urls;
     $scope.partials = partials;
     $scope.isForcedLandscape = false;
@@ -109,13 +109,13 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
             //$scope.coordinates = position.coords;
             $scope.coordinates = coords;
         },
-        function (error) { 
+        function (error) {
             $scope.coordinates = coords;
             console.log(error)}
     )
-        
+
     sessionService.current({}, function(session){
-        $scope.session = session 
+        $scope.session = session
     });
 
     function redirectAnonymous(){
@@ -145,7 +145,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
 
     /*$scope.$on('setShowHeaders', function(e, val){
        $scope.showHeder = val;
-        $scope.showFooter = val; 
+        $scope.showFooter = val;
     })*/
 
     var badges = function(){
@@ -235,12 +235,18 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
        /* $scope.showHeder = true;
         $scope.showFooter = true;*/
         $scope.navigation.setNormal()
+        $scope.bodyScroll = true;
     });
 
+    $scope.$on('setBodyScroll', function(e, val){
+        $scope.bodyScroll = val;
+    })
 
     $scope.map_setHideGameMapShowPath = function(){
         $scope.$broadcast('setGameMap', false)
     }
+
+
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];

@@ -1,8 +1,11 @@
 
 function LoginController($scope, $location, sessionService, $rootScope){
+    $scope.$emit('navigation-hideall');
+    /*$scope.$emit('setBodyScroll', false)*/
     $scope.inProgress = false;
     $scope.loginAlert = new Object;
     $scope.showResendBut = false;
+    $rootScope.bodyScroll = false;
 
     $scope.isEmailAlert = function(){
         if($scope.loginAlert===undefined) return false
@@ -20,15 +23,15 @@ function LoginController($scope, $location, sessionService, $rootScope){
         $rootScope.showLoader = true;
         $scope.session.email = $scope.email;
         $scope.session.password = $scope.password;
-        var session = $scope.session.$login(            
+        var session = $scope.session.$login(
             function(response){
                 $scope.session = session;
                 $scope.inProgress = false;
                 $rootScope.showLoader = false;
                 $location.path($scope.urls.getPath('homePathAuth'))
             },
-            function(error){                         
-                if(error.status==400){   
+            function(error){
+                if(error.status==400){
                     $scope.loginAlert = error.data.data
                 }
                 else{
@@ -43,7 +46,8 @@ function LoginController($scope, $location, sessionService, $rootScope){
 }
 
 
-function RigistrationController($scope, userService){
+function RigistrationController($scope, userService, $rootScope){
+    $scope.$emit('navigation-hideall');
     $scope.user = {'gender':'u'};
     var errorsText = {
         email:{
@@ -56,7 +60,7 @@ function RigistrationController($scope, userService){
             'short':'Your password is to short',
             'long':'Your password is to long, crazy criptomaniac',
             'notmatch':'Passwords are not match'
-        },      
+        },
         race:{
             'nullvalue':'You must choose a race',
         },
@@ -68,7 +72,7 @@ function RigistrationController($scope, userService){
     $rootScope.showLoader = false;
     $scope.regStage1 = true
     $scope.isEmailAlert = function(maxlength){
-        return ($scope.user.email && $scope.loginAlert && $scope.user.email.length!=0) || 
+        return ($scope.user.email && $scope.loginAlert && $scope.user.email.length!=0) ||
                maxlength
     }
 
@@ -78,7 +82,7 @@ function RigistrationController($scope, userService){
                         ($scope.loginAlert.password2/* && $scope.loginAlert.email.password2!=0*/) ||
                         ($scope.loginAlert.password/* && $scope.loginAlert.email.password!=0*/))
                     ) || maxlength
-    }   
+    }
 
     $scope.isPswd2Alert = function(){
         return ($scope.loginAlert && ($scope.loginAlert.password1 || $scope.loginAlert.password)) ||
@@ -87,11 +91,11 @@ function RigistrationController($scope, userService){
 
     var values_is_right = function(){
         if(
-            $scope.user.email && $scope.user.email.length<72 && $scope.user.email.length>2 && 
-            $scope.user.race && 
+            $scope.user.email && $scope.user.email.length<72 && $scope.user.email.length>2 &&
+            $scope.user.race &&
             $scope.user.password1 && $scope.user.password1.length>2 && $scope.user.password1.length<128 &&
             $scope.user.password2 && $scope.user.password1==$scope.user.password2
-        ){return true}         
+        ){return true}
     }
 
     $scope.registration = function(){
@@ -117,7 +121,7 @@ function RigistrationController($scope, userService){
                     $scope.loginAlert = error.data.data;
                     $scope.inProgress = false;
                     $rootScope.showLoader = false;
-            })            
+            })
         }
         else{
             $scope.loginAlert = {
@@ -127,7 +131,7 @@ function RigistrationController($scope, userService){
             };
             if(!$scope.user.email){$scope.loginAlert.email.push($scope.tmlText.errorsText.email.nullvalue)}
             if(!$scope.user.race){$scope.loginAlert.race.push($scope.tmlText.errorsText.race.nullvalue)}
-            if(!$scope.user.password1){$scope.loginAlert.password1.push($scope.tmlText.errorsText.password.nullvalue)} 
+            if(!$scope.user.password1){$scope.loginAlert.password1.push($scope.tmlText.errorsText.password.nullvalue)}
         }
     }
 }

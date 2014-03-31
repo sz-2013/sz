@@ -1,65 +1,50 @@
-<div ng-show="!showResendBut">
-    <div class="big-bordered-box">  
-        <div class="big-bordered-box-inner">
-            <form class="form-group " role="form" name="general">
-                <h2 class="text-right">Sign In</h2>
 
-                <div class="form-group" id="login-nonFieldErrors" ng-show="loginAlert.non_field_errors">
-                    <p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
-                </div><!-- /#login-nonFieldErrors -->
+    <div ng-show="!showResendBut" class="content-inner">
+        <form class="form-group " role="form" name="general">
+            <h2 class="page-header">Sign In</h2>
 
-                <div class="form-group" id="login-email" ng-class="{'has-error':isEmailAlert()}">
-                    <div class="input-group" id="login-email-info">
-                        <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-                        <input class="form-control" id="inputEmail" ng-disabled="inProgress" ng-model="email" placeholder="Email" type="email">
-                    </div><!-- /#login-email-info -->
+            <div class="form-group" id="login-nonFieldErrors" ng-show="loginAlert.non_field_errors">
+                <p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
+            </div><!-- /#login-nonFieldErrors -->
 
-                    <span class="text-danger" id="login-email-alert" ng-show="loginAlert.email">
-                        <span ng-repeat="alert in loginAlert.email">{{alert}}</span>
-                    </span><!-- /#login-email-alert -->
-                </div><!-- /#login-email -->
+            <div class="form-group" id="login-email" ng-class="{'has-error':isEmailAlert()}">
+                <div id="login-email-info">
+                    <i class="fa fa-envelope-o fa-fw"></i>
+                    <input class="form-control" id="inputEmail" ng-disabled="inProgress" ng-model="email" placeholder="Email" type="email">
+                </div><!-- /#login-email-info -->
 
-                <div class="form-group" id="login-pswd" ng-class="{'has-error':isPswdAlert()}">
-                    <div class="input-group" id="login-pswd-info">
-                        <span class="input-group-addon"> <i class="fa fa-key fa-fw"> </i></span>
-                        <input type="password" class="form-control" id="inputPassword" placeholder="Password"
-                            ng-disabled="inProgress" ng-keydown="login($event)" ng-model="password">
-                    </div><!-- /#login-pswd-info -->
+                <span class="text-danger" id="login-email-alert" ng-show="loginAlert.email">
+                    <span ng-repeat="alert in loginAlert.email">{{alert}}</span>
+                </span><!-- /#login-email-alert -->
+            </div><!-- /#login-email -->
 
-                    <span class="text-danger" id="login-pswd-alert" ng-show="loginAlert.password">
-                        <span ng-repeat="alert in loginAlert.password">{{alert}}</span>
-                    </span><!-- /#login-pswd-alert -->
-                </div><!-- /#login-pswd -->
+            <div class="form-group" id="login-pswd" ng-class="{'has-error':isPswdAlert()}">
+                <div id="login-pswd-info">
+                    <i class="fa fa-key fa-fw"> </i>
+                    <input type="password" class="form-control" id="inputPassword" placeholder="Password"
+                        ng-disabled="inProgress" ng-keydown="login($event)" ng-model="password">
+                </div><!-- /#login-pswd-info -->
 
-                <div class="row" id="login-extra">
-                    <div class="col-sm-6" id="login-extra-remember">
-                        <div class="checkbox text-left">
-                            <label><input ng-disabled="inProgress" type="checkbox">
-                                <small>Remember</small>
-                            </label>
-                        </div>
-                    </div><!-- /#login-extra-remember -->
+                <span class="text-danger" id="login-pswd-alert" ng-show="loginAlert.password">
+                    <span ng-repeat="alert in loginAlert.password">{{alert}}</span>
+                </span><!-- /#login-pswd-alert -->
+            </div><!-- /#login-pswd -->
+        </form>
 
-                    <div class="col-sm-6 text-right" id="login-extra-forgot">
-                        <small><a href="#">Forgot your password?</a></small>
-                    </div><!-- /#login-extra-forgot -->
-                </div><!-- /#login-extra -->
-            </form>
+        <div class="form-group margin-top-lg" id="login-mainButtons">
+            <button class="btn btn-block btn-primary btn-large" id="login-mainButtons-login" ng-disabled="inProgress" ng-click="login()" type="submit">
+                <i class="fa fa-sign-in fa-lg"></i>
+            </button><!-- /#login-mainButtons-login -->
+        </div><!-- /#login-mainButtons -->
 
-            
-        </div><!-- /.big-bordered-box-inner -->
-    </div><!-- /.big-bordered-box -->
+        <div class="form-group">
+            <a href="#/registration"  class="btn-large btn btn-default btn-block" id="login-mainButtons-registration" ng-disabled="inProgress" type="submit">
+                Registration</a><!-- /#login-mainButtons-registration -->
+        </div>
+        <div id="login-extra-forgot" class="margin-top-lg">
+            <small><a href="#">Forgot your password?</a></small>
+        </div><!-- /#login-extra-forgot -->
+    </div>
 
-
-    <div class="form-group margin-top-sm text-left paddin-X-normal" id="login-mainButtons">
-        <button class="btn btn-primary" id="login-mainButtons-login" ng-disabled="inProgress" ng-click="login()" type="submit">
-            <i class="fa fa-sign-in fa-lg"></i>
-        </button><!-- /#login-mainButtons-login -->
-
-        <a href="#/registration" class="btn btn-success btn-lg pull-right" id="login-mainButtons-registration" ng-disabled="inProgress" type="submit">
-            Registration</a><!-- /#login-mainButtons-registration -->
-    </div><!-- /#login-mainButtons -->
-</div>
-
-<div ng-include ng-show="showResendBut" src="partials.regConfirm">
-</div><!-- /ng-include regConfirm -->
+    <div ng-include ng-show="showResendBut" src="partials.regConfirm">
+    </div><!-- /ng-include regConfirm -->

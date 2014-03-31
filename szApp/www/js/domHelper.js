@@ -100,3 +100,12 @@ function getMouse (e) {
     if(e.changedTouches) var e = e.changedTouches[0];
     return {x: e.clientX, y: e.clientY}
 }
+
+function findParent(parentSellector, el, nodes){
+    var parent = el.parentNode;
+    var nodes = nodes || node2array(document.querySelectorAll(parentSellector));
+    return nodes.filter(function(el){return el == parent}).length ? parent :
+           parent != document ? findParent(parentSellector, parent, nodes) :
+           null
+}
+

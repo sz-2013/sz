@@ -58,17 +58,11 @@
         <div id="loader" ng-show="showLoader"><i class="fa fa-spinner fa-spin"></i></div>
 
         <div id="mainArea"
-            ng-show="showContent" ng-view sz-scroll-detect sz-set-window> </div><!-- /ng-view -->
+            ng-show="showContent" ng-view sz-scroll-detect sz-set-window sz-scroll="bodyScroll"> </div><!-- /ng-view -->
 
-        <div class="left-part header navigation" ng-include src="navigation.currTL" ng-click="mapSetHideGameMapShowPath">
-            <!-- <a><i class="fa fa-repeat fa-lg"></i></a> -->
-        </div>
-        <div class="right-part header navigation" ng-include src="navigation.currTR">
-            <!-- <a><i class="fa fa-plus fa-lg"></i></a> -->
-        </div>
+        <div class="left-part header navigation" ng-include src="navigation.currTL" ng-click="mapSetHideGameMapShowPath"> </div>
 
-
-
+        <div class="right-part header navigation" ng-include src="navigation.currTR"> </div>
 
         <div class="left-part footer navigation" ng-include src="navigation.currBL"></div>
 

@@ -16,13 +16,13 @@ angular.module('map-directive', [])
             template:
                 '<div class="simpleSlider">' +
                     '<nav>' +
-                        '<button class="btn circle-btn" ng-click="slider.spreadNav()">' +
+                        '<button class="btn circle-btn btn-default" ng-click="slider.spreadNav()">' +
                             '<i class="fa fa-times"></i>' +
                         '</button>' +
-                        '<button class="btn circle-btn">' +
+                        '<button class="btn circle-btn btn-default">' +
                             '<i class="fa fa-ellipsis-h"></i>' +
                         '</button>' +
-                        '<button class="btn circle-btn" ng-click="showGameMap()">' +
+                        '<button class="btn circle-btn btn-default" ng-click="showGameMap()">' +
                             '<i class="fa fa-cogs"></i>' +
                         '</button>' +
                     '</nav>' +
