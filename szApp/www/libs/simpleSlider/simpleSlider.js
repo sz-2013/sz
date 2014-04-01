@@ -101,10 +101,7 @@ simpleSlider.prototype._initDrag = function() {
 
     function fnUp( e ){
         if( self.cx == undefined ) return
-        console.log(e)
         var dx = getMouse(e).x - self.cx;
-        console.log(dx)
-        console.log(self.div)
         self._inDrag = false;
         self.elem.style.cursor = 'default';
         names.forEach( function( name ){delete self[name].cx } )

@@ -143,7 +143,7 @@ angular.module('map-directive', [])
                     _initClick();
                     map.gm.setView($scope.center.pos)
                     $scope.$emit('setPPoints', map.gm.ppoints)
-                    $scope.$emit('setGameMap', false)
+                    //$scope.$emit('setGameMap', false)
                 }
 
                 function _setCenter(){

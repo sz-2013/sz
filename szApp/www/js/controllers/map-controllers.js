@@ -30,6 +30,9 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.$on('setMapInCenter', function(e, val){
         $scope.mapInCenter = val;
     })
+    $scope.$on('runPath', function(e, val){
+        console.log('run!')
+    })
     function _getGameBox(place){
         return getGameBox(place.place_gamemap_position, $scope.gameMap.points)
     }
@@ -67,7 +70,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     }
 
     $scope.$watch('coordinates', function(coordinates){
-        if(coordinates) _explore()
-        //if(coordinates) _getMap()
+        //if(coordinates) _explore()
+        if(coordinates) _getMap()
     });
 }

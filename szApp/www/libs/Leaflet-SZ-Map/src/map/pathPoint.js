@@ -42,12 +42,12 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
     }
     options['alert-stroke'] = '#8B0000'
 
-    function _showhideConn(show, attr){
+    function _showhideConn(self, show, attr){
         //if(point.connections === undefined)
         var t = show ? 150 : 300;
         var easing = show ? '<' : '>'
         var attr = attr || {opacity: show ? 1 : 0};
-        point.connections.forEach(function(c){
+        self.connections.forEach(function(c){
             c.line.animate(attr, t, easing)
             c.bg && c.bg.animate(attr, t, easing);
         })
@@ -58,31 +58,61 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         this.oy = this.attr("cy");
         this.fo = this.attr("fill-opacity");
         var self = this;
-        this.connections = gm.pconnections.filter(function(c){return  self == c.to || self == c.from })
+        this.connections = gm.pconnections.filter( function(c){return  self == c.to || self == c.from } )
+        gm._inDrag();
+        //if( !_can_move(this) ) return _stopMove(this, true)
         this.animate({"fill-opacity": .2}, 500);
-        _showhideConn()
-        gm._inDrag()
+        _showhideConn(self);
+    }
+
+    function _stopMove(self, isAlert){
+        self.animate({"fill-opacity": this.fo}, 500);
+        _showhideConn(self, true)
+        gm._outDrag()
+    }
+
+    function _can_move(self){
+        function _compare(a, b){
+            return Math.abs( a - b ) < 2
+        }
+        //узнаем позицию gamebox, в которой мы сейчас находимся
+        var gp = gm.layer2gm( self.attr('cx'), self.attr('cy') ); //позиция {x, y} gamebox на карте, в которой теперь находится кружочек
+        //если позиция не поменялась - возвращаем none
+        if(gp.x == self._gBox.pos[0] && gp.y == self._gBox.pos[1]) return
+        var newGbox = gm.getGameBoxbyPos(gp.x, gp.y); //сам объект gameBox
+        //теперь проверяем, можно ли находиться в новом gamebox
+        var pos = newGbox.pos;
+        //во-первых, он должен быть свободен от других кружочков
+        if( gm.ppoints.filter( function(p){ return pos.compare( p._gBox.pos ) } ).length ) return
+        //теперь проверяем, что по x мы не отошли от соседей больше чем на две клетки
+        var neighbors = self.connections.map(function(c){return c.to == self ? c.from : c.to});
+        var n1pos = neighbors[0]._gBox.pos;
+        var n2pos = neighbors[1]._gBox.pos;
+        if( !_compare(n1pos[0], pos[0]) || !_compare(n2pos[0], pos[0])) return
+        //и то же самое для y
+        if( !_compare(n1pos[1], pos[1]) || !_compare(n2pos[1], pos[1])) return
+        return newGbox
     }
 
     function _move(dx, dy){
+        var newGbox = _can_move(this)
+        this._gBox = newGbox || this._gBox //если получено новое значение gameBox, в которой находится кружочек, то устанавливаем его
+        /*var dx = can.x ? dx : 0;
+        var dy = can.y ? dy : 0;*/
+
         this.attr({cx: this.ox + dx, cy: this.oy + dy});
         gm._fixPConnections()
     }
 
     function _up(e){
-        var gp = gm.layer2gm( this.attr('cx'), this.attr('cy') ); //позиция {x, y} gamebox на карте, в которой теперь находится кружочек
-        var inGP = gm.getGameBoxbyPos(gp.x, gp.y);
-        var center = gm.gm2layer( inGP.pos[0], inGP.pos[1] );
-        this.animate({"fill-opacity": this.fo}, 500);
+        //if( !_can_move(this) ) return _stopMove(this, true)
+        var center = gm.gm2layer( this._gBox.pos[0], this._gBox.pos[1] );
+        var self = this;
         this.animate({cx: center.x, cy: center.y}, 300, 'bounce', function(){
             gm._fixPConnections();
-            _showhideConn(true);
+            _stopMove(self);
+            if(self.is_center) gm.moveCenter(this)
         });
-        this._gBox = inGP
-        console.log(this._gBox)
-        gm.setPPoints()
-        gm._outDrag()
-        if(this.is_center) gm.moveCenter(this)
     }
 
     function _create_el(){
