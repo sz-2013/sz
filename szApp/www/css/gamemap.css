@@ -38,11 +38,8 @@
 }
 
 .simpleSlider-thumb>li:hover:before, .simpleSlider-thumb>li.active:before{
-    /*background-color: rgba(44, 62, 80, 1);*/
-    background-color: ;
-    /*background-color: rgba(153, 51, 204, 1);*/
-    -webkit-box-shadow: 0 0 10px 10px rgba(241, 196, 15, 1) inset;
-    box-shadow: 0 0 10px 10px rgba(241, 196, 15, 1) inset;
+    -webkit-box-shadow: 0 0 10px 10px rgba(28,42,56,1) inset;
+    box-shadow: 0 0 10px 10px rgba(28,42,56,1) inset;
 }
 
 

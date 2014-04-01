@@ -212,20 +212,22 @@ angular.module('sz.client.directives', [])
     })
     .directive('szBadges', function($timeout) {
         return function(scope, element, attrs) {
+            var cls;
             function addBadge(){
-                scope.showBadgeArea = true
+                cls = scope.badges.current.cls;
+                addClass(element[0], cls);
+                scope.badges.show = true
+            }
+
+            function removeBadge(){
+                scope.badges.show = false;
+                $timeout(function(){removeClass(element[0], cls)}, 100)
             }
 
             scope.$watch('badges.current', function(val){
                 if(val!==undefined) addBadge()
-                else scope.showBadgeArea = false;
-            })
-            /*function hideAchive(){
-                scope.showAchive = false
-            }
-            scope.$watch(attrs.ngShow, function(val){
-                if(val)$timeout(hideAchive, attrs.timeout);
-            });*/
+                else removeBadge()
+            });
         };
     })
     .directive('szRadioBtn', function() {

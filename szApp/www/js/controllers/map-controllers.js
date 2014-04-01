@@ -17,13 +17,14 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             $scope.showGameMap = true;
             if(!nav){
                 $scope.$emit('navigation-hideall');
-                $scope.$emit('navigation-setTL', 'mapbacktopath');
+                $scope.$emit('navigation-setTL', 'map_backtopath');
             }
         }
         else{
             $scope.showGameMap = false;
             $scope.showGamePath = true;
             $scope.$emit('navigation-setNormal');
+            $scope.$emit('navigation-setTR', 'map_runpath');
         }
     });
     $scope.$on('setMapInCenter', function(e, val){
@@ -50,23 +51,23 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             });
         });
     }
+    function _explore_r(r){
+        var val = parseInt(r.places_explored, 10);
+        if(val) $scope.badges.setBadges({name:'explored', places: val});
+        _getMap()
+    }
     function _explore(){
         $rootScope.showLoader = true;
         var params = $scope.coordinates;
         params.radius = 250;
-        placeService.exploreInVenues(params,
-            function(r){
-                var placesValue = parseInt(r.places_explored);
-                if(placesValue){
-                    var badges = $scope.badges.setBadges({name:'explored', places: placesValue})
-                }
-                _getMap()
-            }
-        );
+        $timeout(function() {
+            _explore_r({places_explored: 10})
+        }, 100);
+        /*placeService.exploreInVenues(params, _explore_r);*/
     }
 
     $scope.$watch('coordinates', function(coordinates){
-        //if(coordinates) _explore()
-        if(coordinates) _getMap()
+        if(coordinates) _explore()
+        //if(coordinates) _getMap()
     });
 }

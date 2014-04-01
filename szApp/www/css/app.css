@@ -18,7 +18,6 @@ body{
     position: relative;
     top:0;
     overflow-y: scroll;
-    overflow-x: scroll;
     text-align: center;
 }
 
@@ -29,7 +28,7 @@ body{
 
 .footer{
     margin-top: -38px;
-    position: relative;
+    position: absolute;
 }
 /*
 .navigation{
@@ -64,6 +63,9 @@ html{
     box-shadow:  2px -2px 1px rgba(0, 0, 0, 0.15),
         inset 2px -2px 1px rgba(0, 0, 0, 0.15);
     background-color: rgba(255, 255, 255, 0.7);
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 .navigation a:hover{
@@ -162,10 +164,43 @@ html{
 }
 .right-part{
     float:right;
+    right: 8px;
 }
 
 #raphaelGameMap-Svg{
     z-index: 300;
+}
+
+#badgeArea{
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+#badgeArea .close-ico{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #fff;
+}
+
+#badgeArea.info{background-color: #9ba59b}
+#badgeArea.success{background-color: #8ab223}
+#badgeArea.warning{background-color: #e74c3c}
+.sz-badge{
+    color: #fff;
+    width: 100%;
+    position: absolute;
+    padding: 0 10px;
+    top: 25%;
+}
+.sz-badge h2{
+    margin-top: 5px;
 }
 
 /*--------------------------------*/
@@ -401,6 +436,10 @@ a:visited { border-bottom: 1px solid gray; }
 
 .margin-top-nm{
     margin-top: 10px;
+}
+
+.margin-right-lg{
+    margin-right: 30px;
 }
 
 .page-header{

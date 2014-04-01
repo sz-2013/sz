@@ -19,6 +19,7 @@
 .simpleSlider-thumb{
     width:160px;
     height: 160px;
+    left: 26px;
 }
 
 
@@ -106,8 +107,7 @@
 .simpleSlider-thumb{
     display: inline-block;
     background-color: transparent;
-    bottom: 0;
-    left:0;
+    top: 0;
     z-index: 10;
     visibility: visible;
 }

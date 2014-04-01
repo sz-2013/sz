@@ -1,18 +1,18 @@
 'use strict';
 var szApp = angular.module(
-    'sz.client', 
+    'sz.client',
     [
     'phonegap-servive',
-    'sz.client.services', 
-    'sz.client.directives', 
-    'ngResource', 
-    'ngRoute', 
-    'ngCookies', 
-    'ngAnimate', 
+    'sz.client.services',
+    'sz.client.directives',
+    'ngResource',
+    'ngRoute',
+    'ngCookies',
+    'ngAnimate',
     /*'sz.raphael.directives',*/
     /*'navs-directive',*/
     'map-directive',
-  /*  'leaflet-directive', 
+  /*  'leaflet-directive',
     ,*/
     /*'gamemap-directive',*/
 //    'selectplace-directive'
@@ -21,17 +21,16 @@ var szApp = angular.module(
 
 szApp.config(['$routeProvider', function($routeProvider) {
     $routeProvider
-        .when('/', {templateUrl: 'partials/home.html', controller: HomeController})
+        .when('/', {templateUrl: 'partials/map.html', controller: MapController})
         .when('/login', {templateUrl: 'partials/login.html', controller: LoginController})
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
         .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
         .when('/map', {templateUrl: 'partials/map.html', controller: MapController})
-        .when('/mapjs', {templateUrl: 'partials/mapjs.html', controller: MapJSController})
         /*
-        
+
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})
         //.when('/places/select/:placeId', {templateUrl: 'partials/place-select.html', controller: PlaceSelectionController})
-        
+
         .when('/messages/:previewId/publish', {templateUrl: 'partials/message-pub.html', controller: MessagePublisherController})
         .when('/feed', {templateUrl: 'partials/news-feed.html', controller: NewsFeedController})
 

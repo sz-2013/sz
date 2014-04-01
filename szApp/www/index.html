@@ -36,10 +36,6 @@
 
         <!-- <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.css"> -->
 
-        <link rel="stylesheet" href="libs/Baraja/Baraja/css/baraja.css">
-        <script src="libs/Baraja/Baraja/js/modernizr.custom.79639.js" type="text/javascript"></script>
-        <script src="libs/Baraja/Baraja/js/jquery.baraja.js" type="text/javascript"></script>
-
         <!-- <link rel="stylesheet" href="libs/IconHoverEffects/css/component.css">
         <script src="libs/IconHoverEffects/js/component.js" type="text/javascript"></script> -->
 
@@ -68,13 +64,13 @@
 
         <div class="right-part footer navigation" ng-include src="navigation.currBR"> </div>
 
-        <div class="animate-spread-center" id="badgeArea"
-            ng-click="badges.hideBadge()" ng-show="badges.show"  sz-badges>
-            <div class="media sz-badge">
-                <div class="pull-left">
+        <div class="animate-spread-center" id="badgeArea" ng-show="badges.show"  sz-badges>
+            <i class="fa fa-times fa-4x close-ico" ng-click="badges.hideBadge()" ></i>
+            <div class="sz-badge">
+                <div class="pull-left margin-right-lg">
                     <i class="fa fa-star fa-5x"></i>
                 </div>
-                <div class="media-body">
+                <div>
                     <h2 class="media-heading">{{badges.current.header}}</h2>
                     <p>{{badges.current.body}}</p>
                 </div>
@@ -97,6 +93,7 @@
         <script src="js/domHelper.js" type="text/javascript"></script>
 
         <link rel="stylesheet" href="libs/Leaflet-SZ-Map/src/leaflet.css" >
+        <script src="libs/Leaflet-SZ-Map/src/Leaflet.js"></script>
         <script src="libs/Leaflet-SZ-Map/src/Leaflet.js"></script>
         <script src="libs/Leaflet-SZ-Map/src/core/Browser.js"></script>
         <script src="libs/Leaflet-SZ-Map/src/core/Util.js"></script>

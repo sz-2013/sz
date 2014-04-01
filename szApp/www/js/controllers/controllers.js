@@ -46,7 +46,8 @@ var navigationPaths = {
     mainTR: '',
     mainBL: 'partials/navs/navigation/main/menu.html',
     mainBR: 'partials/navs/navigation/main/score.html',
-    mapbacktopath: 'partials/navs/navigation/map/backtopath.html',
+    map_backtopath: 'partials/navs/navigation/map/backtopath.html',
+    map_runpath: 'partials/navs/navigation/map/runpath.html',
 }
 
 
@@ -150,11 +151,12 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
 
     var badges = function(){
         var tmChange = 1000;
-        var tmShow = 3000;
+        var tmShow = 10000;
         function _getBadgesExplored(value){
-            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places'}
+            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places', cls: 'warning'}
         }
         return {
+            _in_show: false,
             show: false,
             current: undefined,
             queue: [],
@@ -166,6 +168,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
                 $scope.badges.setCurrent()
             },
             setCurrent: function(){
+                if($scope.showLoader) return $timeout($scope.badges.setCurrent, 100);
                 if($scope.badges.current === undefined){
                     $scope.badges.current = $scope.badges.queue.pop()
                     $scope.badges.show = true;
@@ -181,7 +184,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
                 var badge;
                 if(value.name=='explored') var badge = _getBadgesExplored(value)
 
-                if(badges) $scope.badges.update(badge)
+                if(badge) $scope.badges.update(badge)
             }
         }
     }
@@ -244,6 +247,9 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
 
     $scope.map_setHideGameMapShowPath = function(){
         $scope.$broadcast('setGameMap', false)
+    }
+    $scope.map_runPath = function(){
+        $scope.$broadcast('runPath', true)
     }
 
 
