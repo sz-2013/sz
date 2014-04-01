@@ -153,7 +153,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         var tmChange = 1000;
         var tmShow = 10000;
         function _getBadgesExplored(value){
-            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places', cls: 'warning'}
+            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places', cls: 'success'}
         }
         return {
             _in_show: false,

@@ -29,13 +29,13 @@
     top: 0;
 }
 
-.simpleSlider-thumb>li:first-child:before{
+/*.simpleSlider-thumb>li:first-child:before{
     background-color: rgba(0, 102, 255, 1);
 }
 
 .simpleSlider-thumb>li:last-child:before{
     background-color: rgba(163, 78, 36, 1);
-}
+}*/
 
 .simpleSlider-thumb>li:hover:before, .simpleSlider-thumb>li.active:before{
     -webkit-box-shadow: 0 0 10px 10px rgba(28,42,56,1) inset;

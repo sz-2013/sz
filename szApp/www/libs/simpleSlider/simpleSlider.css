@@ -1,6 +1,9 @@
 .simpleSlider{
     display: inline-block;
     position: relative;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 .simpleSlider.trem{
@@ -19,7 +22,7 @@
 .simpleSlider-thumb{
     width:160px;
     height: 160px;
-    left: 26px;
+    left:0;
 }
 
 
@@ -54,6 +57,9 @@
     padding: 0;
     position: absolute;
     outline-style: none;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
 }
 
 .simpleSlider>ul>li{

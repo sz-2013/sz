@@ -8,7 +8,7 @@ simpleSlider.prototype._init = function( elem ) {
     this.longPressTm = 1000;
     this.elem = elem;
     this.elemUl = elem.getElementsByClassName('simpleSlider-container')[0]
-    this.div = elem.offsetWidth * 0.2;
+    this.div = 5;
     this.nav = elem.getElementsByTagName('nav')[0]
     this._isShowNav= false;
     this._initItems()
@@ -84,15 +84,6 @@ simpleSlider.prototype._initThumb = function() {
 simpleSlider.prototype._initDrag = function() {
     var self = this, names = ['active', '_prev', '_next'];
 
-    function inCont( mouse ){
-        var cont = self.elemUl.getBoundingClientRect();
-        console.log(mouse)
-        console.log(cont)
-        var _in = (mouse.x > cont.left && mouse.x < cont.right) && (mouse.y > cont.top && mouse.y < cont.bottom)
-        console.log(_in)
-        return _in
-    }
-
     function fnDrag( e ){
         self.elem.style.cursor = 'move';
         self._inDrag = true;
@@ -110,7 +101,10 @@ simpleSlider.prototype._initDrag = function() {
 
     function fnUp( e ){
         if( self.cx == undefined ) return
+        console.log(e)
         var dx = getMouse(e).x - self.cx;
+        console.log(dx)
+        console.log(self.div)
         self._inDrag = false;
         self.elem.style.cursor = 'default';
         names.forEach( function( name ){delete self[name].cx } )
@@ -122,35 +116,14 @@ simpleSlider.prototype._initDrag = function() {
     }
 
     self.elem.addEventListener( 'mousedown', fnDrag )
+    self.elem.addEventListener( 'touchstart', fnDrag )
     self.elem.addEventListener( 'mousemove', fnMove )
+    self.elem.addEventListener( 'touchmove', fnMove )
     self.elem.addEventListener( 'mouseup', fnUp )
+    self.elem.addEventListener( 'touchend', fnUp )
     self.elem.addEventListener( 'mouseleave', fnUp )
+    self.elem.addEventListener( 'touchcancel', fnUp )
 
-    function touchHandler(event) {
-        var mouse = getMouse( event );
-        var _in = inCont( mouse );
-        console.log(_in)
-        if(!_in && event.type == 'touchstart' ) return
-        var touch = event.changedTouches[0];
-
-        var simulatedEvent = document.createEvent("MouseEvent");
-            simulatedEvent.initMouseEvent({
-            touchstart: "mousedown",
-            touchmove: "mousemove",
-            touchend: "mouseup"
-        }[event.type], true, true, window, 1,
-            touch.screenX, touch.screenY,
-            touch.clientX, touch.clientY, false,
-            false, false, false, 0, null);
-
-        touch.target.dispatchEvent(simulatedEvent);
-        event.preventDefault();
-    }
-
-    this.elem.addEventListener("touchstart", touchHandler, true);
-    this.elem.addEventListener("touchmove", touchHandler, true);
-    this.elem.addEventListener("touchend", touchHandler, true);
-    this.elem.addEventListener("touchcancel", touchHandler, true);
 };
 
 
