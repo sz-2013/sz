@@ -86,6 +86,11 @@ angular.module('map-directive', [])
             replace: true,
             link: function($scope, element, attrs) {
                 L.GM.prototype.setPPoints = function() {
+                    for (var i = this.ppoints.length - 1; i >= 0; i--) {
+                        var pos = this.ppoints[i]._gBox.pos
+                        var tile = this.getTile(pos[0], pos[1]);
+                        if( tile ) tile.querySelector('h3').innerText = this.ppoints[i].i
+                    };
                     $scope.$emit('setPPoints', $scope.map.gm.ppoints)
                 };
                 L.GM.prototype.moveCenter = function(point) {
@@ -152,6 +157,7 @@ angular.module('map-directive', [])
                     $scope.showPPvalue = false;
                     $scope.map.gm._inAction = undefined;
                     $scope.map.gm._newPoint = undefined;
+                    $scope.map.gm.clearView()
                 }
 
                 $scope.$on('clearPPControl', function(e){_clearPPControl() })
@@ -169,6 +175,7 @@ angular.module('map-directive', [])
                     _clearPPControl()
                     if(val === false) return
                     $scope.map.gm._inAction = false;
+                    $scope.map.gm.focusCanBeRemove();
                 })
 
                 $scope.$watch('points', function(val){if(val) _init(); });

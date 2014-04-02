@@ -1,30 +1,16 @@
 L.GM.prototype.ppoints = new Array;
-L.GM.prototype.pushPPoint = function(gBox, i, shift) { //x in gamemap, y in gamemap, num, bln
-    var newi = shift ? i : i + 1
-    var point = this._pathPoint({
-        gp: gBox,
-        is_end: false,
-        is_start: false,
-        thisI: newi,
-        pre: this.ppoints[i]
-    });
-    this.ppoints.forEach(function(p){
-        if(p.i>i || (p.i==i && shift)){
-            p.i = p.i + 1
-        }
-    }) //update all indexes
-    this.ppoints.splice(newi, 0, point)
-    this._updatePConnections()
-    //this._markBox()
-    return point
-};
+
 
 L.GM.prototype.pushNewPPoint = function(gBox) {
     //если нет _newPoint или данные о нем не полные - прерываем
     if( !this._newPoint || !this._newPoint.to || !this._newPoint.from ) return
     //проверяем, что в выбранной клетке может стоять point
     if( !this._canBeIn_gBox( [this._newPoint.to, this._newPoint.from], gBox ) ) return
-    this.pushPPoint( gBox, this._newPoint.i, this._newPoint.shift );
+    var index = this._newPoint.i;
+    var point = this._pathPoint( { gp: gBox, pre: this.ppoints[index] } );
+    //update ppoints list
+    this.ppoints.splice(index + 1, 0, point)
+    this._updatePConnections()
     this.clearView();
     this._newPoint = undefined;
     //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
@@ -32,35 +18,26 @@ L.GM.prototype.pushNewPPoint = function(gBox) {
     this.setPPoints()
 };
 
-L.GM.prototype.removePPoint = function(gBox) {
 
+L.GM.prototype.removePPoint = function(point) {
+    if( !point._canRemove ) return
+    this.ppoints.splice( this._getPointIndex( point ), 1 )
+    point.remove()
     //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
     //если в ответ придет false - откатываться
+    this._updatePConnections()
+    this.focusCanBeRemove()
     this.setPPoints()
 };
 
 
-L.GM.prototype._canBeIn_gBox = function(point, gBox) { //point || neightbors, gBox
-    //проверяем, может ли point находится в данном gBox
-    var pos = gBox.pos;
-    //во-первых, он должен быть свободен от других кружочков
-    if( this.ppoints.filter( function(p){ return pos.compare( p._gBox.pos ) } ).length ) return
-    //теперь проверяем, что по x мы не отошли от соседей больше чем на две клетки
-    var neighbors = Object.prototype.toString.call( point ) === '[object Array]' ? point :
-                                                                                   this._get_neigthbors(point);
-    var n1pos = neighbors[0]._gBox.pos, n2pos = neighbors[1]._gBox.pos;
-    if( !this._compare_pos(n1pos[0], pos[0]) || !this._compare_pos(n2pos[0], pos[0])) return
-    //и то же самое для y
-    if( !this._compare_pos(n1pos[1], pos[1]) || !this._compare_pos(n2pos[1], pos[1])) return
-    return true
-};
 
-L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pre
+L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
     var gm = this;
     var paper = this._map.paper;
     var gBox = params.gp;
-    var GP = gBox.pos, is_end = params.is_end, is_start = params.is_start, thisI = params.thisI, pre = params.pre;
-    var pos = gm.gm2layer(GP[0], GP[1]);
+    var GP = gBox.pos, is_end = params.is_end, is_start = params.is_start, pre = params.pre;
+    var pos = gm.gm2layer( GP[0], GP[1] );
     var options = {
         'stroke'       : '#f39c12',
         'stroke-width' : 3,
@@ -68,11 +45,11 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         'fill-opacity' : .8,
         'r'            : gm._getTileSize()/4,
     };
-    if(is_start){
+    if( is_start ){
         options.stroke = 'rgba(0, 102, 255, 1)';
         options.fill = 'rgba(0, 80, 255, 1)';
     }
-    if(is_end){
+    if( is_end ){
         options.stroke = 'rgba(163, 78, 36, 1)';
         options.fill = 'rgba(198, 54, 5, 1)';
     }
@@ -115,7 +92,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         //если позиция не поменялась - возвращаем none
         if(gp.x == self._gBox.pos[0] && gp.y == self._gBox.pos[1]) return
         var newGbox = gm.getGameBoxbyPos(gp.x, gp.y); //сам объект gameBox
-        return _canBeIn_gBox(self, newGbox) ? newGbox : false
+        return gm._canBeIn_gBox(self, newGbox) ? newGbox : false
     }
 
     function _dragger(x, y, e){
@@ -174,19 +151,15 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
                 gm._newPoint.to = self;
                 gm._newPoint.from.focus()
                 gm._newPoint.to.focus()
-                gm._newPoint.i = Math.min(gm._newPoint.from.i, gm._newPoint.to.i);
+                gm._newPoint.i = Math.min( gm._getPointIndex( gm._newPoint.from ), gm._getPointIndex( gm._newPoint.to ) );
                 gm._newPoint.shift = false;
             }
         }
     }
 
-    function _remove(self){
-        console.log('remove')
-    }
-
     function _create_el(){
-        function _animate(opt){
-            point.animate(opt, 'bounce', 500);
+        function _animate(opt, fn){
+            point.animate(opt, 'bounce', 500, fn);
         }
         var point  = gm._map.paper.circle(0, 0);
         point.attr(options);
@@ -194,20 +167,34 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
 
         point.setView = function(){ this.focus(); this.is_center = true; }
         point.blur = function(){ _animate( blurOpt ) }
-        point.focus = function(){ _animate(viewOpt) }
+        point.focus = function(){ _animate(viewOpt), function(){gm.repaintConnByPoint( this );};  }
         point.clearView = function(){ _animate( options ) }
+        point.canBeRemove = function(){
+            this._canRemove = false
+            var pos = this._gBox.pos;
+            if( !is_start && !is_end ){
+                //берем  два соседних элемента
+                var neighbors = gm._get_neigthbors( this );
+                //если они могут быть соседями напрямую, без учкастия этого элемента - этот элемент может быть удален
+                var n = neighbors.pop()
+                if( gm._canBeNeightbors( n._gBox.pos, neighbors ) ) this._canRemove = true;
+            }
+            return this._canRemove
+        }
 
-        point.click(function(){
+        function clickPoint(){
             //Поведение при клике определается с помощью параметра gm._inAction
             //undefined - move
             //true - add
             //false - remove
             if(gm._inAction === true) _add(this)
-            if(gm._inAction === false) _remover(this)
-        });
-        if(!is_start&&!is_end){
-            point.drag(_move, _dragger, _up);
+            if(gm._inAction === false) gm.removePPoint(this)
         }
+
+        point.click(clickPoint);
+        point.touchstart(clickPoint)
+
+        if( !is_start && !is_end ) point.drag(_move, _dragger, _up);
 
         return point
     }
@@ -219,7 +206,6 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         this.attr({cx: pos.x, cy: pos.y});
     }
     point.updatePos()
-    point.i = thisI;
 
     return point;
 
@@ -232,7 +218,6 @@ L.GM.prototype.pathPoint = function(i, path){
         gp: path[i], //gBox
         is_end: i === path.length - 1,
         is_start: i === 0,
-        thisI: i,
         pre: pre
     });
     this.ppoints[i] = point;

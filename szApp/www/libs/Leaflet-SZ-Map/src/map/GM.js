@@ -186,25 +186,36 @@ L.GM.prototype.pathConnection = function(obj1, obj2, line, bg) {
         line.bg && line.bg.attr({path: path});
         line.line.attr({path: path});
     } else {
-        var color = typeof line == "string" ? line : "#000";
+        //var color = typeof line == "string" ? line : "#000";
         return {
-            bg: bg && bg.split && paper.path(path).attr({stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3, opacity:1}),
-            line: paper.path(path).attr({stroke: color, fill: "none"}),
+            bg: paper.path(path),
+            line: paper.path(path),
             from: obj1,
             to: obj2
         };
     }
 };
 
+
+L.GM.prototype.paintConn = function(conn) {
+    //@TODO: ставить произвольны таймаут здесь не кажется мне хорошим решением, нужно что-то другое придумать. Однако если сразу применять - не успевают атрибуты смениться
+    setTimeout(function(){
+        conn.bg.attr({stroke: conn.to.attr('stroke'), fill: "none", "stroke-width": conn.to.attr('stroke-width') || 3, opacity:1})
+        conn.line.attr({stroke: conn.to.attr('stroke'), fill: "none"})
+    }, 100)
+};
+
 L.GM.prototype.setConnection = function (pre, point) {
-    var stroke = /*options.stroke*/point.attr('stroke') + '|' + point.attr('stroke-width');
-    this.pconnections.push( this.pathConnection(pre, point, point.attr('stroke'), stroke) );
+    var conn = this.pathConnection(pre, point)
+    this.pconnections.push( conn );
+    this.paintConn( conn )
 }
 
 L.GM.prototype.removeConnection = function (conn) {
     var i = this.pconnections.indexOf(conn);
-    if(~i) this.pconnections.splice(i, 1);
-    conn.remove()
+    if( conn.line ) conn.line.remove()
+    if( conn.bg ) conn.bg.remove()
+    if( ~i ) this.pconnections.splice(i, 1);
 }
 
 L.GM.prototype.updateConnection = function (conn, from, to) {
@@ -223,17 +234,32 @@ L.GM.prototype._fixPConnections = function() {
 
 
 L.GM.prototype._updatePConnections = function(){
+    //сначала удаляем лишние connection, т.е те,к оторые растут из пустоты (from было удалено)
+    //или уходят в пустоту (to было удалено)
+    var self = this;
+    var toRemoveConn = this.pconnections.filter( function( conn ){
+        return !~self._getPointIndex( conn.from ) || !~self._getPointIndex( conn.to )
+    } )
+    for (var i = toRemoveConn.length - 1; i >= 0; i--) {
+        this.removeConnection( toRemoveConn[i] )
+    };
     var pathLen = this.ppoints.length;
-    for (var i = 0; i < pathLen; i++) {
+    //начинаем со второй, чтобы не трогать
+    for (var i = 1; i < pathLen; i++) {
+        //для каждой точки и ее предыдущего соседа
         var point = this.ppoints[i];
         var pre = this.ppoints[i-1];
-        var conn_from = this.pconnections.filter(function(c){return c.to == point})
-        var conn = conn_from.length ? conn_from[0] : null;
-        if(pre){
-            if(conn&&pre!=conn.from) this.updateConnection(conn, pre, point)
-            if(!conn) this.setConnection(pre, point)
-        } else if(conn) this.removeConnection(conn)
+        //находим connection, который идет до точки
+        var conn_to = this.pconnections.filter(function(c){return c.to == point})[0]
+        //если есть connection и второй конец не соответствует pre,
+        //те была перед текущей вставлена новая точка
+        //делаем апдейт
+        if(conn_to&&pre!=conn_to.from) this.updateConnection(conn_to, pre, point)
+        //если нет connection до этой точки, те эта точка - новая -
+        //создаем connection
+        if(!conn_to) this.setConnection(pre, point)
     }
+    this.repaintConnections()
 }
 
 
@@ -260,14 +286,40 @@ L.GM.prototype._get_connections = function( point ) {
 
 
 L.GM.prototype._get_neigthbors = function( point ) {
-    point.connections = this._get_connections(point);
-    return  point.connections.map(function(c){return c.to == point ? c.from : c.to});
+    var neightbors = new Array, i = this._getPointIndex( point );
+    if( this.ppoints[i+1] ) neightbors.push( this.ppoints[i+1] )
+    if( this.ppoints[i-1] ) neightbors.push( this.ppoints[i-1] )
+    return neightbors
+    /*point.connections = this._get_connections(point);
+    return  point.connections.map(function(c){return c.to == point ? c.from : c.to});*/
 };
 
 
 L.GM.prototype._compare_pos = function( a, b ){
     return Math.abs( a - b ) < 2
 }
+
+
+L.GM.prototype._canBeIn_gBox = function(point, gBox) { //point || neightbors, gBox
+    //проверяем, может ли point находится в данном gBox
+    var pos = gBox.pos;
+    //во-первых, он должен быть свободен от других кружочков
+    if( this.ppoints.filter( function(p){ return pos.compare( p._gBox.pos ) } ).length ) return
+    //теперь проверяем, что по x и y мы не отошли от соседей больше чем на две клетки
+    var neighbors = Object.prototype.toString.call( point ) === '[object Array]' ? point : this._get_neigthbors(point);
+    if( !this._canBeNeightbors( pos, neighbors ) ) return
+    return true
+};
+
+
+L.GM.prototype._canBeNeightbors = function(pos, neightbors) {
+    //для каждого из соседей (объекты ppoint) проверяем, что мы не отошли от него по х или y больше, чем на 2 клетки
+    for (var i = neightbors.length - 1; i >= 0; i--) {
+        var nPos = neightbors[i]._gBox.pos;
+        if( !this._compare_pos( pos[0], nPos[0] ) || !this._compare_pos( pos[1], nPos[1] ) ) return false
+    };
+    return true
+};
 
 
 L.GM.prototype._map_pp = function(fn) {
@@ -277,6 +329,16 @@ L.GM.prototype._map_pp = function(fn) {
 
 L.GM.prototype.blurAll = function() {
     this._map_pp( function(point){ point.blur() } )
+    this.repaintConnections()
+};
+
+
+L.GM.prototype.focusCanBeRemove = function(first_argument) {
+    this.blurAll()
+    this._map_pp(function( point ){
+        if( point.canBeRemove() ) point.focus()
+    })
+    this.repaintConnections()
 };
 
 
@@ -285,8 +347,28 @@ L.GM.prototype.clearView = function() {
         point.clearView();
         point.is_center = false;
     } )
+    this.repaintConnections()
 };
 
+
+L.GM.prototype.repaintConnections = function() {
+    for (var i = this.pconnections.length - 1; i >= 0; i--) {
+        this.paintConn( this.pconnections[i] )
+    };
+};
+
+
+L.GM.prototype.repaintConnByPoint = function(point) {
+    point.connections = point.connections || this._get_connections( point );
+    for (var i = point.connections.length - 1; i >= 0; i--) {
+        this.paintConn( point.connections[i] )
+    };
+};
+
+
+L.GM.prototype._getPointIndex = function(point) {
+    return this.ppoints.indexOf(point)
+};
 
 
 L.GM.prototype.setPPoints = function() {

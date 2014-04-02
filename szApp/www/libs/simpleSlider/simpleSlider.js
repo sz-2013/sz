@@ -93,14 +93,14 @@ simpleSlider.prototype._initDrag = function() {
     }
 
     function fnMove( e ){
-        if( !self._inDrag ) return
+        if( !self._inDrag || self._isShowNav) return
         var dx = getMouse( e ).x - self.cx;
         names.forEach( function( name ){self[name].style.left = self[name].cx + dx + 'px'} )
         if( (dx < self.div*-1 || dx > self.div)&&self.pressTimer ) clearTimeout(self.pressTimer)
     }
 
     function fnUp( e ){
-        if( self.cx == undefined ) return
+        if( self.cx == undefined  || self._isShowNav) return
         var dx = getMouse(e).x - self.cx;
         self._inDrag = false;
         self.elem.style.cursor = 'default';
