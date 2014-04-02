@@ -4,12 +4,8 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.showGameMap = false;
     $scope.showGamePath = false;
     $scope.gameMap = {}
-    $scope.$on('setActivePoint', function(e, gBox){
-        $scope.activePoint = gBox;
-    })
-    $scope.$on('setPPoints',function(e, ppoints){
-        $scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox});
-    })
+    $scope.$on('setActivePoint', function(e, gBox){$scope.activePoint = gBox; })
+    $scope.$on('setPPoints',function(e, ppoints){$scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox}); })
     $scope.$on('setGameMap', function(e, val, nav){
         var t = 500;
         if(val){
@@ -18,6 +14,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             if(!nav){
                 $scope.$emit('navigation-hideall');
                 $scope.$emit('navigation-setTL', 'map_backtopath');
+                $scope.$emit('navigation-setTR', 'map_ppcontrol');
             }
         }
         else{
@@ -27,12 +24,8 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             $scope.$emit('navigation-setTR', 'map_runpath');
         }
     });
-    $scope.$on('setMapInCenter', function(e, val){
-        $scope.mapInCenter = val;
-    })
-    $scope.$on('runPath', function(e, val){
-        console.log('run!')
-    })
+    $scope.$on('setMapInCenter', function(e, val){$scope.mapInCenter = val; })
+    $scope.$on('runPath', function(e, val){console.log('run!') })
     function _getGameBox(place){
         return getGameBox(place.place_gamemap_position, $scope.gameMap.points)
     }

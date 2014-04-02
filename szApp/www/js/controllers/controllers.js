@@ -48,6 +48,7 @@ var navigationPaths = {
     mainBR: 'partials/navs/navigation/main/score.html',
     map_backtopath: 'partials/navs/navigation/map/backtopath.html',
     map_runpath: 'partials/navs/navigation/map/runpath.html',
+    map_ppcontrol: 'partials/navs/navigation/map/ppcontrol.html',
 }
 
 
@@ -241,18 +242,13 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         $scope.bodyScroll = true;
     });
 
-    $scope.$on('setBodyScroll', function(e, val){
-        $scope.bodyScroll = val;
-    })
+    $scope.$on('setBodyScroll', function(e, val){$scope.bodyScroll = val;})
 
-    $scope.map_setHideGameMapShowPath = function(){
-        $scope.$broadcast('setGameMap', false)
-    }
-    $scope.map_runPath = function(){
-        $scope.$broadcast('runPath', true)
-    }
-
-
+    $scope.map_setHideGameMapShowPath = function(){$scope.$broadcast('setGameMap', false) }
+    $scope.map_runPath = function(){$scope.$broadcast('runPath', true) }
+    $scope.map_ppcontrol_add = function($event){console.log($event.currentTarget); $scope.$broadcast('ppcontrol_add', $event.currentTarget) }
+    $scope.map_ppcontrol_remove = function($event){$scope.$broadcast('ppcontrol_remove', $event.currentTarget) }
+    $scope.$on('setPpControlReset', function(e){$scope.ppControlReset = !$scope.ppControlReset; })
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];

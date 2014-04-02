@@ -1,18 +1,12 @@
 angular.module('map-directive', [])
     .directive('mapPathPreview', [function(){
-        // Runs during compile
         return {
-            // name: '',
-            // priority: 1,
-            // terminal: true,
             scope: {
                 isshow: '=isshow',
                 ppoints: '=ppoints',
                 center: '=center'
-            }, // {} = isolate, true = child, false/undefined = no change
-            // controller: function($scope, $element, $attrs, $transclude) {},
-            // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
-            restrict: 'E', // E = Element, A = Attribute, C = Class, M = Comment
+            },
+            restrict: 'E',
             template:
                 '<div class="simpleSlider">' +
                     '<nav>' +
@@ -29,10 +23,8 @@ angular.module('map-directive', [])
                     '<ul class="simpleSlider-container gamemap-item">' +
                     '</ul>' +
                 '</div>',
-            // templateUrl: '',
             replace: true,
             transclude: true,
-            // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
                 var startLabel = 'mapbox-start-label';
                 var endLabel = 'mapbox-end-label';
@@ -80,57 +72,61 @@ angular.module('map-directive', [])
         };
     }])
     .directive('gameMap', [function(){
-        // Runs during compile
         return {
-            // name: '',
-            // priority: 1,
-            // terminal: true,
             scope: {
                 'center': '=center',
                 'path': '=path',
                 'points': '=points',
-            }, // {} = isolate, true = child, false/undefined = no change
-            // controller: function($scope, $element, $attrs, $transclude) {},
-            // require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
-            restrict: 'E', // E = Element, A = Attribute, C = Class, M = Comment
-            template: '<div id="gamemap"></div>',
-            // templateUrl: '',
+            },
+            restrict: 'E',
+            template: '<div id="gameMapCont">' +
+                        '<h1 ng-show="showPPvalue" class="animate-spread-center animate-quick">{{map.gm.ppoints.length}}/{{maxPP}}</h1>' +
+                        '<div id="gamemap"></div>' +
+                      '</div>',
             replace: true,
-            // transclude: true,
-            // compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, element, attrs){}})),
             link: function($scope, element, attrs) {
                 L.GM.prototype.setPPoints = function() {
-                    $scope.$emit('setPPoints', map.gm.ppoints)
+                    $scope.$emit('setPPoints', $scope.map.gm.ppoints)
                 };
                 L.GM.prototype.moveCenter = function(point) {
                     $scope.$emit('setActivePoint', point._gBox)
                 };
-                var elem = element[0];
-                var map;
+                var elem = element[0].querySelector('#gamemap');
+                $scope.maxPP = 25;
+                $scope.showPPvalue = false;
                 function _initCont(){
                     elem.style.display = 'block';
                     elem.style.height = document.getElementById('mainArea').style.height || '314px';
                 }
 
                 function _initClick(){
-                    map.on('click', function(e){
+                    $scope.map.on('click', function(e){
                         if ( e.originalEvent.target.localName == 'circle' ) return
-                        var gPoint = map.gm.latlng2gm(e.latlng);
-                        var tile = map.gm.getTile(gPoint.x, gPoint.y);
-                        var inner = tile.getElementsByClassName('gmtile-inner')[0];
+                        var gPoint = $scope.map.gm.latlng2gm(e.latlng);
+                        var tile = $scope.map.gm.getTile(gPoint.x, gPoint.y);
+                        if(!tile) return
+                        var inner = tile.querySelector('.gamemap-item');
                         var gBox = tile._gBox;
+
+                        //в любом случае сбрасывает ppcontrol
+                        $scope.map.gm.pushNewPPoint(gBox)
+                        $scope.$apply(function(){
+                            _clearPPControl();
+                            _clearBtn();
+                        })
+
                         if( gBox.owner == 'nobody' ) return
 
-                        L.DomUtil.addClass(inner, 'gmtile-inner-wavein');
+                        addClass(inner, 'gmtile-inner-wavein');
                         inner.addEventListener( 'webkitTransitionEnd', function( e ) {
-                            L.DomUtil.removeClass(inner, 'gmtile-inner-wavein');
+                            removeClass(inner, 'gmtile-inner-wavein');
                         }, false );
                     });
                 }
 
                 function _init(){
                     _initCont()
-                    map = L.szMap(
+                    $scope.map = L.szMap(
                         elem.getAttribute('id'),
                         $scope.points);
                 }
@@ -138,32 +134,66 @@ angular.module('map-directive', [])
                 function _doPath(){
                     var pathLen = $scope.path.length;
                     for (var i = 0; i < pathLen; i++) {
-                        var point =  map.gm.pathPoint(i, $scope.path);
+                        var point =  $scope.map.gm.pathPoint(i, $scope.path);
                     };
                     _initClick();
-                    map.gm.setView($scope.center.pos)
-                    $scope.$emit('setPPoints', map.gm.ppoints)
-                    //$scope.$emit('setGameMap', false)
+                    $scope.map.gm.setView($scope.center.pos)
+                    $scope.$emit('setPPoints', $scope.map.gm.ppoints)
+                    $scope.$emit('setGameMap', true)
                 }
 
                 function _setCenter(){
-                    var center = map.gm.gm2latlng($scope.center.pos); //latlng
-                    map.setView(center);
-                    map.gm.setView($scope.center.pos)
-                    if(map.gm.ppoints.length){
-                        map.gm.updatePpointsPos()
-                    }
-                    if($scope.path&&!map.gm.ppoints.length) _doPath()
+                    var center = $scope.map.gm.gm2latlng( $scope.center.pos ); //latlng
+                    $scope.map.setView(center);
+                    $scope.map.gm.setView( $scope.center.pos )
+                    if( $scope.map.gm.ppoints.length ) $scope.map.gm.updatePpointsPos()
+                    if( $scope.path&&!$scope.map.gm.ppoints.length ) _doPath()
                 }
+
+                function _clearPPControl(){
+                    $scope.showPPvalue = false;
+                    $scope.map.gm._inAction = undefined;
+                    $scope.map.gm._newPoint = undefined;
+                }
+
+                var addBtn;
+                var removeBtn;
+                function _clearBtn(){
+                    //Это все не очень красивая схема получается
+                    function _clear(btn){
+                        if(!btn) return
+                        $scope.$emit(btn.getAttribute('sz-ico-reset-name'))
+                    }
+                    _clear(addBtn)
+                    _clear(removeBtn)
+                }
+
+                $scope.$on('ppcontrol_add', function(e, elem){
+                    var val = $scope.map.gm._inAction;
+                    addBtn = elem;
+                    console.log(addBtn)
+                    _clearPPControl()
+                    if(val === true) return _clearBtn()
+                    $scope.showPPvalue = true;
+                    $scope.map.gm._inAction = true;
+                });
+
+                $scope.$on('ppcontrol_remove', function(e, elem){
+                    var val = $scope.map.gm._inAction;
+                    removeBtn = elem;
+                    _clearPPControl()
+                    if(val === false) return _clearBtn()
+                    $scope.map.gm._inAction = false;
+                })
 
                 $scope.$watch('points', function(val){if(val) _init(); });
                 $scope.$watch('center', function(val){
-                    if(!val || !map) return
-                    var center = map.gm.latlng2gm( map.getCenter() );
+                    if(!val || !$scope.map) return
+                    var center = $scope.map.gm.latlng2gm( $scope.map.getCenter() );
                     var pos = val.pos;
                     if( (pos[0] != center[0] && pos[1] != center[1])  ) _setCenter()
                 });
 
             }
         };
-    }]);;
+    }])

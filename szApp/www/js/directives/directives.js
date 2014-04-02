@@ -231,7 +231,7 @@ angular.module('sz.client.directives', [])
         };
     })
     .directive('szRadioBtn', function() {
-        //the directive for a selected place modal window
+        //convert nedded btns into radio
         return function(scope, element, attrs) {
             node2array(element[0].querySelectorAll('[type=radio]')).forEach(function(input){
                 var btnGroup = findParent('[data-toggle="buttons"]', input);
@@ -242,5 +242,36 @@ angular.module('sz.client.directives', [])
                     addClass(label, 'active')
                 }
             });
+        };
+    })
+    .directive('szChangeIco', function() {
+        return function(scope, element, attrs) {
+            var clses = attrs.szChangeIco.split( '|' ),
+                oldCls = clses[1], newCls = clses[0], elem = element[0],
+                fa = elem.querySelector('.fa'),
+                neightbors = elem.parentElement.querySelectorAll( '[sz-change-ico]' );
+            elem.addEventListener('click', function(){
+                scope.$apply(function(){ scope.$broadcast( 'ppcontrol_add', elem )})
+                for (var i = neightbors.length - 1; i >= 0; i--) {
+                    var otherelem = neightbors[i], otherclses = otherelem.getAttribute( 'sz-change-ico' ).split( '|' ),
+                        otherOld = otherclses[1], otherNew = otherclses[0];
+                    if( !sameNode(otherelem, elem) && otherNew==newCls){
+                        var otherfa = otherelem.querySelector( '.fa' );
+                        removeClass( otherfa, newCls );
+                        removeClass( otherelem, 'active' );
+                        addClass( otherfa, otherOld );
+                    }
+                };
+                toggleClass( fa, oldCls );
+                toggleClass( fa, newCls );
+                toggleClass( elem, 'active' );
+            });
+
+            scope.$watch(attrs.szIcoReset, function(val){
+                if( val===undefined ) return
+                removeClass( fa, newCls );
+                removeClass( elem, 'active' );
+                addClass( fa, oldCls );
+            })
         };
     })

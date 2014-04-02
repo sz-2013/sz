@@ -8,7 +8,7 @@
     transform: translate(-500px, 100px) rotate(-70deg);
     opacity: 0;
 }
- 
+
 .animate-from-left.ng-hide-remove.ng-hide-remove-active,
 .animate-from-left.ng-hide-add {
     -webkit-transform: none;
@@ -40,7 +40,7 @@
     transform: translate(500px, 100px) rotate(70deg);
     opacity: 0;
 }
- 
+
 .animate-from-right.ng-hide-remove.ng-hide-remove-active,
 .animate-from-right.ng-hide-add {
     -webkit-transform: none;
@@ -63,7 +63,7 @@
 }
 
 /*-----------SpreadCenter---------*/
- 
+
 .animate-spread-center.ng-hide-add.ng-hide-add-active,
 .animate-spread-center.ng-hide-remove {
     -webkit-transform: scale(.3);
@@ -73,7 +73,7 @@
     transform: scale(.3);
     opacity: 0;
 }
- 
+
 .animate-spread-center.ng-hide-remove.ng-hide-remove-active,
 .animate-spread-center.ng-hide-add {
     -webkit-transform: scale(1);
@@ -87,10 +87,6 @@
 .animate-spread-center.ng-hide-add,
 .animate-spread-center.ng-hide-remove{
     transition-timing-function:ease-in-out;
-    -webkit-transition-duration: .7s;
-    -o-transition-duration: .7s;
-    -moz-transition-duration: .7s;
-    transition-duration: .7s;
 }
 
 
@@ -149,3 +145,19 @@
     transform: translate3d(0, 0, 0);
 }
 
+.animate-easy.ng-hide-add,
+.animate-easy.ng-hide-remove{
+    -webkit-transition-duration: .7s;
+    -o-transition-duration: .7s;
+    -moz-transition-duration: .7s;
+    transition-duration: .7s;
+}
+
+
+.animate-quick.ng-hide-add,
+.animate-quick.ng-hide-remove{
+    -webkit-transition-duration: .3s;
+    -o-transition-duration: .3s;
+    -moz-transition-duration: .3s;
+    transition-duration: .3s;
+}

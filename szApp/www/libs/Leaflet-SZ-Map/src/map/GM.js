@@ -247,31 +247,55 @@ L.GM.prototype.setView = function(pos) { //[x, y]
 };
 
 
-L.GM.prototype.clearView = function() {
-    for (var i = this.ppoints.length - 1; i >= 0; i--) {
-        this.ppoints[i].clearView()
-        this.ppoints[i].is_center = false;
-    };
+
+L.GM.prototype.updatePpointsPos = function() {
+    this._map_pp( function(point){ point.updatePos() } )
+    this._fixPConnections()
 };
 
 
-L.GM.prototype.updatePpointsPos = function() {
-    for (var i = this.ppoints.length - 1; i >= 0; i--) {
-        var point = this.ppoints[i];
-        point.updatePos()
-    };
-    this._fixPConnections()
+L.GM.prototype._get_connections = function( point ) {
+    return this.pconnections.filter( function(c){return  point == c.to || point == c.from } )
+};
+
+
+L.GM.prototype._get_neigthbors = function( point ) {
+    point.connections = point.connections || this._get_connections(point);
+    return  point.connections.map(function(c){return c.to == point ? c.from : c.to});
+};
+
+
+L.GM.prototype._compare_pos = function( a, b ){
+    return Math.abs( a - b ) < 2
+}
+
+
+L.GM.prototype._map_pp = function(fn) {
+    for (var i = this.ppoints.length - 1; i >= 0; i--) { fn( this.ppoints[i], this ); }
+};
+
+
+L.GM.prototype.blurAll = function() {
+    this._map_pp( function(point){ point.blur() } )
+};
+
+
+L.GM.prototype.clearView = function() {
+    this._map_pp( function(point){
+        point.clearView();
+        point.is_center = false;
+    } )
 };
 
 
 
 L.GM.prototype.setPPoints = function() {
-    // empty method
+    // empty method, will rewriting in map-directive
 };
 
 
 L.GM.prototype.moveCenter = function() {
-    // empty method
+    // empty method, will rewriting in map-directive
 };
 
 
