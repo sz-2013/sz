@@ -20,12 +20,39 @@ L.GM.prototype.pushPPoint = function(gBox, i, shift) { //x in gamemap, y in game
 };
 
 L.GM.prototype.pushNewPPoint = function(gBox) {
+    //если нет _newPoint или данные о нем не полные - прерываем
     if( !this._newPoint || !this._newPoint.to || !this._newPoint.from ) return
+    //проверяем, что в выбранной клетке может стоять point
+    if( !this._canBeIn_gBox( [this._newPoint.to, this._newPoint.from], gBox ) ) return
     this.pushPPoint( gBox, this._newPoint.i, this._newPoint.shift );
     this.clearView();
     this._newPoint = undefined;
     //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
     //если в ответ придет false - откатываться
+    this.setPPoints()
+};
+
+L.GM.prototype.removePPoint = function(gBox) {
+
+    //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
+    //если в ответ придет false - откатываться
+    this.setPPoints()
+};
+
+
+L.GM.prototype._canBeIn_gBox = function(point, gBox) { //point || neightbors, gBox
+    //проверяем, может ли point находится в данном gBox
+    var pos = gBox.pos;
+    //во-первых, он должен быть свободен от других кружочков
+    if( this.ppoints.filter( function(p){ return pos.compare( p._gBox.pos ) } ).length ) return
+    //теперь проверяем, что по x мы не отошли от соседей больше чем на две клетки
+    var neighbors = Object.prototype.toString.call( point ) === '[object Array]' ? point :
+                                                                                   this._get_neigthbors(point);
+    var n1pos = neighbors[0]._gBox.pos, n2pos = neighbors[1]._gBox.pos;
+    if( !this._compare_pos(n1pos[0], pos[0]) || !this._compare_pos(n2pos[0], pos[0])) return
+    //и то же самое для y
+    if( !this._compare_pos(n1pos[1], pos[1]) || !this._compare_pos(n2pos[1], pos[1])) return
+    return true
 };
 
 L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pre
@@ -88,16 +115,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, thisI, pr
         //если позиция не поменялась - возвращаем none
         if(gp.x == self._gBox.pos[0] && gp.y == self._gBox.pos[1]) return
         var newGbox = gm.getGameBoxbyPos(gp.x, gp.y); //сам объект gameBox
-        //теперь проверяем, можно ли находиться в новом gamebox
-        var pos = newGbox.pos;
-        //во-первых, он должен быть свободен от других кружочков
-        if( gm.ppoints.filter( function(p){ return pos.compare( p._gBox.pos ) } ).length ) return
-        //теперь проверяем, что по x мы не отошли от соседей больше чем на две клетки
-        var neighbors = gm._get_neigthbors(self), n1pos = neighbors[0]._gBox.pos, n2pos = neighbors[1]._gBox.pos;
-        if( !gm._compare_pos(n1pos[0], pos[0]) || !gm._compare_pos(n2pos[0], pos[0])) return
-        //и то же самое для y
-        if( !gm._compare_pos(n1pos[1], pos[1]) || !gm._compare_pos(n2pos[1], pos[1])) return
-        return newGbox
+        return _canBeIn_gBox(self, newGbox) ? newGbox : false
     }
 
     function _dragger(x, y, e){

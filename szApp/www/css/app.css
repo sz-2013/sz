@@ -519,10 +519,11 @@ transition: all 300ms ease-in-out;
 
 #gameMapCont h1{
     position: absolute;
-    width: 100%;
+    width: 20%;
     text-align: center;
     z-index: 100;
     top: 20%;
+    left: 40%;
     font-size: 3em;
     margin: 0;
     text-shadow: 0 0 60px rgba(255,255,255,1) , 0 0 60px rgba(255,255,255,1) , 0 0 60px rgba(255,255,255,1) , 0 0 9px rgba(255,255,255,1) , 0 0 60px rgba(255,255,255,1) , 0 0 60px rgba(255,255,255,1), 0 0 60px rgba(255,255,255,1);

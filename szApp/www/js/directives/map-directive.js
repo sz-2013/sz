@@ -109,10 +109,8 @@ angular.module('map-directive', [])
                         var gBox = tile._gBox;
 
                         //в любом случае сбрасывает ppcontrol
-                        $scope.map.gm.pushNewPPoint(gBox)
                         $scope.$apply(function(){
-                            _clearPPControl();
-                            _clearBtn();
+                            $scope.map.gm.pushNewPPoint(gBox)
                         })
 
                         if( gBox.owner == 'nobody' ) return
@@ -137,9 +135,9 @@ angular.module('map-directive', [])
                         var point =  $scope.map.gm.pathPoint(i, $scope.path);
                     };
                     _initClick();
-                    $scope.map.gm.setView($scope.center.pos)
-                    $scope.$emit('setPPoints', $scope.map.gm.ppoints)
-                    $scope.$emit('setGameMap', true)
+                    $scope.map.gm.setView($scope.center.pos);
+                    $scope.$emit('setPPoints', $scope.map.gm.ppoints);
+                    $scope.$emit('setGameMap', true);
                 }
 
                 function _setCenter(){
@@ -156,33 +154,20 @@ angular.module('map-directive', [])
                     $scope.map.gm._newPoint = undefined;
                 }
 
-                var addBtn;
-                var removeBtn;
-                function _clearBtn(){
-                    //Это все не очень красивая схема получается
-                    function _clear(btn){
-                        if(!btn) return
-                        $scope.$emit(btn.getAttribute('sz-ico-reset-name'))
-                    }
-                    _clear(addBtn)
-                    _clear(removeBtn)
-                }
+                $scope.$on('clearPPControl', function(e){_clearPPControl() })
 
                 $scope.$on('ppcontrol_add', function(e, elem){
                     var val = $scope.map.gm._inAction;
-                    addBtn = elem;
-                    console.log(addBtn)
                     _clearPPControl()
-                    if(val === true) return _clearBtn()
+                    if(val === true) return
                     $scope.showPPvalue = true;
                     $scope.map.gm._inAction = true;
                 });
 
                 $scope.$on('ppcontrol_remove', function(e, elem){
                     var val = $scope.map.gm._inAction;
-                    removeBtn = elem;
                     _clearPPControl()
-                    if(val === false) return _clearBtn()
+                    if(val === false) return
                     $scope.map.gm._inAction = false;
                 })
 

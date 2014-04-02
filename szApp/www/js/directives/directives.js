@@ -266,12 +266,5 @@ angular.module('sz.client.directives', [])
                 toggleClass( fa, newCls );
                 toggleClass( elem, 'active' );
             });
-
-            scope.$watch(attrs.szIcoReset, function(val){
-                if( val===undefined ) return
-                removeClass( fa, newCls );
-                removeClass( elem, 'active' );
-                addClass( fa, oldCls );
-            })
         };
     })

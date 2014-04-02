@@ -260,7 +260,7 @@ L.GM.prototype._get_connections = function( point ) {
 
 
 L.GM.prototype._get_neigthbors = function( point ) {
-    point.connections = point.connections || this._get_connections(point);
+    point.connections = this._get_connections(point);
     return  point.connections.map(function(c){return c.to == point ? c.from : c.to});
 };
 

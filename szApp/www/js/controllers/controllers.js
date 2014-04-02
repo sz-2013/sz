@@ -244,11 +244,12 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
 
     $scope.$on('setBodyScroll', function(e, val){$scope.bodyScroll = val;})
 
-    $scope.map_setHideGameMapShowPath = function(){$scope.$broadcast('setGameMap', false) }
+    $scope.map_setHideGameMapShowPath = function(){
+        $scope.$broadcast('setGameMap', false);
+        $scope.$broadcast('clearPPControl')}
     $scope.map_runPath = function(){$scope.$broadcast('runPath', true) }
-    $scope.map_ppcontrol_add = function($event){console.log($event.currentTarget); $scope.$broadcast('ppcontrol_add', $event.currentTarget) }
+    $scope.map_ppcontrol_add = function($event){$scope.$broadcast('ppcontrol_add', $event.currentTarget) }
     $scope.map_ppcontrol_remove = function($event){$scope.$broadcast('ppcontrol_remove', $event.currentTarget) }
-    $scope.$on('setPpControlReset', function(e){$scope.ppControlReset = !$scope.ppControlReset; })
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
