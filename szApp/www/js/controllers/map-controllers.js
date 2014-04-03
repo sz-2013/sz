@@ -4,8 +4,20 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.showGameMap = false;
     $scope.showGamePath = false;
     $scope.gameMap = {}
-    $scope.$on('setActivePoint', function(e, gBox){$scope.activePoint = gBox; })
-    $scope.$on('setPPoints',function(e, ppoints){$scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox}); })
+    $scope.$on('getGBoxFromApi', function(e, x, y, fnName){
+        var params = $scope.coordinates;
+        params.x = x;
+        params.y = y;
+        gameMapService.getTile(params, function(r){
+            $scope.$broadcast(fnName, r)
+        })
+    })
+    $scope.$on('setActivePoint', function(e, pos){
+        $scope.activePoint = pos;
+    })
+    $scope.$on('setPPoints',function(e, ppoints){//set path points
+        $scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox});
+    });
     $scope.$on('setGameMap', function(e, val, nav){
         var t = 500;
         if(val){
@@ -30,10 +42,19 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         return getGameBox(place.place_gamemap_position, $scope.gameMap.points)
     }
     function _getMap(){
-        $rootScope.showLoader = true;
+        $rootScope.showLoader = false;
         $scope.showGameMap = true;
         var params = $scope.coordinates;
-        gameMapService.getMap(params, function(r){
+        gameMapService.getPath(params, function(r){          //r - {path: [[x, y], ...], currentBox: place_serializer.data, prevBox: place_serializer.data}
+            /*$scope.gameMap.path = r.path.map(function(pos){
+                return getGameBox(pos, $scope.gameMap.points) //gameBox.js function
+            });*/
+            $scope.gameMap.pathPositions = r.path
+            $scope.activePoint = r.current_box.place_gamemap_position; //[x, y]
+            //сначала строим путь на карте, а потом уже отображаем пафпревью
+            $rootScope.showLoader = false;
+        });
+   /*     gameMapService.getMap(params, function(r){
             $scope.gameMap.points = r;          //[{place_serializer.data}, {}]
             gameMapService.getPath(params, function(r){          //r - {path: [[x, y], ...], currentBox: place_serializer.data, prevBox: place_serializer.data}
                 $scope.gameMap.curr = _getGameBox(r.current_box);
@@ -45,7 +66,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
                 //сначала строим путь на карте, а потом уже отображаем пафпревью
                 $rootScope.showLoader = false;
             });
-        });
+        });*/
     }
     function _explore_r(r){
         var val = parseInt(r.places_explored, 10);

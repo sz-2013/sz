@@ -35,9 +35,11 @@ urlpatterns = patterns(
     #     messages.MessagePreviewInstance.as_view(),
     #     name='message-previews-detail'),
 
-    url(r'^gamemap/?$', places.GameMapRoot.as_view(), name='gamemap'),
+    # url(r'^gamemap/?$', places.GameMapRoot.as_view(), name='gamemap'),
     url(r'^gamemap/path/?$',
         places.GameMapPath.as_view(), name='gamemap-path'),
+    url(r'^gamemap/tile/?$',
+        places.GameMapTile.as_view(), name='gamemap-tile'),
 
     url(r'^places/newsfeed/?$',
         places.PlaceRootNews.as_view(), name='place-news'),

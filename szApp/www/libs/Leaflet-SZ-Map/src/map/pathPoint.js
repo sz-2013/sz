@@ -63,10 +63,10 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
     };
     var viewOpt = {
         'stroke'       : options.stroke,
-        'stroke-width' : options['stroke-width']*1.2,
+        'stroke-width' : options['stroke-width']+1,
         'fill'         : options.fill,
         'fill-opacity' : 1,
-        'r'            : options.r*1.1,
+        'r'            : options.r*1.2,
     };
 
     function _showhideConn(self, show, attr){
@@ -91,7 +91,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
         var gp = gm.layer2gm( self.attr('cx'), self.attr('cy') ); //позиция {x, y} gamebox на карте, в которой теперь находится кружочек
         //если позиция не поменялась - возвращаем none
         if(gp.x == self._gBox.pos[0] && gp.y == self._gBox.pos[1]) return
-        var newGbox = gm.getGameBoxbyPos(gp.x, gp.y); //сам объект gameBox
+        var newGbox = gm.findGbox([gp.x, gp.y]); //сам объект gameBox
         return gm._canBeIn_gBox(self, newGbox) ? newGbox : false
     }
 
@@ -212,11 +212,12 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
 }
 
 
-L.GM.prototype.pathPoint = function(i, path){
+L.GM.prototype.createPathPoint = function( i ){
     var pre = this.ppoints[i-1];
+    var gBox = this.findGbox( this.pathPositions[i] );
     var point = this._pathPoint({
-        gp: path[i], //gBox
-        is_end: i === path.length - 1,
+        gp: gBox, //gBox
+        is_end: i === this.path.length - 1,
         is_start: i === 0,
         pre: pre
     });

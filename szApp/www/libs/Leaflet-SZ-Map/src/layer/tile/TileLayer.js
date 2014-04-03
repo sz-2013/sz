@@ -38,14 +38,13 @@ L.TileLayer = L.GridLayer.extend({
 		}
 	},
 
-	createTile: function (gBox) {
-		if(gBox.pos[0] < 0 || gBox.pos[1] < 0) return
+	createTile: function () {
+		//if(gBox.pos[0] < 0 || gBox.pos[1] < 0) return
 		var tile = document.createElement('div');
 		tile.className = 'gmtile'
-		tile.innerHTML = '<div class="gamemap-item ' + gBox.owner + '">' +
-							'<h3>' + gBox.name + '</h3>' +
-							'<img src="' + gBox.castle.img + '" >' +
-			             '</div>'
+/*		tile.innerHTML = '<div class="gamemap-item nobody">' +
+							'<h3>Empty Box</h3>' +
+			             '</div>'*/
 		return tile;
 	},
 
@@ -89,6 +88,7 @@ L.TileLayer = L.GridLayer.extend({
 		}
 	}
 });
+
 
 L.tileLayer = function (url, options) {
 	return new L.TileLayer(url, options);

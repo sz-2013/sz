@@ -21,14 +21,16 @@ class FeedService:
         return dict(count=count, items=items, params=params.get_api_params())
 
     def _make_place_distance_item(self, place, params):
-        latitude, longitude = parameters.get_position_from_dict(
-            params.get_api_params())
-        distance = gis_core.distance(
-            longitude, latitude, place.longitude(), place.latitude())
-        azimuth = gis_core.azimuth(
-            longitude, latitude, place.longitude(), place.latitude())
-        item = dict(place=place, distance=distance, azimuth=azimuth)
-        return item
+        if place.position:
+            latitude, longitude = parameters.get_position_from_dict(
+                params.get_api_params())
+            args = [longitude, latitude, place.longitude(), place.latitude()]
+            distance = gis_core.distance(*args)
+            azimuth = gis_core.azimuth(*args)
+        else:
+            distance = None
+            azimuth = None
+        return dict(place=place, distance=distance, azimuth=azimuth)
 
     def _get_max_id(self):
         return models.Message.objects.aggregate(max_id=Max('id'))["max_id"]
@@ -233,24 +235,24 @@ class GameMapService(FeedService):
                     p.update_gamemap(x + 1, y + 1)
         return
 
-    def get_gamemap(self, user, **kwargs):
-        """Return a square map of the city
+    # def get_gamemap(self, user, **kwargs):
+    #     """Return a square map of the city
 
-        Args:
-            **kwargs:
-                latitude - the point latitude
-                longitude  - the point longitude
-                user - <User>, who did it request
+    #     Args:
+    #         **kwargs:
+    #             latitude - the point latitude
+    #             longitude  - the point longitude
+    #             user - <User>, who did it request
 
-        Return:
-            list of places with distance
-        """
-        params = parameters.PlaceSearchParametersFactory.create(
-            kwargs, self.city_service)
-        places_list = filter(
-            lambda p: p.gamemap_position,
-            queries.search_places(**params.get_db_params()))
-        return self._make_distance_items_list(params, places_list)
+    #     Return:
+    #         list of places with distance
+    #     """
+    #     params = parameters.PlaceSearchParametersFactory.create(
+    #         kwargs, self.city_service)
+    #     places_list = filter(
+    #         lambda p: p.gamemap_position,
+    #         queries.search_places(**params.get_db_params()))
+    #     return self._make_distance_items_list(params, places_list)
 
     def get_gamemap_path(self, user, **kwargs):
         """Return a path between last and current user position
@@ -298,17 +300,26 @@ class GameMapService(FeedService):
         places_list = filter(
             lambda p: p.gamemap_position,
             queries.search_places(**params.get_db_params()))
-        find_p = lambda p, pos: p.gamemap_position and \
-            p.get_gamemap_position() == pos
-        _prev = []  # filter(lambda p: find_p(p, [9, 10]), places_list)
-        _curr = []  # filter(lambda p: find_p(p, [13, 10]), places_list)
-        curr = _curr[0] if _curr else places_list[0]
-        prev = _prev[0] if _prev else random.choice(places_list)
+        curr = places_list[0]
+        prev = random.choice(places_list)
         return dict(
             path=_get_path(prev, curr),
             prev_box=self._make_place_distance_item(prev, params),
             current_box=self._make_place_distance_item(curr, params),
         )
+
+    def get_gamemap_tile(self, user, **kwargs):
+        """Returns needed <Place> object be gamemap_position
+
+        Kwargs:
+            - x, y - gamemap_position
+            - latitude, longitude - user current position
+        """
+        params = parameters.PlaceSearchParametersFactory.create(
+            kwargs, self.city_service)
+        place = queries.get_place(
+            kwargs.get('x'), kwargs.get('y'), **params.get_db_params())
+        return self._make_place_distance_item(place, params)
 
 
 class MessageService(FeedService):

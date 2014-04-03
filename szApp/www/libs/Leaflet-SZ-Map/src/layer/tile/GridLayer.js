@@ -150,7 +150,6 @@ L.GridLayer = L.Layer.extend({
 	},
 
 	_update: function () {
-
 		if (!this._map) { return; }
 
 		var bounds = this._map.getPixelBounds(),
@@ -208,7 +207,7 @@ L.GridLayer = L.Layer.extend({
 
 		for (i = 0; i < tilesToLoad; i++) {
 			var crds  = queue[i];
-			if( this._map.gm.canBeBox(crds) ) this._addTile(crds, fragment);
+			/*if( this._map.gm.canBeBox(crds) )*/ this._addTile(crds, fragment);
 		}
 		this._tileContainer.appendChild(fragment);
 	},
@@ -292,33 +291,25 @@ L.GridLayer = L.Layer.extend({
 	},
 
 	_addTile: function (coords, container) {
-		var tilePos = this._getTilePos(coords),
-			gBox = this._map.gm.getGameBox(coords); //get_gm - gm.js fn
+		var tilePos = this._getTilePos(coords);
 		// wrap tile coords if necessary (depending on CRS)
 		this._wrapCoords(coords);
 
-		var tile = this.createTile(gBox);
-
+		var tile = this.createTile();
 		this._initTile(tile);
-
-		// if createTile is defined with a second argument ("done" callback),
-		// we know that tile is async and will be ready later; otherwise
-		if (this.createTile.length < 2) {
-			// mark tile as ready, but delay one frame for opacity animation to happen
-			setTimeout(L.bind(this._tileReady, this, null, tile), 0);
-		}
 
 		// we prefer top/left over translate3d so that we don't create a HW-accelerated layer from each tile
 		// which is slow, and it also fixes gaps between tiles in Safari
 		L.DomUtil.setPosition(tile, tilePos, true);
 
 		// save tile in cache
-		tile._gBox = gBox;
-		tile._centerCoords = this._map.gm.gm2latlng( gBox.pos )
 		var key = this._tileCoordsToKey(coords)
+		tile._coords = coords;
+		tile._key = key;
 		this._tiles[key] = tile;
 
 		container.appendChild(tile);
+		this._map.gm.getGameBox(coords)
 		this.fire('tileloadstart', {tile: tile});
 	},
 
@@ -351,7 +342,7 @@ L.GridLayer = L.Layer.extend({
 				.subtract(this._map.getPixelOrigin());
 	},
 
-	_wrapCoords: function (coords) {		
+	_wrapCoords: function (coords) {
 		coords.x = this._wrapLng ? L.Util.wrapNum(coords.x, this._wrapLng) : coords.x;
 		coords.y = this._wrapLat ? L.Util.wrapNum(coords.y, this._wrapLat) : coords.y;
 	},
@@ -408,6 +399,18 @@ L.GridLayer = L.Layer.extend({
 		clearTimeout(this._clearBgBufferTimer);
 	}
 });
+
+L.GridLayer.prototype.markReady = function(tile, readyfn) {
+	this._tiles[tile._key]._isready = true
+	var unready = new Array;
+	var tiles = this._tiles
+	for(key in tiles){
+        if(tiles.hasOwnProperty(key)){
+            if( !tiles[key]._isready ) unready.push( tiles[key] )
+        }
+    }
+    if(!unready.length) readyfn()
+};
 
 L.gridLayer = function (options) {
 	return new L.GridLayer(options);

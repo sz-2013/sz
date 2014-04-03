@@ -42,7 +42,8 @@ simpleSlider.prototype.spreadNav = function() {
         item.style['-webkit-transform'] = rotate;
         item.style['transform'] = rotate;
     };
-    (!this._isShowNav ? addClass : removeClass)(this.elem, 'spreadNav')
+    var fn = !this._isShowNav ? addClass : removeClass;
+    fn(this.elem, 'spreadNav')
     this._isShowNav = !this._isShowNav;
 };
 
@@ -89,7 +90,8 @@ simpleSlider.prototype._initDrag = function() {
         self._inDrag = true;
         self.cx = getMouse( e ).x
         names.forEach( function( name ){self[name].cx = self[name].offsetLeft })
-        self.pressTimer = window.setTimeout(function(){self.longPressFn()}, self.longPressTm)
+        if(!self._isShowNav)
+            self.pressTimer = window.setTimeout(function(){self.longPressFn()}, self.longPressTm)
     }
 
     function fnMove( e ){

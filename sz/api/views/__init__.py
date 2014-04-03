@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from sz.api import response as sz_api_response
 from sz.core import services, models
 from sz.core.services import morphology, gis
-from sz.settings import LEBOWSKI_MODE_TEST
+# from sz.settings import LEBOWSKI_MODE_TEST
 
 # if LEBOWSKI_MODE_TEST:
 #     city_service = gis.SZCityService()
@@ -95,8 +95,9 @@ class ApiRoot(SzApiView):
                 #    'message-search', request=request),
             },
             'gamemap': {
-                'map': reverse('gamemap', request=request),
+                # 'map': reverse('gamemap', request=request),
                 'path': reverse('gamemap-path', request=request),
+                'tile': reverse('gamemap-tile', request=request),
             },
             # 'city-nearest': reverse('city-nearest', request=request),
         })

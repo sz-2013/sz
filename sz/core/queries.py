@@ -7,21 +7,18 @@ from django.contrib.gis.measure import D
 from django.utils import timezone
 from sz.core import models
 from sz.core.services.parameters import names as params_names
-from sz.settings import LEBOWSKI_MODE_TEST
-from sz import mode_test
 
 
 def search_places(**kwargs):
-    if not LEBOWSKI_MODE_TEST:
-        latitude = kwargs.get(params_names.LATITUDE)
-        longitude = kwargs.get(params_names.LONGITUDE)
-    else:
-        latitude = mode_test.STEP*mode_test.COUNT/2
-        longitude = mode_test.STEP*mode_test.COUNT/2
+    latitude = kwargs.get(params_names.LATITUDE)
+    longitude = kwargs.get(params_names.LONGITUDE)
     query = kwargs.get(params_names.QUERY)
     limit = kwargs.get(params_names.LIMIT)
     current_position = fromstr("POINT(%s %s)" % (longitude, latitude))
     radius = kwargs.get(params_names.RADIUS)
+    #@TODO: не забыть раскоментить следующие две строки и закоментить третью,
+    # когда заработает движок
+    #
     # filtered_places = models.Place.objects.annotate(
     #    messages_count=dj_models.Count('message__id'))\
     #     .order_by('-messages_count')
@@ -29,8 +26,7 @@ def search_places(**kwargs):
     filtered_places = models.Place.objects.all()
     if radius == 0 or radius is None:
         city_id = kwargs.get(params_names.CITY_ID)
-        if not LEBOWSKI_MODE_TEST:
-            assert city_id, 'city_id is required'
+        assert city_id, 'city_id is required'
         filtered_places = filtered_places.filter(city_id=city_id)
     else:
         distance_kwargs = {'m': '%i' % radius}
@@ -43,6 +39,12 @@ def search_places(**kwargs):
     if limit:
         filtered_places = filtered_places[:limit]
     return filtered_places
+
+
+def get_place(x, y, **kwargs):
+    city_id = kwargs.get(params_names.CITY_ID)
+    assert city_id, 'city_id is required'
+    return models.Place.objects.get_by_gamemap_pos(x, y, city_id)
 
 
 def places_news_feed(**kwargs):
@@ -73,12 +75,8 @@ def places_news_feed(**kwargs):
     if max_id is not None:
         filtered_places = filtered_places.filter(message__id__lte=max_id)
     if radius == 0 or radius is None:
-        # TODO: определять город по координатам
-        #^вроде сделала(ну я просто взяла уже готовый сервис.
-        #Почему дима это не сделал-не понятно)
         city_id = kwargs.get(params_names.CITY_ID)
-        if not LEBOWSKI_MODE_TEST:
-            assert city_id, 'city_id is required'
+        assert city_id, 'city_id is required'
         filtered_places = filtered_places.filter(city_id=city_id)
     else:
         distance_kwargs = {'m': '%i' % radius}
@@ -141,10 +139,8 @@ def search_messages(**kwargs):
 
     # creating the query
     if radius == 0 or radius is None:
-        # TODO: определять город по координатам
         city_id = kwargs.get(params_names.CITY_ID)
-        if not LEBOWSKI_MODE_TEST:
-            assert city_id, 'city_id is required'
+        assert city_id, 'city_id is required'
         filtered_messages = models.Message.objects.filter(
             place__city_id=city_id)
     else:

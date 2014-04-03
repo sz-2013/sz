@@ -75,31 +75,10 @@ L.Draggable = L.Evented.extend({
 			this._moved = true;
 			return;
 		}
-		var bounds = this._getMapPixelBounds(),
-			tileSize = 100,
-		    tileBounds = L.bounds(
-			bounds.min.divideBy(tileSize).floor(),
-			bounds.max.divideBy(tileSize).floor());
-
-		var canBL = this._canBeBox( tileBounds.getBottomLeft() ),
-			canTL = this._canBeBox( tileBounds.getTopLeft() ),
-			canTR = this._canBeBox( tileBounds.getTopRight() ), 
-			canBR = this._canBeBox( tileBounds.getBottomRight() );
 
 		var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
 		    newPoint = new L.Point(first.clientX, first.clientY),
 		    offset = newPoint.subtract(this._startPoint);
-
-		if( offset.x < 0 ){ // right - check that BR and TR is true
-			if( !(canBR||canTR) ) offset.x = 0; //cant to right
-		} else{ //left - check that BL and TL is true
-			if( !(canBL||canTL) ) offset.x = 0; //cant to left
-		}
-		if( offset.y < 0 ){// down - check that BL and BR is true
-			if( !(canBL||canBR) ) offset.y = 0; //cant to down
-		}else{//up - check that TL and TR is true
-			if( !(canTL||canTR) ) offset.y = 0; //cant to up
-		}
 
 		if (!offset.x && !offset.y) { return; }
 

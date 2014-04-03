@@ -6,20 +6,24 @@ L.GM = L.Class.extend({
     initialize: function (options) {
         options = L.setOptions(this, options);
         this.zero = this.options.zero
-        this.points = options.points
+        this.gboxes = new Array;
+        this.path = new Array;
+        this.ppoints = new Array;
+        this.pathPosLen = 0;
+        /*this.points = options.points
         var points_positions = this.points_positions = this.points.map(function(el){ return  el.place_gamemap_position});
         function _getMax(num){
             var list = points_positions.map( function(pos){return pos[num]} );
             return Math.max.apply(null, list)
         }
-        this.posMax = this.gm2project(_getMax(0), _getMax(1))
+        this.posMax = this.gm2project(_getMax(0), _getMax(1))*/
     },
 
-    canBeBox: function (point){ //(Point)
+    /*canBeBox: function (point){ //(Point)
         if(point.x < this.zero.x || point.y > this.zero.y) return false
         if(point.x > this.posMax.x || point.y < this.posMax.y) return false
         return true
-    },
+    },*/
 
     getColor: function (isOpacity){
         function _rand(){return Math.floor(Math.random() * 256)}
@@ -29,30 +33,67 @@ L.GM = L.Class.extend({
 
     getGameBox: function (point){
         var pos = this.project2gm(point);
-        return this.getGameBoxbyPos(pos.x, pos.y)
+        this.getGameBoxFromApi(pos.x, pos.y)
     },
 
-    getGameBoxbyPos: function (x, y){
-        return getGameBox([x, y], this.points) //gameBox.js function
+    findGbox: function (pos){
+        return this.gboxes.filter(function(gBox){return gBox.pos.compare( pos )})[0]
     },
 
     getTile: function (x, y){ //game x, y; -> tile
         var tiles = this._map.tileLayer._tiles;
+        var proj = this.gm2project( x, y )
         for(key in tiles){
             if(tiles.hasOwnProperty(key)){
-                var pos = tiles[key]._gBox.pos;
-                if(pos[0] == x && pos[1] == y) return tiles[key]
+                var coords = tiles[key]._coords;
+                if(proj.x == coords.x && proj.y == coords.y) return tiles[key]
             }
         }
+    },
+
+    drawTile: function(place_data, gBox){
+        //функция вызывается после получения данных от апи
+        //или из getGameBox
+        if(!gBox){
+            place_data.pos = place_data.place_gamemap_position;
+            var gBox = new this.gameBox( place_data );
+            this.gboxes.push(gBox)
+        }
+        var tile = this.getTile( gBox.pos[0], gBox.pos[1] )
+        //рисуем внутрености у tile
+        if( tile ){
+            tile.innerHTML = '<div class="gamemap-item hideitem ' + gBox.owner + '">' +
+                                '<h3>' + gBox.name + '</h3>' +
+                                '<img src="' + (gBox.castle ? gBox.castle.img : '') + '" >' +
+                             '</div>'
+            setTimeout(function(){L.DomUtil.removeClass(tile.querySelector('.gamemap-item'), 'hideitem')}, 100);
+            this._map.tileLayer.markReady(tile, this.gmReady)
+        }
+        if( this.pathPositions &&
+            this.pathPositions.filter( function(p){return p.compare( gBox.pos )} ).length && //если есть  такой элемент в pathPosition
+            !this.path.filter( function(b){return b.pos.compare( gBox.pos )} ).length){ //и еще не добавлен в path
+            //добавляем gBox в path
+            this.path.push( gBox )
+            //если path полностью наполнился - те его длина сравнялась с pathPositions
+            //начинаем отрисовывать path
+            if( this.path.length === this.pathPositions.length ) this.createPath()
+        }
+    },
+
+    pathPositions2ppoints: function( pathPositions ){
+        this.pathPositions = pathPositions;
+        for (var i = pathPositions.length - 1; i >= 0; i--) {
+            this.getGameBoxFromApi( pathPositions[i][0], pathPositions[i][1] )
+        };
     },
 
     _getTileSize: function(){
         return this._map.tileLayer._getTileSize()
     },
 
-    getRandomGP: function (){
+ /*   getRandomGP: function (){
         return this.points_positions[Math.floor(Math.random() * this.points_positions.length)]
-    },
+    },*/
 
     generatePath: function(start){
         var start = start || this.getRandomGP(), end = this.getRandomGP();
@@ -133,6 +174,30 @@ L.GM = L.Class.extend({
     }
 
 });
+
+
+L.GM.prototype.gameBox = function(options){
+    var empty_name = 'Empty box';
+    this.name = options.name || options.place_name || empty_name,
+    this.pos = options.pos;
+
+    var ownerArr = ['neutral', 'negative', 'positive', 'nobody']
+    if(this.name != empty_name){
+        this.owner = ownerArr[Math.floor(Math.random()*ownerArr.length)]
+        if( Math.floor(Math.random()*10) == 1) this.owner = 'own'
+    } else { this.owner = 'nobody' }
+    this.castle = {
+        img: this.owner !== 'nobody' ? 'img/' + Math.floor(Math.random()*10 + 1) + '.png' : ''
+    }
+}
+
+
+L.GM.prototype.gameBox.prototype.toString = function() {
+    //return this.name
+    return [this.name, '<br>',
+            'x: ', this.pos[0], ';',
+            'y: ', this.pos[1]].join('')
+};
 
 
 L.GM.prototype.pconnections = new Array;
@@ -266,8 +331,7 @@ L.GM.prototype._updatePConnections = function(){
 L.GM.prototype.setView = function(pos) { //[x, y]
     this.clearView();
     var points = this.ppoints.filter(function(p){
-        var _pos = p._gBox.pos;
-        return pos[0] == _pos[0] && pos[1] == _pos[1]
+        return  p._gBox.pos.compare(pos)
     });
     points.forEach(function(p){p.setView()});
 };
@@ -381,7 +445,22 @@ L.GM.prototype.moveCenter = function() {
 };
 
 
-L.gm = function (options) {
-    return new L.GM(options);
+L.GM.prototype.getGameBoxFromApi = function (x, y){
+    // empty method, will rewriting in map-directive
+},
+
+
+L.GM.prototype.gmReady = function() {
+    // empty method, will rewriting in map-directive
+};
+
+
+L.GM.prototype.createPath = function() {
+    // empty method, will rewriting in map-directive
+};
+
+
+L.gm = function () {
+    return new L.GM();
 };
 

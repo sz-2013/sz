@@ -39,8 +39,9 @@ szServices.factory('userService', function($http,$resource){
 
 szServices.factory('gameMapService', function($resource){
     return $resource(apiIp + '/api/gamemap/:cntrl', {}, {
-        getMap: { method:'GET' , isArray:true },
-        getPath: { method:'GET' , isArray:false, params: {cntrl: 'path'} }
+        /*getMap: { method:'GET' , isArray:true },*/
+        getPath: { method:'GET' , isArray:false, params: {cntrl: 'path'} },
+        getTile: { method:'GET' , isArray:false, params: {cntrl: 'tile'} },
     });
 });
 

@@ -152,18 +152,18 @@ class PlaceInstanceMessages(SzApiView):
         # return sz_api_response(response_builder.build(place, messages))
 
 
-class GameMapRoot(PlaceRoot):
-    """For example,[map
-    (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082).
-    (I need position for a distance calculate)"""
-    form = forms.GameMapRequestForm
+# class GameMapRoot(PlaceRoot):
+#     """For example,[map
+#     (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082).
+#     (I need position for a distance calculate)"""
+#     form = forms.GameMapRequestForm
 
-    def get(self, request, format=None):
-        params = self.validate_req_params(request.QUERY_PARAMS)
-        user = request.user
-        gamemap = gamemap_service.get_gamemap(user, **params)
-        data = map(lambda item: self._serialize_item(item, user), gamemap)
-        return sz_api_response(data)
+#     def get(self, request, format=None):
+#         params = self.validate_req_params(request.QUERY_PARAMS)
+#         user = request.user
+#         gamemap = gamemap_service.get_gamemap(user, **params)
+#         data = map(lambda item: self._serialize_item(item, user), gamemap)
+#         return sz_api_response(data)
 
 
 class GameMapPath(PlaceRoot):
@@ -180,4 +180,27 @@ class GameMapPath(PlaceRoot):
             current_box=self._serialize_item(gamemap.get('current_box'), user),
             path=gamemap.get('path')
         )
+        return sz_api_response(data)
+
+
+class GameMapTile(PlaceRoot):
+    """For example,[new tile
+    (1, 1)](?x=1&y=1&latitude=50.2616113&longitude=127.5266082)."""
+    form = forms.GameMapTileRequestForm
+
+    def get(self, request, format=None):
+        """
+        In request:
+            latitude, longitude - user current position
+            x, y - needed tile gamemap position
+        """
+        params = self.validate_req_params(request.QUERY_PARAMS)
+        user = request.user
+        # return {<place>, distance}
+        tile = gamemap_service.get_gamemap_tile(user, **params)
+        data = self._serialize_item(tile, user)
+        # Если у объекта нет gamemap_position значит это шаблон,
+        # но без gamemap_position я не смогу найти его на карте
+        data['place_gamemap_position'] = data['place_gamemap_position'] or \
+            [params['x'], params['y']]
         return sz_api_response(data)

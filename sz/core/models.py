@@ -27,6 +27,7 @@ from sz.core.utils import diff_lists
 
 STANDART_ROLE_USER_NAME = "player"
 STANDART_ROLE_PLACE_NAME = "shop"
+EMPTY_ROLE_PLACE_NAME = "empty"
 ACTIVATION_KEY_PATTERN = re.compile('^[a-f0-9]{32}$')
 
 """Static clases"""
@@ -49,6 +50,7 @@ ROLE_USER_CHOICES = (
 
 ROLE_PLACE_CHOICES = (
     ("shop", "SHOP"),
+    ("empty", "EMPTY PLACE"),
 )
 
 
@@ -461,13 +463,29 @@ class RegistrationProfile(models.Model):
 
 
 class PlaceManager(models.GeoManager):
-    pass
+    def get_by_gamemap_pos(self, x, y, city_id):
+        """Возвращает либо нужное место либо пустую балванку,
+        чтобы на карте оно отрисовалось как "Empty place"
+        """
+        empty_params = dict(
+            city_id=city_id, role=RolePlace.objects.get_or_create(
+                name=EMPTY_ROLE_PLACE_NAME)[0])
+        places = self.filter(
+            city_id=city_id, gamemap_position="%s,%s" % (x, y)) or \
+            self.filter(**empty_params)
+        if places:
+            return places[0]
+        return self.create(**empty_params)
 
 
 class Place(models.Model):
     #name&position - уникальный индификатор
-    name = models.CharField(max_length=128, verbose_name=u"название")
-    position = models.PointField(verbose_name=u"координаты")
+    name = models.CharField(max_length=128, verbose_name=u"название",
+                            blank=True, null=True)
+    # если имя - пустое, те место явлется просто болванкой,
+    # то позиция может быть пустой
+    position = models.PointField(
+        verbose_name=u"координаты", blank=True, null=True)
     objects = PlaceManager()
 
     city_id = models.IntegerField(
@@ -517,10 +535,10 @@ class Place(models.Model):
         verbose_name=u"суффикс (расширение) пиктограммы категории в 4sq")
 
     def longitude(self):
-        return self.position.x
+        return self.position and self.position.x
 
     def latitude(self):
-        return self.position.y
+        return self.position and self.position.y
 
     def foursquare_details_url(self):
         return "https://foursquare.com/v/%s" % self.fsq_id
@@ -533,9 +551,8 @@ class Place(models.Model):
             self.message_set.order_by('-date')[0].date or None
 
     def get_gamemap_position(self):
-        if not self.gamemap_position:
-            return None
-        return map(lambda pos: int(pos), self.gamemap_position.split(','))
+        return self.gamemap_position and map(
+            lambda pos: int(pos), self.gamemap_position.split(','))
 
     # def get_fake_owner_data(self):
     #     return [self.owner.id, 0.0] if self.owner else []
@@ -600,9 +617,21 @@ class Place(models.Model):
         ordering = ("name",)
 
     def save(self, *args, **kwargs):
+        def _get_role(name):
+            return RolePlace.objects.get_or_create(name=name)[0]
+
         if not self.__dict__.get('role_id'):
-            self.role, is_create = RolePlace.objects.get_or_create(
-                name=STANDART_ROLE_PLACE_NAME)
+            self.role = _get_role(STANDART_ROLE_PLACE_NAME)
+        empty_role = _get_role(EMPTY_ROLE_PLACE_NAME)
+        if self.__dict__.get('role_id') != empty_role.id:
+            if not self.position:
+                raise ValueError('Position is required')
+            if not self.name:
+                raise ValueError('Position is required')
+        else:
+            if Place.objects.filter(city_id=self.city_id, role=empty_role):
+                raise ValueError(
+                    'City %s arleady have empty place template' % self.city_id)
         super(Place, self).save(*args, **kwargs)
 
 

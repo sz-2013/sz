@@ -664,18 +664,17 @@ L.map = function (id, options) {
 };
 
 
-L.szMap = function(id, points, center){ //id, [{name:NAME, pos:[x, y]}, ..], [x, y]
+L.szMap = function(id, center){ //id, [x, y]
 	var map = L.map(id);
     map.tileLayer = L.tileLayer('', {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
-	map.gm = L.gm({points:points});
+	map.gm = L.gm();
 	map.gm._map = map;
-	map.dragging._draggable._getMapPixelBounds = function(){
+	/*map.dragging._draggable._getMapPixelBounds = function(){
 		return map.getPixelBounds();
 	}
 	map.dragging._draggable._canBeBox = function(p){
 		return map.gm.canBeBox(p)
-	}
-	var center = center || map.gm.getRandomGP();
+	}*/
     map.setView( map.gm.gm2latlng( center ) );
     map.getRenderer();
     return map

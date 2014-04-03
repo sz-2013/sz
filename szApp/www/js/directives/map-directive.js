@@ -3,8 +3,8 @@ angular.module('map-directive', [])
         return {
             scope: {
                 isshow: '=isshow',
-                ppoints: '=ppoints',
-                center: '=center'
+                ppoints: '=ppoints', //[gBox, gBox]
+                center: '=center', //[x, y]
             },
             restrict: 'E',
             template:
@@ -29,7 +29,7 @@ angular.module('map-directive', [])
                 var startLabel = 'mapbox-start-label';
                 var endLabel = 'mapbox-end-label';
                 simpleSlider.prototype._update_active_el = function() {
-                    $scope.$emit('setActivePoint', this.active._gBox)
+                    $scope.$emit('setActivePoint', this.active._gBox.pos)
                 };
 
                 $scope.slider = new simpleSlider( element[0], $scope )
@@ -51,22 +51,23 @@ angular.module('map-directive', [])
                         el._gBox = gBox;
                         $scope.slider.update( el, gBox )
                     });
-                    updateCenter(center)
+                    updateCenter()
                 }
 
-                function updateCenter(gBox){
-                    if( gBox.pos.compare($scope.slider.active._gBox) ) return
+                function updateCenter(){
+                    var pos = $scope.center;
+                    if( pos.compare( $scope.slider.active._gBox.pos ) ) return
                     var item;
                     for (var i = $scope.slider.items.length - 1; i >= 0; i--) {
                         var _item = $scope.slider.items[i];
-                        if( gBox.pos.compare(_item._gBox.pos) ) var item = _item;
+                        if( pos.compare(_item._gBox.pos) ) var item = _item;
                     };
                     if(!item) return
                     $scope.slider._setActive(item)
                 }
 
                 $scope.$watch('ppoints', function(val){if(val) init() });
-                $scope.$watch('center', function(val){if(val&&$scope.slider.active) updateCenter(val) });
+                $scope.$watch('center', function(pos){if(pos&&$scope.slider.active) updateCenter() });
                 $scope.$watch('isshow', function(val){if(val) $scope.$emit('setMapInCenter', true) });
             }
         };
@@ -74,9 +75,8 @@ angular.module('map-directive', [])
     .directive('gameMap', [function(){
         return {
             scope: {
-                'center': '=center',
-                'path': '=path',
-                'points': '=points',
+                'center': '=center', //[x, y]
+                'pathPositions': '=pathPositions', // [[x, y], ..]
             },
             restrict: 'E',
             template: '<div id="gameMapCont">' +
@@ -89,13 +89,34 @@ angular.module('map-directive', [])
                     for (var i = this.ppoints.length - 1; i >= 0; i--) {
                         var pos = this.ppoints[i]._gBox.pos
                         var tile = this.getTile(pos[0], pos[1]);
-                        if( tile ) tile.querySelector('h3').innerText = this.ppoints[i].i
                     };
                     $scope.$emit('setPPoints', $scope.map.gm.ppoints)
                 };
-                L.GM.prototype.moveCenter = function(point) {
-                    $scope.$emit('setActivePoint', point._gBox)
+                L.GM.prototype.moveCenter = function( point ) {
+                    $scope.$emit('setPPoints', $scope.map.gm.ppoints)
+                    $scope.$emit('setActivePoint', point._gBox.pos)
                 };
+                L.GM.prototype.getGameBoxFromApi = function ( x, y ){
+                    var gBox = this.findGbox([x, y]);
+                    if(!gBox) $scope.$emit('getGBoxFromApi', x, y, 'setGBox')
+                    else $scope.map.gm.drawTile( false, gBox )
+                };
+                L.GM.prototype.gmReady = function() {
+                    //console.log(1)
+                };
+                L.GM.prototype.createPath = function() {
+                    var pathLen = this.pathPositions.length;
+                    for (var i = 0; i < pathLen; i++) {
+                        var point =  this.createPathPoint( i );
+                    };
+                    $scope.$emit('setPPoints', $scope.map.gm.ppoints);
+                    $scope.$emit('setGameMap', false);
+                };
+
+
+
+                $scope.$on('setGBox', function( e, data ){ $scope.map.gm.drawTile( data ) });
+
                 var elem = element[0].querySelector('#gamemap');
                 $scope.maxPP = 25;
                 $scope.showPPvalue = false;
@@ -111,12 +132,10 @@ angular.module('map-directive', [])
                         var tile = $scope.map.gm.getTile(gPoint.x, gPoint.y);
                         if(!tile) return
                         var inner = tile.querySelector('.gamemap-item');
-                        var gBox = tile._gBox;
+                        var gBox = $scope.map.gm.findGbox([gPoint.x, gPoint.y]);
 
-                        //в любом случае сбрасывает ppcontrol
-                        $scope.$apply(function(){
-                            $scope.map.gm.pushNewPPoint(gBox)
-                        })
+                        //добавляем новую точку если нужно
+                        if( $scope.map.gm._newPoint ) return $scope.$apply( function(){$scope.map.gm.pushNewPPoint( gBox ) } )
 
                         if( gBox.owner == 'nobody' ) return
 
@@ -128,29 +147,23 @@ angular.module('map-directive', [])
                 }
 
                 function _init(){
-                    _initCont()
-                    $scope.map = L.szMap(
-                        elem.getAttribute('id'),
-                        $scope.points);
+                    _initCont();
+                    $scope.map = L.szMap( elem.getAttribute('id'), $scope.center );
+                    _getGboxes4path();
+                    _initClick();
                 }
 
-                function _doPath(){
-                    var pathLen = $scope.path.length;
-                    for (var i = 0; i < pathLen; i++) {
-                        var point =  $scope.map.gm.pathPoint(i, $scope.path);
-                    };
-                    _initClick();
-                    $scope.map.gm.setView($scope.center.pos);
-                    $scope.$emit('setPPoints', $scope.map.gm.ppoints);
-                    $scope.$emit('setGameMap', true);
+                function _getGboxes4path(){
+                    if(!$scope.pathPositions || !$scope.map || $scope.map.gm.pathPositions) return
+                    $scope.map.gm.pathPositions2ppoints($scope.pathPositions)
                 }
 
                 function _setCenter(){
-                    var center = $scope.map.gm.gm2latlng( $scope.center.pos ); //latlng
-                    $scope.map.setView(center);
-                    $scope.map.gm.setView( $scope.center.pos )
+                    if(!$scope.map.gm.ppoints || !$scope.map.gm.ppoints.length) return
+                    var center = $scope.map.gm.gm2latlng( $scope.center ); //latlng
+                    $scope.map.setView( center );
+                    $scope.map.gm.setView( $scope.center )
                     if( $scope.map.gm.ppoints.length ) $scope.map.gm.updatePpointsPos()
-                    if( $scope.path&&!$scope.map.gm.ppoints.length ) _doPath()
                 }
 
                 function _clearPPControl(){
@@ -178,12 +191,14 @@ angular.module('map-directive', [])
                     $scope.map.gm.focusCanBeRemove();
                 })
 
-                $scope.$watch('points', function(val){if(val) _init(); });
-                $scope.$watch('center', function(val){
-                    if(!val || !$scope.map) return
+
+                $scope.$watch('pathPositions', _getGboxes4path );
+
+                $scope.$watch('center', function(pos){
+                    if(!pos) return
+                    if(!$scope.map) _init()
                     var center = $scope.map.gm.latlng2gm( $scope.map.getCenter() );
-                    var pos = val.pos;
-                    if( (pos[0] != center[0] && pos[1] != center[1])  ) _setCenter()
+                    if( !pos.compare( center )  ) _setCenter()
                 });
 
             }
