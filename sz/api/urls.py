@@ -7,11 +7,6 @@ urlpatterns = patterns(
     '',
     url(r'^$', root.ApiRoot.as_view()),
 
-    url(r'^testmode/generate-places/?$',
-        testmode.GeneratePlaces.as_view(), name='generate-places'),
-    url(r'^testmode/places/?$',
-        testmode.GetPlaces.as_view(), name='testmode-places'),
-
     url(r'^auth/login/?$', auth.AuthLogin.as_view(), name='auth-login'),
     url(r'^auth/logout/?$', auth.AuthLogout.as_view(), name='auth-logout'),
     url(r'^auth/user/?$', auth.AuthUser.as_view(), name='auth-user'),
@@ -56,8 +51,6 @@ urlpatterns = patterns(
     # url(r'^places/(?P<pk>\w+)/?$',
     #    places.PlaceInstance.as_view(), name='place-detail'),
 
-    url(r'^static/categories/$',
-        static.CategoriesRoot.as_view(), name='static-categories'),
     url(r'^static/races/$',
         static.RacesRoot.as_view(), name='static-races'),
     url(r'^static/genders/$',
@@ -69,9 +62,6 @@ urlpatterns = patterns(
 
     url(r'^users/register/?$',
         users.UsersRoot.as_view(), name='users-registration'),
-    url(r'^users/resend-activation-key/?$',
-        users.UsersRootResendingActivationKey.as_view(),
-        name='users-resending-activation-key'),
     url(r'^users/profile/?$',
         users.UserInstanceSelf.as_view(), name='users-profile'),
 )

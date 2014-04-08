@@ -316,7 +316,7 @@ class BLStandartDataTest(unittest.TestCase):
         user = user[0]
         return dict(user=user, data=data)
 
-    def user_activate(self):
+    def user_create_in_bl(self):
         user = self.user_create_inactive()['user']
         activation_key = models.RegistrationProfile.objects.get(
             user=user).activation_key
@@ -329,7 +329,7 @@ class BLStandartDataTest(unittest.TestCase):
 
     def place_explore(self, user=None):
         if user is None:
-            user = self.user_activate()
+            user = self.user_create_in_bl()
         query = dict(latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
 
         data = self._getdata_(
@@ -376,74 +376,7 @@ class PlaceDetailSerialiserTest(StandartDataSerializerTest):
         data = serializers.place_detail_serialiser(
             self.place, self.user, distance)
         self.check_standart_data_place(data, is_owner=False, distance=distance)
-"""
 
-class RegistrationSerialiserTest(unittest.TestCase):
-    # idk but when race and gener in serialiser is ChoiceField -
-    # serialiser works in UsersRoot.create, but dont wont works here :(
-    s = serializers.RegistrationSerializer
-
-    def setUp(self):
-        self.data = get_normal_user_data()
-
-    def test_email_not_unique(self):
-        models.User.objects.get_or_create(email=EMAIL)
-        self.data.update(email=EMAIL)
-        #try to create user with email, which arlyady exist
-        s = self.s(data=self.data)
-        error = {'email': [u'Email is already used']}
-        self.assertEqual(s.errors, error)
-
-    def test_gender_empty(self):
-        del self.data['gender']
-        s = self.s(data=self.data)
-        error = {'gender': [u'Обязательное поле.']}
-        self.assertEqual(s.errors, error)
-
-    # def test_gender_wrong(self):
-    #     wrong = 'x'
-    #     self.data.update(gender=wrong)
-    #     s = self.s(data=self.data)
-    #     error = {'gender': [u'Выберите корректный вариант.' +
-    #                         u' %s нет среди допустимых значений.' % wrong]}
-    #     self.assertEqual(s.errors, error)
-
-    def test_race_empty(self):
-        del self.data['race']
-        s = self.s(data=self.data)
-        error = {'race': [u'Обязательное поле.']}
-        self.assertEqual(s.errors, error)
-
-    # def test_race_wrong(self):
-    #     wrong = 'x'
-    #     self.data.update(race=wrong)
-    #     s = self.s(data=self.data)
-    #     error = {'race': [u'Выберите корректный вариант.' +
-    #                       u' %s нет среди допустимых значений.' % wrong]}
-    #     self.assertEqual(s.errors, error)
-
-    def test_password_empty(self):
-        del self.data['password1']
-        s = self.s(data=self.data)
-        error = {'password1': [u'Обязательное поле.']}
-        self.assertEqual(s.errors, error)
-
-    def test_passwords_not_match(self):
-        self.data.update(
-            password2="%s-wrong" % self.data.get('password1', ''))
-        s = self.s(data=self.data)
-        error = {u'non_field_errors': [u"Passwords don't match"]}
-        self.assertEqual(s.errors, error)
-
-    def test_all_ok(self):
-        s = serializers.RegistrationSerializer(data=self.data)
-        self.assertEqual(s.errors, {})
-        self.assertTrue(s.is_valid())
-        self.assertTrue(isinstance(s.object, models.User))
-        return s.object
-"""
-
-"""Views"""
 
 ########## USERS
 from sz.api.views import users as views_users
@@ -475,8 +408,8 @@ class UsersRootTest(BLStandartDataTest):
         self.assertEqual(user.role.name, models.STANDART_ROLE_USER_NAME)
         self.assertIsNone(user.last_box)
 
-    def test_activate(self):
-        user_dict = self.user_activate()
+    def test_create_in_db(self):
+        user_dict = self.user_create_in_bl()
         user = user_dict['user']
         activate_response = user_dict['activate_response']
 
@@ -486,10 +419,6 @@ class UsersRootTest(BLStandartDataTest):
 
         self.assertTrue(user.is_active)
         self.assertIsNotNone(user.date_confirm)
-
-    def test_resending_activation_key(self):
-        #@TODO(kunla): doit
-        pass
 
     def test_user_instance(self):
         #@TODO(kunla): doit
@@ -501,7 +430,7 @@ from sz.api.views import places as views_places
 
 class PlacesVenueListTest(BLStandartDataTest):
     def setUp(self):
-        self.user = self.user_activate()['user']
+        self.user = self.user_create_in_bl()['user']
         self.query = dict(
             latitude=LATITUDE, longitude=LONGITUDE, radius=RADIUS)
 

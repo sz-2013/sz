@@ -25,11 +25,6 @@ class FaceSerializer(serializers.ModelSerializer):
         model = models.Face
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Category
-
-
 class RoleUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RoleUser
@@ -125,14 +120,14 @@ class RegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password1 = serializers.CharField(required=True)
     password2 = serializers.CharField(required=True)
-    # race = serializers.ChoiceField(required=True, choices=[
-    #     (race.pk, race.name) for race in models.Races.objects.all()
-    # ])
-    # gender = serializers.ChoiceField(required=True, choices=[
-    #     (gender.pk, gender.name) for gender in models.Gender.objects.all()
-    # ])
-    race = serializers.IntegerField(required=True)
-    gender = serializers.IntegerField(required=True)
+    race = serializers.ChoiceField(required=True, choices=[
+        (race.pk, race.name) for race in models.Races.objects.all()
+    ])
+    gender = serializers.ChoiceField(required=True, choices=[
+        (gender.pk, gender.name) for gender in models.Gender.objects.all()
+    ])
+    # race = serializers.IntegerField(required=True)
+    # gender = serializers.IntegerField(required=True)
 
     def validate_email(self, attrs, source):
         """
@@ -153,19 +148,9 @@ class RegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Passwords don't match"))
         race = models.Races.objects.get(pk=attrs.get('race'))
         gender = models.Gender.objects.get(pk=attrs.get('gender'))
-        return models.RegistrationProfile.objects.create_inactive_user(
-            attrs.get('email'), password1, race, gender)
+        return models.User.objects.create_user(
+            attrs.get('email'), race, gender, password1)
 
-
-class ResendingConfirmationKeySerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-
-    def validate(self, attrs):
-        attrs = super(
-            ResendingConfirmationKeySerializer, self).validate(attrs)
-        email = attrs.get('email')
-        models.RegistrationProfile.objects.send_key(email)
-        return attrs
 
 """
 User section
@@ -178,7 +163,7 @@ class UserStandartDataSerializer(serializers.Serializer):
     user_gender = serializers.CharField(source="gender.name")
     user_race = serializers.CharField(source="race.name")
     user_role = serializers.CharField(source="role.name")
-    user_date_confirm = StringDataField(source="date_confirm")
+    user_date_joined = StringDataField(source="date_joined")
     user_faces = IdListField(source="faces", required=True)
     user_places = serializers.IntegerField(
         source="get_own_places", required=False)

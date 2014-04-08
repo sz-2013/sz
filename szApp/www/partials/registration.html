@@ -1,4 +1,4 @@
-<div ng-show="regStage1" class="content-inner">
+<div class="content-inner">
     <form class="form-group" name="general" role="form">
         <h2 class="page-header">Registration</h2>
 
@@ -45,34 +45,30 @@
             </div><!-- /#registration-pswd2-alert -->
         </div>
 
-        <div class="form-group" id="registration-genders" ng-class="{'has-error':loginAlert.gender}">
+        <div class="form-group" id="registration-genders">
             <label class="control-label">Choose your gender</label>
 
             <p class="help-block">If it is a secret or if you are not sure - choose "Smile".</p>
 
-            <div id="regisstration-genders-alert">
-                <p class="text-danger" ng-repeat="alert in loginAlert.gender">{{alert}}</p>
-            </div><!-- /#regisstration-genders-alert -->
-
-            <div data-toggle="buttons" class="btn-group btn-group-justified" id="registration-genders-options" sz-radio-btn>
-                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=f">
+            <div id="registration-genders-options">
+                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='f'" sz-radio-btn>
                     <input id="f" name="options" type="radio">
                         <span><i class="fa fa-female"></i></span>
                 </label><!-- /.registration-genders-option -->
 
-                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=m">
+                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='m'" sz-radio-btn>
                     <input id="m" name="options" type="radio">
                         <span><i class="fa fa-male"></i></span>
                 </label><!-- /.registration-genders-option -->
 
-                <label class="btn btn-default circle-btn active registration-genders-option" ng-disabled="inProgress" ng-click="user.gender=u">
+                <label class="btn btn-default circle-btn active registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='u'" sz-radio-btn>
                     <input id="u" name="options" type="radio">
                         <span><i class="fa fa-smile-o"></i></span>
                 </label><!-- /.registration-genders-option -->
             </div><!-- /#registration-genders-options -->
         </div><!-- /#registration-genders -->
 
-        <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race}">
+        <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race.length}">
             <label for="radioRace" class="control-label">Choose your race</label>
 
             <p class="help-block">
@@ -84,9 +80,9 @@
                 <span ng-repeat="alert in loginAlert.race">{{alert}}</span>
             </div><!-- /#registration-races-alert -->
 
-            <div data-toggle="buttons" id="registration-races-options" sz-radio-btn>
+            <div id="registration-races-options">
                 <label class="btn btn-default circle-btn"
-                ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races">
+                    ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races" sz-radio-btn>
                     <input name="options" type="radio"><span><i>{{r.name}}</i></span>
                 </label>
             </div><!-- /#registration-races-options -->
@@ -142,7 +138,3 @@
         <button class="btn btn-block btn-primary btn-large" ng-disabled="inProgress" ng-click="registration()" type="submit">Do it!</button>
     </div>
 </div>
-
-
-<div ng-include ng-show="!regStage1" src="'partials/registration-confirmation.html'">
-</div> <!-- /ng-include regConfirm -->

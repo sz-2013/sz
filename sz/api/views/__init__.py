@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from sz.api import response as sz_api_response
-from sz.core import services, models
-from sz.core.services import morphology, gis
+from sz.core import services
+from sz.core.services import gis
 # from sz.settings import LEBOWSKI_MODE_TEST
 
 # if LEBOWSKI_MODE_TEST:
@@ -15,10 +15,9 @@ from sz.core.services import morphology, gis
 city_service = gis.NYCityService()
 place_service = services.PlaceService(city_service)
 gamemap_service = services.GameMapService(city_service)
-categorization_service = morphology.CategorizationService(
-    models.Category.objects.all(), morphology.RussianStemmingService())
-message_service = services.MessageService(
-    city_service, categorization_service)
+# categorization_service = morphology.CategorizationService(
+#     models.Category.objects.all(), morphology.RussianStemmingService())
+message_service = services.MessageService(city_service)
 news_feed_service = services.NewsFeedService(message_service)
 
 

@@ -36,7 +36,4 @@ urlpatterns = patterns(
     url(r'^api/', include('sz.api.urls'), name='api'),
     url(r'^api-auth/',
         include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^activate/(?P<activation_key>.*)/?$', 'sz.core.views.activate',
-        name='registration-confirm'),
-    url(r'^lebowski/', include('lebowski.urls'), name='lebowski'),
 )

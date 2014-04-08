@@ -140,10 +140,8 @@ class PagingDecorator(ParametersGroupDecorator):
 
 class ContentDecorator(ParametersGroupDecorator):
 
-    def __init__(self, params, categorization_service, component=None):
+    def __init__(self, params, component=None):
         ParametersGroupDecorator.__init__(self, params, component)
-        self.__categorization_service = categorization_service
-        self.__category = params.get(params_names.CATEGORY, None)
         self.__query = params.get(params_names.QUERY, None)
         self.__photo = params.get(params_names.PHOTO, None)
 
@@ -154,10 +152,6 @@ class ContentDecorator(ParametersGroupDecorator):
             if self.__query.strip != '':
                 params[params_names.STEMS] = \
                     self.__categorization_service.detect_stems(self.__query)
-        if isinstance(self.__category, models.Category):
-            params[params_names.CATEGORY] = self.__category
-        else:
-            params[params_names.CATEGORY] = None
         if self.__photo:
             params[params_names.PHOTO] = True
         else:
@@ -169,10 +163,6 @@ class ContentDecorator(ParametersGroupDecorator):
         if self.__query:
             if self.__query.strip != '':
                 params[params_names.QUERY] = self.__query
-        if isinstance(self.__category, models.Category):
-            params[params_names.CATEGORY] = self.__category
-        else:
-            params[params_names.CATEGORY] = None
         if self.__photo:
             params[params_names.PHOTO] = True
         return params
@@ -198,10 +188,8 @@ class PlaceNameDecorator(ParametersGroupDecorator):
 class PlaceMessagesParametersFactory:
 
     @classmethod
-    def create(
-            cls, params, categorization_service,
-            current_max_id, default_limit):
-        content_group = ContentDecorator(params, categorization_service)
+    def create(cls, params, current_max_id, default_limit):
+        content_group = ContentDecorator(params)
         paging_group = PagingDecorator(
             params, current_max_id, default_limit, content_group)
         return paging_group
@@ -210,10 +198,8 @@ class PlaceMessagesParametersFactory:
 class PlaceNewsParametersFactory:
 
     @classmethod
-    def create(
-            cls, params, categorization_service,
-            current_max_id, default_limit):
-        content_group = ContentDecorator(params, categorization_service)
+    def create(cls, params, current_max_id, default_limit):
+        content_group = ContentDecorator(params)
         position_group = PositionDecorator(params, content_group)
         paging_group = PagingDecorator(
             params, current_max_id, default_limit, position_group)
@@ -223,10 +209,8 @@ class PlaceNewsParametersFactory:
 class NewsParametersFactory:
 
     @classmethod
-    def create(
-            cls, params, categorization_service,
-            city_service, current_max_id, default_limit):
-        content_group = ContentDecorator(params, categorization_service)
+    def create(cls, params, city_service, current_max_id, default_limit):
+        content_group = ContentDecorator(params)
         location_group = LocationDecorator(params, city_service, content_group)
         paging_group = PagingDecorator(
             params, current_max_id, default_limit, location_group)

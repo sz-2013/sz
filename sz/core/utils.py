@@ -1,3 +1,27 @@
+import os
+from sz import settings
+
+
+def get_img_absolute_urls(host_url="", img=None):
+    host_url = str(host_url) + 'media/'
+    return host_url + img.url if img else None
+
+
+def get_img_dict_absolute_url(img_dict, host_url=''):
+    for key, img in img_dict.iteritems():
+        img_dict[key] = get_img_absolute_urls(host_url, img)
+    return img_dict
+
+
+def get_system_path_media(url=''):
+    return os.path.join(settings.MEDIA_ROOT, url)
+
+
+def get_string_date(date):
+    return [date.year, date.month, date.day,
+            date.hour, date.minute, date.second] if date else []
+
+
 def safe_cast(val, to_type, default=None):
     try:
         return to_type(val)

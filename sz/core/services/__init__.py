@@ -326,9 +326,8 @@ class MessageService(FeedService):
     default_limit = settings.DEFAULT_PAGINATE_BY
     media_url = settings.MEDIA_ROOT + '/'
 
-    def __init__(self, city_service, categorization_service):
+    def __init__(self, city_service):
         self.city_service = city_service
-        self.categorization_service = categorization_service
 
     def unface_photo(self, MessagePhotoPreview):
         """Put masks on a photo
@@ -408,7 +407,7 @@ class MessageService(FeedService):
         if default_limit is None:
             default_limit = self.default_limit
         params = parameters.PlaceMessagesParametersFactory.create(
-            kwargs, self.categorization_service, current_max_id, default_limit)
+            kwargs, current_max_id, default_limit)
         messages, count = queries.place_messages(
             place, **params.get_db_params())
         return self._make_result(messages, count, params)
@@ -424,8 +423,7 @@ class MessageService(FeedService):
         if default_limit is None:
             default_limit = self.default_limit
         params = parameters.NewsParametersFactory.create(
-            kwargs, self.categorization_service, self.city_service,
-            current_max_id, default_limit)
+            kwargs, self.city_service, current_max_id, default_limit)
         messages, count = queries.search_messages(**params.get_db_params())
         items = map(
             lambda message: self.__get_search_item(message, params),
@@ -463,15 +461,13 @@ class NewsFeedService(FeedService):
 
         current_max_id = self._get_max_id()
         params = parameters.NewsParametersFactory.create(
-            kwargs, self.message_service.categorization_service,
-            self.message_service.city_service,
+            kwargs, self.message_service.city_service,
             current_max_id, self.news_items_default_limit)
         places, count = queries.places_news_feed(**params.get_db_params())
         kwargs.pop(params_names.LIMIT)
         kwargs.pop(params_names.OFFSET)
         item_params = parameters.PlaceNewsParametersFactory.create(
-            kwargs, self.message_service.categorization_service,
-            current_max_id, self.news_item_default_size)
+            kwargs, current_max_id, self.news_item_default_size)
         feed = self._make_result(
             [self.__make_feed_item(place, item_params)
              for place in places], count, params)
@@ -480,7 +476,6 @@ class NewsFeedService(FeedService):
     def get_place_news(self, place, **kwargs):
         current_max_id = self._get_max_id()
         params = parameters.PlaceNewsParametersFactory.create(
-            kwargs, self.message_service.categorization_service,
-            current_max_id, self.place_news_default_limit)
+            kwargs, current_max_id, self.place_news_default_limit)
         item = self.__make_feed_item_with_gallery_preview(place, params)
         return item

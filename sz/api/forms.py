@@ -36,9 +36,6 @@ class PaginatedRequestForm(forms.Form):
 
 class MessageRequestForm(PaginatedRequestForm):
     query = forms.CharField(required=False, label=u'Запрос')
-    category = forms.ModelChoiceField(
-        queryset=models.Category.objects.all(),
-        required=False, label=u'Категория')
     photo = forms.BooleanField(label=u'Только с фото', required=False)
 
 

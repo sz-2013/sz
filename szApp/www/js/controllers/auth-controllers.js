@@ -1,3 +1,9 @@
+function loginSuccess($scope, $rootScope, $location, session){
+    $scope.session = session;
+    $rootScope.showLoader = false;
+    $location.path($scope.urls.getPath('homePathAuth'))
+}
+
 
 function LoginController($scope, $location, sessionService, $rootScope){
     $scope.$emit('navigation-hideall');
@@ -6,6 +12,11 @@ function LoginController($scope, $location, sessionService, $rootScope){
     $scope.loginAlert = new Object;
     $scope.showResendBut = false;
     $rootScope.bodyScroll = false;
+
+    $scope.setGender = function(gender){
+        console.log(gender)
+        $scope.user.gender = gender
+    }
 
     $scope.isEmailAlert = function(){
         if($scope.loginAlert===undefined) return false
@@ -25,10 +36,7 @@ function LoginController($scope, $location, sessionService, $rootScope){
         $scope.session.password = $scope.password;
         var session = $scope.session.$login(
             function(response){
-                $scope.session = session;
-                $scope.inProgress = false;
-                $rootScope.showLoader = false;
-                $location.path($scope.urls.getPath('homePathAuth'))
+                loginSuccess($scope, $rootScope, $location, session)
             },
             function(error){
                 if(error.status==400){
@@ -46,7 +54,7 @@ function LoginController($scope, $location, sessionService, $rootScope){
 }
 
 
-function RigistrationController($scope, userService, $rootScope){
+function RigistrationController($scope, userService, $rootScope, $location){
     $scope.$emit('navigation-hideall');
     $scope.user = {'gender':'u'};
     var errorsText = {
@@ -70,7 +78,6 @@ function RigistrationController($scope, userService, $rootScope){
 
     $scope.inProgress = false;
     $rootScope.showLoader = false;
-    $scope.regStage1 = true
     $scope.isEmailAlert = function(maxlength){
         return ($scope.user.email && $scope.loginAlert && $scope.user.email.length!=0) ||
                maxlength
@@ -89,17 +96,16 @@ function RigistrationController($scope, userService, $rootScope){
                ($scope.user.password1&&$scope.user.password2&&$scope.user.password1!=$scope.user.password2)
     }
 
-    var values_is_right = function(){
-        if(
-            $scope.user.email && $scope.user.email.length<72 && $scope.user.email.length>2 &&
-            $scope.user.race &&
-            $scope.user.password1 && $scope.user.password1.length>2 && $scope.user.password1.length<128 &&
-            $scope.user.password2 && $scope.user.password1==$scope.user.password2
-        ){return true}
-    }
-
     $scope.registration = function(){
-        if(values_is_right()){
+        $scope.loginAlert = {
+            'email':[],
+            'password1':[],
+            'race':[]
+        };
+        if( !$scope.user.email ){ $scope.loginAlert.email.push( $scope.tmlText.errorsText.email.nullvalue ) }
+        if( !$scope.user.race ){ $scope.loginAlert.race.push( $scope.tmlText.errorsText.race.nullvalue ) }
+        if( !$scope.user.password1 ){ $scope.loginAlert.password1.push( $scope.tmlText.errorsText.password.nullvalue ) }
+        if( !$scope.loginAlert.email.length && !$scope.loginAlert.password1.length && !$scope.loginAlert.race.length){
             $scope.inProgress = true;
             $rootScope.showLoader = true;
             var user = $scope.user;
@@ -113,9 +119,7 @@ function RigistrationController($scope, userService, $rootScope){
 
             userService.register(user,
                 function(response){
-                    $scope.regStage1 = false;
-                    $scope.inProgress = false;
-                    $rootScope.showLoader = false;
+                    loginSuccess($scope, $rootScope, $location, response)
                 },
                 function(error){
                     $scope.loginAlert = error.data.data;
@@ -123,45 +127,5 @@ function RigistrationController($scope, userService, $rootScope){
                     $rootScope.showLoader = false;
             })
         }
-        else{
-            $scope.loginAlert = {
-                'email':[],
-                'password1':[],
-                'race':[]
-            };
-            if(!$scope.user.email){$scope.loginAlert.email.push($scope.tmlText.errorsText.email.nullvalue)}
-            if(!$scope.user.race){$scope.loginAlert.race.push($scope.tmlText.errorsText.race.nullvalue)}
-            if(!$scope.user.password1){$scope.loginAlert.password1.push($scope.tmlText.errorsText.password.nullvalue)}
-        }
-    }
-}
-
-
-function RegistrationConfirmation($scope, userService, $location, $route, $rootScope){
-    $scope.inProgress = false;
-    $rootScope.showLoader = false;
-
-    $scope.confirmation = function(email){
-        $scope.showConfirmationResponse = false;
-        delete $scope.confirmationError
-        $scope.inProgress = true;
-        $rootScope.showLoader = true;
-        var email = $scope.user && $scope.user.email
-        userService.resend_activation_key({'email': email},
-        function(response){
-            $scope.inProgress = false;
-            $rootScope.showLoader = false;
-            $scope.showConfirmationResponse = true;
-        },
-        function(error){
-            $scope.inProgress = false;
-            $rootScope.showLoader = false;
-            $scope.confirmationError = error.data});
-    }
-
-    $scope.goToLogin = function(){
-        var loginUrl = $scope.urls.getPath('login');
-        if($location.path()!=loginUrl) $location.path(loginUrl);
-        else $route.reload();
     }
 }

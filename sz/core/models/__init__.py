@@ -2,76 +2,30 @@
 import datetime
 import hashlib
 import os
+from PIL import Image
 import random
 import re
 import StringIO
 import time
 import uuid
-from django.db import transaction
-from django.core import validators
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.gis.db import models
+from django.core import validators
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from imagekit import models as imagekit_models
 from imagekit import processors
-from PIL import Image, ImageDraw
 from south.modelsinspector import add_introspection_rules
-
 from sz import settings
-from sz.core.utils import float_to_int
 from sz.core.image_utils import FitImage
 from sz.core.utils import diff_lists
 
+from sz.core.utils import float_to_int, get_string_date, \
+    get_img_dict_absolute_url, get_img_absolute_urls, get_system_path_media
 
-STANDART_ROLE_USER_NAME = "player"
-STANDART_ROLE_PLACE_NAME = "shop"
-EMPTY_ROLE_PLACE_NAME = "empty"
-ACTIVATION_KEY_PATTERN = re.compile('^[a-f0-9]{32}$')
-
-"""Static clases"""
-
-EMOTION_CHOICES = (
-    ("smile", "Smile"),
-    ("lol", "LOL"),
-    ("bad", "Bad"),
-    ("indifferent", "Indifferent")
-)
-
-LANGUAGE_CHOICES = (
-    ("en", _("English")),
-    ("ru", _("Russian")),
-)
-
-ROLE_USER_CHOICES = (
-    ("player", "Player"),
-)
-
-ROLE_PLACE_CHOICES = (
-    ("shop", "SHOP"),
-    ("empty", "EMPTY PLACE"),
-)
-
-
-def get_string_date(date):
-    return [date.year, date.month, date.day,
-            date.hour, date.minute, date.second] if date else []
-
-
-def get_img_absolute_urls(host_url="", img=None):
-    host_url = str(host_url) + 'media/'
-    return host_url + img.url if img else None
-
-
-def get_img_dict_absolute_url(img_dict, host_url=''):
-    for key, img in img_dict.iteritems():
-        img_dict[key] = get_img_absolute_urls(host_url, img)
-    return img_dict
-
-
-def get_system_path_media(url=''):
-    return os.path.join(settings.MEDIA_ROOT, url)
+# south -----------------------------------------------------------------------
 
 
 class ModifyingFieldDescriptor(object):
@@ -105,43 +59,39 @@ class LowerCaseCharField(models.CharField):
 
 add_introspection_rules([], ["^sz\.core\.models\.LowerCaseCharField"])
 
-
-class Races(models.Model):
-    """user race: {'futuri':1,'amadeus':2, 'united':3} """
-    description = models.CharField(max_length=256, null=True, blank=True)
-
-    def get_img_absolute_urls(self, host_url="", img=None):
-        return get_img_absolute_urls(host_url, self.blazon)
-
-    def get_blazon_path(self, filename):
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (self.name, ext)
-        directory = 'blazons'
-        return os.path.join(directory, filename)
-    blazon = imagekit_models.ProcessedImageField(
-        upload_to=get_blazon_path, null=False, blank=True, default=None,
-        processors=[processors.ResizeToFit(150, 150), ],
-        options={'quality': 85}
-    )
-    name = models.CharField(max_length=32)
-
-    def __unicode__(self):
-        return self.name
+# -----------------------------------------------------------------------------
 
 
-class Gender(models.Model):
-    """user gender: {'u':1,'m':2,'f':3}"""
-    name = models.CharField(max_length=1)
+ACTIVATION_KEY_PATTERN = re.compile('^[a-f0-9]{32}$')
 
-    def __unicode__(self):
-        return self.name
+STANDART_ROLE_PLACE_NAME = "shop"
+EMPTY_ROLE_PLACE_NAME = "empty"
+
+
+ROLE_PLACE_CHOICES = (
+    ("shop", "SHOP"),
+    ("empty", "EMPTY PLACE"),
+)
+
+ROLE_USER_CHOICES = (
+    ("player", "Player"),
+)
+STANDART_ROLE_USER_NAME = "player"
+
+
+EMOTION_CHOICES = (
+    ("smile", "Smile"),
+    ("lol", "LOL"),
+    ("bad", "Bad"),
+    ("indifferent", "Indifferent")
+)
 
 
 class Face(models.Model):
     emotion = models.CharField(
         max_length=16, verbose_name=_('emotion'), choices=EMOTION_CHOICES)
     race = models.ForeignKey(
-        Races, verbose_name=_('race'), blank=True, null=True)
+        'Races', verbose_name=_('race'), blank=True, null=True)
 
     def get_img_absolute_urls(self, host_url="", img=None):
         return get_img_absolute_urls(host_url, self.face)
@@ -174,6 +124,38 @@ class Face(models.Model):
         verbose_name_plural = _('face')
 
 
+class Races(models.Model):
+    """user race: {'futuri':1,'amadeus':2, 'united':3} """
+    description = models.CharField(max_length=256, null=True, blank=True)
+
+    def get_img_absolute_urls(self, host_url="", img=None):
+        return get_img_absolute_urls(host_url, self.blazon)
+
+    def get_blazon_path(self, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (self.name, ext)
+        directory = 'blazons'
+        return os.path.join(directory, filename)
+
+    blazon = imagekit_models.ProcessedImageField(
+        upload_to=get_blazon_path, null=False, blank=True, default=None,
+        processors=[processors.ResizeToFit(150, 150), ],
+        options={'quality': 85}
+    )
+    name = models.CharField(max_length=32)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Gender(models.Model):
+    """user gender: {'u':1,'m':2,'f':3}"""
+    name = models.CharField(max_length=1)
+
+    def __unicode__(self):
+        return self.name
+
+
 class RoleUser(models.Model):
     """user role: player, bot, other"""
     name = models.CharField(
@@ -192,65 +174,12 @@ class RolePlace(models.Model):
         return self.name
 
 
-class Category(models.Model):
-
-    alias = models.SlugField(
-        verbose_name=u"псевдоним", max_length=32,
-        db_index=True, unique=True)
-
-    name = models.CharField(
-        verbose_name=u"наименование", max_length=64, db_index=True)
-
-    description = models.CharField(
-        verbose_name=u"описание", max_length=256,
-        null=True, blank=True)
-
-    keywords = models.TextField(
-        verbose_name=u"ключевые слова", max_length=2048,
-        help_text=u"ключевые слова, разделённые запятыми, регистр неважен")
-
-    def get_keywords_list(self):
-        normalized_keywords = u' '.join(self.keywords.split()).lower()
-        return sorted(
-            [kw.strip() for kw in normalized_keywords.split(',')])
-
-    def save(self, *args, **kwargs):
-        self.keywords = u', '.join(self.get_keywords_list())
-        super(Category, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u"%s" % self.name
-
-    class Meta:
-        verbose_name = _('category')
-        verbose_name_plural = _('categories')
-
-
-class Stem(models.Model):
-
-    stem = LowerCaseCharField(
-        verbose_name=u"основа слова", max_length=32,
-        db_index=True, unique=True)
-
-    language = LowerCaseCharField(
-        verbose_name=u"язык", db_index=True, max_length=2,
-        choices=LANGUAGE_CHOICES)
-
-    def __unicode__(self):
-        return u"%s" % self.stem
-
-    class Meta:
-        unique_together = ('stem', 'language',)
-
-"""Volatile clases"""
-
-
 class UserManager(BaseUserManager):
     def _create_user(self, email, password):
         now = timezone.now()
         user = self.model(
             email=UserManager.normalize_email(email),
-            is_active=False, is_superuser=False,
+            is_active=True, is_superuser=False,
             last_login=now, date_joined=now
         )
         user.set_password(password)
@@ -265,6 +194,8 @@ class UserManager(BaseUserManager):
         user = self._create_user(email, password)
         user.race = race
         user.gender = gender
+        user.role = RoleUser.objects.get_or_create(
+            name=STANDART_ROLE_USER_NAME)[0]
         user.save(using=self._db)
         return user
 
@@ -298,7 +229,7 @@ class User(AbstractBaseUser):
     date_joined = models.DateTimeField(
         _('date joined'), default=timezone.now)
     date_confirm = models.DateTimeField(
-        _('date confirmation'), default=None, blank=True, null=True)
+        _('date of create in engine'), default=None, blank=True, null=True)
 
     objects = UserManager()
     race = models.ForeignKey(
@@ -326,6 +257,7 @@ class User(AbstractBaseUser):
 
     def create_in_engine(self):
         self.is_in_engine = True
+        self.date_confirm = timezone.now()
         self.save()
         return self
 
@@ -368,98 +300,6 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
-
-
-class RegistrationManager(models.Manager):
-
-    def activate(self, activation_key):
-        if ACTIVATION_KEY_PATTERN.search(activation_key):
-            try:
-                profile = self.get(activation_key=activation_key)
-            except self.model.DoesNotExist:
-                return False
-            if not profile.activation_key_expired():
-                user = profile.user
-                user.is_active = True
-                user.date_confirm = timezone.now()
-                user.save()
-                profile.activation_key = self.model.CONFIRMED
-                profile.save()
-                return user
-        return False
-
-    def create_inactive_user(self, email, password, race, gender):
-        new_user = User.objects.create_user(email, race, gender, password)
-        role, create = RoleUser.objects.get_or_create(
-            name=STANDART_ROLE_USER_NAME)
-        new_user.role = role
-        new_user.is_active = False
-        new_user.save()
-        self.create_profile(new_user)
-        return new_user
-
-    def send_key(self, email):
-        try:
-            profile = self.get(user__email=email)
-        except self.model.DoesNotExist:
-            return False
-        profile.is_sending_email_required = True
-        profile.save()
-        return email
-
-    create_inactive_user = transaction.commit_on_success(create_inactive_user)
-
-    def create_profile(self, user):
-        salt = hashlib.md5(str(random.random())).hexdigest()[:5]
-        email = user.email
-        if isinstance(email, unicode):
-            email = email.encode('utf-8')
-        activation_key = hashlib.md5(salt + email).hexdigest()
-        return self.create(
-            user=user, activation_key=activation_key,
-            is_sending_email_required=True
-        )
-
-    def delete_expired_users(self):
-        for profile in self.all():
-            try:
-                if profile.activation_key_expired():
-                    user = profile.user
-                    if not user.is_active:
-                        user.delete()
-                        profile.delete()
-            except User.DoesNotExist:
-                profile.delete()
-
-
-class RegistrationProfile(models.Model):
-    CONFIRMED = 'CONFIRMED'
-    user = models.ForeignKey(User, unique=True, verbose_name=_('user'))
-    activation_key = models.CharField(
-        _('email confirmation key'), max_length=32,
-        validators=[validators.RegexValidator(regex=ACTIVATION_KEY_PATTERN)]
-    )
-    is_sending_email_required = models.BooleanField(
-        default=True,
-        help_text=_('Designates whether to send email'),
-        db_index=True
-    )
-    objects = RegistrationManager()
-
-    def activation_key_expired(self):
-        expiration_date = datetime.timedelta(
-            days=settings.ACCOUNT_CONFIRMATION_DAYS
-        )
-        return (
-            self.activation_key == self.CONFIRMED or
-            self.user.date_joined + expiration_date <= timezone.now()
-        )
-
-    activation_key_expired.boolean = True
-
-    class Meta:
-        verbose_name = _('registration profile')
-        verbose_name_plural = _('registration profiles')
 
 
 class PlaceManager(models.GeoManager):
@@ -807,3 +647,16 @@ class Message(models.Model):
 
     def get_string_date(self):
         return get_string_date(self.date)
+
+
+
+
+
+
+
+# class UserPathManager(models.Model):
+#     pass
+
+
+# class UserPath(models.Model):
+#     objects = UserPathManager()

@@ -233,14 +233,16 @@ angular.module('sz.client.directives', [])
     .directive('szRadioBtn', function() {
         //convert nedded btns into radio
         return function(scope, element, attrs) {
-            node2array(element[0].querySelectorAll('[type=radio]')).forEach(function(input){
-                var btnGroup = findParent('[data-toggle="buttons"]', input);
-                var label = findParent('.btn', input);
-                var labels = node2array(btnGroup.getElementsByClassName('btn'))
-                input.onclick = function(){
-                    labels.forEach(function(el){removeClass(el, 'active')})
-                    addClass(label, 'active')
-                }
+            function btnsMap(fn){ }
+            var btn = element[0];
+            var btnGroup = btn.parentElement;
+
+            btn.addEventListener('click', function(e){
+                var btns = btnGroup.querySelectorAll('.btn')
+                for (var i = btns.length - 1; i >= 0; i--) {
+                    removeClass(btns[i], 'active')
+                };
+                addClass(btn, 'active')
             });
         };
     })

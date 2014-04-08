@@ -17,11 +17,6 @@ class StaticObjects(SzApiView):
         return sz_api_response.Response({'data': data})
 
 
-class CategoriesRoot(StaticObjects):
-    model = models.Category
-    serializer = serializers.CategorySerializer
-
-
 class RacesRoot(StaticObjects):
     model = models.Races
     serializer = serializers.RacesSerializer
