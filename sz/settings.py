@@ -121,7 +121,11 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'rest_framework',
+    'sz.static',
     'sz.core',
+    'sz.place',
+    'sz.message',
+    'sz.gamemap',
     'sz.api',
     # 'lebowski',
     'south',

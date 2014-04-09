@@ -5,29 +5,35 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from sz.api import fields as sz_api_fields
-from sz.api.fields import IdListField, IntFloatListField, \
+from sz.api.fields import IdListField, \
     MessagePhotoPreviewFacesLIstField, StringDataField
-from sz.core import models, gis as gis_core
+from sz.core import gis as gis_core
+from sz.core.models import User as modelUser
+from sz.message.models import Message as modelMessage, \
+    MessagePreview as modelMessagePreview
+from sz.place.models import Place as modelPlace
+from sz.static.models import Races as modelRaces, Gender as modelGender, \
+    Face as modelFace, RoleUser as modelRoleUser
 
 
 class RacesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Races
+        model = modelRaces
 
 
 class GenderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Gender
+        model = modelGender
 
 
 class FaceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Face
+        model = modelFace
 
 
 class RoleUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.RoleUser
+        model = modelRoleUser
 
 
 """
@@ -61,7 +67,7 @@ class AuthUserSerializer(serializers.ModelSerializer):
     is_verified = AuthUserIsVerified()
 
     class Meta:
-        model = models.User
+        model = modelUser
         fields = ('email', 'is_anonymous', 'is_authenticated', )
 
 
@@ -108,7 +114,7 @@ class RegistrationSerializer(serializers.Serializer):
         email, password1, password2, race (id), gender (id)
 
     Returns:
-        <core.models.User>
+        <core.modelUser>
 
     Raise:
         ValidationError:
@@ -121,10 +127,10 @@ class RegistrationSerializer(serializers.Serializer):
     password1 = serializers.CharField(required=True)
     password2 = serializers.CharField(required=True)
     race = serializers.ChoiceField(required=True, choices=[
-        (race.pk, race.name) for race in models.Races.objects.all()
+        (race.pk, race.name) for race in modelRaces.objects.all()
     ])
     gender = serializers.ChoiceField(required=True, choices=[
-        (gender.pk, gender.name) for gender in models.Gender.objects.all()
+        (gender.pk, gender.name) for gender in modelGender.objects.all()
     ])
     # race = serializers.IntegerField(required=True)
     # gender = serializers.IntegerField(required=True)
@@ -134,7 +140,7 @@ class RegistrationSerializer(serializers.Serializer):
         Check that the blog post is about Django.
         """
         email = attrs[source]
-        if models.User.objects.filter(email=email).count() > 0:
+        if modelUser.objects.filter(email=email).count() > 0:
             raise serializers.ValidationError(_("Email is already used"))
         return attrs
 
@@ -146,9 +152,9 @@ class RegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Password is required"))
         if password1 != password2:
             raise serializers.ValidationError(_("Passwords don't match"))
-        race = models.Races.objects.get(pk=attrs.get('race'))
-        gender = models.Gender.objects.get(pk=attrs.get('gender'))
-        return models.User.objects.create_user(
+        race = modelRaces.objects.get(pk=attrs.get('race'))
+        gender = modelGender.objects.get(pk=attrs.get('gender'))
+        return modelUser.objects.create_user(
             attrs.get('email'), race, gender, password1)
 
 
@@ -186,7 +192,7 @@ Place section
 
 def get_place(latitude, longitude, name):
     try:
-        return models.Place.objects.get(
+        return modelPlace.objects.get(
             name=name, position=gis_core.ll_to_point(longitude, latitude))
     except ObjectDoesNotExist:
         raise serializers.ValidationError(_("Place with name %s, lng %f,\
@@ -267,21 +273,21 @@ class MessagePhotoPreviewSerializer(serializers.Serializer):
     photo_width = serializers.FloatField(required=True)
     face_id = serializers.IntegerField(required=True)
     # face_id = serializers.ChoiceField(required=True, choices=[
-    #     (face.pk, face.pk) for face in models.Face.objects.all()
+    #     (face.pk, face.pk) for face in modelFace.objects.all()
     # ])
     faces_list = MessagePhotoPreviewFacesLIstField(required=False)
     pk = serializers.IntegerField(required=False)
 
     def validate(self, attrs):
         attrs = super(MessagePhotoPreviewSerializer, self).validate(attrs)
-        return models.MessagePreview.objects.unface_photo(**attrs)
+        return modelMessagePreview.objects.unface_photo(**attrs)
 
 
 class MessageAddSerializer(serializers.ModelSerializer):
     photo_id = serializers.IntegerField(required=False)
 
     class Meta:
-        model = models.Message
+        model = modelMessage
         read_only_fields = ('date',)
         exclude = ('stems',)
 
@@ -291,7 +297,7 @@ class MessageAddSerializer(serializers.ModelSerializer):
         """
         text = attrs.get('text').strip() if attrs.get('text') else ''
         photo_id = attrs.get('photo_id', None)
-        photo = models.MessagePreview.objects.get(
+        photo = modelMessagePreview.objects.get(
             pk=photo_id) if photo_id else None
         if not (photo or text != ""):
             raise serializers.ValidationError("Message don't must be empty")
@@ -302,13 +308,13 @@ class MessageAddSerializer(serializers.ModelSerializer):
 
     def restore_object(self, attrs, instance=None):
         if not instance:
-            instance = models.Message.objects.createMessage(**attrs)
+            instance = modelMessage.objects.createMessage(**attrs)
         return instance
 
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Message
+        model = modelMessage
 
 # class MessageBigLSerializer(serializers.Serializer):
 #     message_id = serializers.IntegerField(source="id")

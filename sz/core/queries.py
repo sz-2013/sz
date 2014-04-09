@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import datetime
 from django.db import models as dj_models
 from django.db.models import Q
 from django.contrib.gis.geos import fromstr
 from django.contrib.gis.measure import D
-from django.utils import timezone
-from sz.core import models
+from sz.message.models import Message as modelMessage
+from sz.place.models import Place as modelPlace
 from sz.core.services.parameters import names as params_names
 
 
@@ -19,11 +18,11 @@ def search_places(**kwargs):
     #@TODO: не забыть раскоментить следующие две строки и закоментить третью,
     # когда заработает движок
     #
-    # filtered_places = models.Place.objects.annotate(
+    # filtered_places = modelPlace.objects.annotate(
     #    messages_count=dj_models.Count('message__id'))\
     #     .order_by('-messages_count')
-    # filtered_places = models.Place.objects.filter(is_active=True)
-    filtered_places = models.Place.objects.all()
+    # filtered_places = modelPlace.objects.filter(is_active=True)
+    filtered_places = modelPlace.objects.all()
     if radius == 0 or radius is None:
         city_id = kwargs.get(params_names.CITY_ID)
         assert city_id, 'city_id is required'
@@ -44,7 +43,7 @@ def search_places(**kwargs):
 def get_place(x, y, **kwargs):
     city_id = kwargs.get(params_names.CITY_ID)
     assert city_id, 'city_id is required'
-    return models.Place.objects.get_by_gamemap_pos(x, y, city_id)
+    return modelPlace.objects.get_by_gamemap_pos(x, y, city_id)
 
 
 def places_news_feed(**kwargs):
@@ -65,10 +64,10 @@ def places_news_feed(**kwargs):
     photo = kwargs.get(params_names.PHOTO)
     # creating the query
     if photo:
-        filtered_places = models.Place.objects.filter(
+        filtered_places = modelPlace.objects.filter(
             message__id__isnull=False, message__photo__istartswith='photo')
     else:
-        filtered_places = models.Place.objects.filter(
+        filtered_places = modelPlace.objects.filter(
             message__id__isnull=False)
     filtered_places = filtered_places.annotate(
         last_message=dj_models.Max('message__id'))
@@ -117,7 +116,7 @@ def place_messages(place, **kwargs):
     limit = kwargs.get(params_names.LIMIT)
     offset = kwargs.get(params_names.OFFSET)
     # creating the query
-    filtered_messages = models.Message.objects.filter(place__pk=place.pk)
+    filtered_messages = modelMessage.objects.filter(place__pk=place.pk)
     if max_id is not None:
         filtered_messages = filtered_messages.filter(id__lte=max_id)
     filtered_messages = filter_messages(filtered_messages, **kwargs)
@@ -141,14 +140,14 @@ def search_messages(**kwargs):
     if radius == 0 or radius is None:
         city_id = kwargs.get(params_names.CITY_ID)
         assert city_id, 'city_id is required'
-        filtered_messages = models.Message.objects.filter(
+        filtered_messages = modelMessage.objects.filter(
             place__city_id=city_id)
     else:
         current_position = fromstr("POINT(%s %s)" % (longitude, latitude))
         distance_kwargs = {'m': '%i' % radius}
-        places = models.Place.objects.filter(
+        places = modelPlace.objects.filter(
             position__distance_lte=(current_position, D(**distance_kwargs)))
-        filtered_messages = models.Message.objects.filter(place__in=places)
+        filtered_messages = modelMessage.objects.filter(place__in=places)
     if max_id is not None:
         filtered_messages = filtered_messages.filter(id__lte=max_id)
     filtered_messages = filter_messages(filtered_messages, **kwargs)
@@ -156,15 +155,3 @@ def search_messages(**kwargs):
     count = filtered_messages.aggregate(count=dj_models.Count('id'))['count']
     query = filtered_messages.order_by('-date')[offset:offset + limit]
     return query, count
-
-
-def categories(place):
-    last_day = timezone.now() - datetime.timedelta(days=56)
-    query = models.Category.objects.filter(
-        thing__message__place_id=place.id,
-        thing__message__date__gte=last_day
-    ).values('name').annotate(
-        count=dj_models.Count('thing__message'),
-        last=dj_models.Max('thing__message__date')
-    ).order_by('-count', '-last')
-    return query

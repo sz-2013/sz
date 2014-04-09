@@ -53,8 +53,6 @@ class ApiRoot(SzApiView):
     def get(self, request, format=None):
         return sz_api_response.Response({
             'static': {
-                'static_categories': reverse(
-                    'static-categories', request=request),
                 'static_races': reverse('static-races', request=request),
                 'static_genders': reverse('static-genders', request=request),
                 'static_faces': reverse('static-faces', request=request),
@@ -62,10 +60,10 @@ class ApiRoot(SzApiView):
                     'static-roles-user', request=request),
                 # 'categories': reverse('category-list', request=request),
             },
-            'test_mode': {
-                'generate_places': reverse('generate-places', request=request),
-                'testmode_places': reverse('testmode-places', request=request),
-            },
+            # 'test_mode': {
+            #     'generate_places':reverse('generate-places',request=request),
+            #     'testmode_places':reverse('testmode-places',request=request),
+            # },
             'place': {
                 'places_news': reverse('place-news', request=request),
                 'places_search_in_venues': reverse(
@@ -86,8 +84,6 @@ class ApiRoot(SzApiView):
                 'users_registration': reverse(
                     'users-registration', request=request),
                 'users_profile': reverse('users-profile', request=request),
-                'users_resending_activation_key': reverse(
-                    'users-resending-activation-key', request=request),
             },
             'message': {
                 # 'messages-search': reverse(
