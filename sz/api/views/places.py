@@ -7,7 +7,7 @@ from sz.api import forms, posts, serializers
 from sz.api.response import Response as sz_api_response
 from sz.api.views import SzApiView, news_feed_service,\
     place_service, gamemap_service
-from sz.core import models
+from sz.place import models
 
 
 class PlaceRoot(SzApiView):

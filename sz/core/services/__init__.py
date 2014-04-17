@@ -178,7 +178,7 @@ class GameMapService(FeedService):
             None
         """
         city_id = self.city_service.get_city_by_position(
-            params.get('longitude'), params.get('latitude'))['geoname_id']
+            params['longitude'], params['latitude'])['id']
         #dont forget add is_active in filter
         places_list = modelPlace.objects.filter(city_id=city_id)
         #нужно получить нечетное целое число, чтобы оно стало длиной ребра
@@ -291,8 +291,8 @@ class GameMapService(FeedService):
         places_list = filter(
             lambda p: p.gamemap_position,
             queries.search_places(**params.get_db_params()))
-        curr = places_list[0]
-        prev = random.choice(places_list)
+        curr = places_list and places_list[0] or None
+        prev = places_list and random.choice(places_list) or None
         return dict(
             path=_get_path(prev, curr),
             prev_box=self._make_place_distance_item(prev, params),

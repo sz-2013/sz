@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from sz.api.views import SzApiView
 from sz.api import forms, posts, serializers
 from sz.api import response as sz_api_response
-from sz.core import models
+from sz.message import models
 from sz.settings import LEBOWSKI_MODE_TEST
 
 

@@ -1,5 +1,9 @@
 from django.contrib import admin
 from sz.core.models import *
+from sz.gamemap.models import *
+from sz.message.models import *
+from sz.place.models import *
+from sz.static.models import *
 
 admin.site.register(Races)
 admin.site.register(Gender)

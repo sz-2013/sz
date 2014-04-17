@@ -3,7 +3,7 @@ from django.http import Http404
 from sz.api import response as sz_api_response, serializers
 from rest_framework.reverse import reverse
 from sz.api.views import SzApiView
-from sz.core import models
+from sz.static import models
 
 
 class StaticObjects(SzApiView):

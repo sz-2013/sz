@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from sz.api import views as root
-from sz.api.views import auth, messages, places, static, users, testmode
+from sz.api.views import auth, messages, places, static, users
 
 
 urlpatterns = patterns(
