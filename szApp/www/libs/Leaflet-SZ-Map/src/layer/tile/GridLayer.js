@@ -7,7 +7,7 @@ L.GridLayer = L.Layer.extend({
 	options: {
 		pane: 'tilePane',
 
-		tileSize: 100,
+		tileSize: 164,  /*150+расстояние между tiles + бордер*/
 		opacity: 1,
 
 		unloadInvisibleTiles: L.Browser.mobile,

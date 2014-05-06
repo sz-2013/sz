@@ -345,23 +345,22 @@ input {
   border: none;
   -webkit-border-radius: 21px;
   border-radius: 21px;
-  color: rgba(140,140,140,1);
   text-decoration: normal;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  background: rgba(40,40,40,0.1);
   -webkit-box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
   box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
-  -webkit-transition: all 502ms cubic-bezier(0.68, -0.75, 0.265, 1.75);
-  -moz-transition: all 502ms cubic-bezier(0.68, -0.75, 0.265, 1.75);
-  -o-transition: all 502ms cubic-bezier(0.68, -0.75, 0.265, 1.75);
-  transition: all 502ms cubic-bezier(0.68, -0.75, 0.265, 1.75);
-
-}
-
-input:focus, input:hover {
+  -webkit-transition: all .3s easy-out;
+  -moz-transition: all .3s easy-out;
+  -o-transition: all .3s easy-out;
+  transition: all .3s easy-out;
   color: rgba(255,255,255,1);
   background: rgba(40,40,40,0.2);
+}
+
+input:focus{
+  color: rgba(140,140,140,1);
+  background: rgba(40,40,40,0.1);
   outline: none;
 }
 
@@ -413,6 +412,13 @@ a:visited { border-bottom: 1px solid gray; }
     overflow: hidden;
     white-space: nowrap;
     text-overflow:ellipsis;
+}
+
+.hideAfter:after{
+    visibility: hidden!important;
+}
+.hideBefore:before{
+    visibility: hidden!important;
 }
 
 

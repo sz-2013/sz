@@ -47,20 +47,6 @@ angular.module('sz.client.directives', [])
             });
         }
     })
-    .directive('szInCenter', function(){
-        return function(scope, element, attrs) {
-            function inCenter(){
-                var incenter = element[0];
-                incenter.style.marginTop = (window.innerHeight - incenter.offsetHeight)/2 + 'px';
-            }
-            scope.$watch(attrs.szInCenter, function(val){
-                if(val) inCenter()
-            });
-            window.addEventListener("orientationchange", function() {
-                inCenter()
-            }, false);
-        }
-    })
     .directive('szSetWindow', function(){
         return function(scope, element, attrs) {
             function setWindow(){

@@ -39,12 +39,8 @@ L.TileLayer = L.GridLayer.extend({
 	},
 
 	createTile: function () {
-		//if(gBox.pos[0] < 0 || gBox.pos[1] < 0) return
 		var tile = document.createElement('div');
 		tile.className = 'gmtile'
-/*		tile.innerHTML = '<div class="gamemap-item nobody">' +
-							'<h3>Empty Box</h3>' +
-			             '</div>'*/
 		return tile;
 	},
 

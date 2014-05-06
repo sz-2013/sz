@@ -111,7 +111,8 @@ class User(AbstractBaseUser):
     faces = models.ManyToManyField(
         'static.Face', verbose_name=_('faces'), blank=True, null=True)
     last_box = models.ForeignKey(
-        'place.Place', verbose_name=_('last user position'), blank=True, null=True)
+        'place.Place', verbose_name=_('last user position'),
+        blank=True, null=True)
 
     USERNAME_FIELD = 'email'
 

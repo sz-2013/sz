@@ -61,9 +61,9 @@ simpleSlider.prototype._initThumb = function() {
         var li = document.createElement( 'li' );
         var sameitem = self.items[index];
         addClass(li, sameitem._gBox.owner)
-        var rotate = 'rotateZ(' + start_angle + step*(index+1) + 'deg)';
+        /*var rotate = 'rotateZ(' + start_angle + step*(index+1) + 'deg)';
         li.style['-webkit-transform'] = rotate;
-        li.style['transform'] = rotate;
+        li.style['transform'] = rotate;*/
         li.addEventListener( 'click', function(e){self._setActive( sameitem ) });
         self.thumbElem.appendChild( li );
     }
@@ -76,7 +76,7 @@ simpleSlider.prototype._initThumb = function() {
         this.thumbElem.innerHTML = ''
     }
     for (var index = 0; index < itemslen; index++) {_createThumb(index)};
-    this.elem.insertBefore(this.thumbElem, this.elemUl);
+    this.elem.appendChild(this.thumbElem, this.elemUl);
     this.thumbItems = this.thumbElem.getElementsByTagName( 'li' );
     this._setThumb( this.thumbItems[0] )
 };
@@ -90,19 +90,16 @@ simpleSlider.prototype._initDrag = function() {
         self._inDrag = true;
         self.cx = getMouse( e ).x
         names.forEach( function( name ){self[name].cx = self[name].offsetLeft })
-        if(!self._isShowNav)
-            self.pressTimer = window.setTimeout(function(){self.longPressFn()}, self.longPressTm)
     }
 
     function fnMove( e ){
-        if( !self._inDrag || self._isShowNav) return
+        if( !self._inDrag) return
         var dx = getMouse( e ).x - self.cx;
         names.forEach( function( name ){self[name].style.left = self[name].cx + dx + 'px'} )
-        if( (dx < self.div*-1 || dx > self.div)&&self.pressTimer ) clearTimeout(self.pressTimer)
     }
 
     function fnUp( e ){
-        if( self.cx == undefined  || self._isShowNav) return
+        if( self.cx == undefined) return
         var dx = getMouse(e).x - self.cx;
         self._inDrag = false;
         self.elem.style.cursor = 'default';
@@ -111,17 +108,16 @@ simpleSlider.prototype._initDrag = function() {
         self._clearPosition()
         if( dx < self.div*-1 ) self.next()
         else if( dx > self.div ) self.prev()
-        if(self.pressTimer) clearTimeout(self.pressTimer)
     }
 
-    self.elem.addEventListener( 'mousedown', fnDrag )
-    self.elem.addEventListener( 'touchstart', fnDrag )
-    self.elem.addEventListener( 'mousemove', fnMove )
-    self.elem.addEventListener( 'touchmove', fnMove )
-    self.elem.addEventListener( 'mouseup', fnUp )
-    self.elem.addEventListener( 'touchend', fnUp )
-    self.elem.addEventListener( 'mouseleave', fnUp )
-    self.elem.addEventListener( 'touchcancel', fnUp )
+    self.elemUl.addEventListener( 'mousedown', fnDrag )
+    self.elemUl.addEventListener( 'touchstart', fnDrag )
+    self.elemUl.addEventListener( 'mousemove', fnMove )
+    self.elemUl.addEventListener( 'touchmove', fnMove )
+    self.elemUl.addEventListener( 'mouseup', fnUp )
+    self.elemUl.addEventListener( 'touchend', fnUp )
+    self.elemUl.addEventListener( 'mouseleave', fnUp )
+    self.elemUl.addEventListener( 'touchcancel', fnUp )
 
 };
 

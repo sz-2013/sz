@@ -1,17 +1,6 @@
-.simpleSlider{
-}
 
-.simpleSlider-thumb>li{
-    background-color: rgba(40,40,40,0.1);
-    -webkit-box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
-        box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.5) inset;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.simpleSlider-thumb>li:before, .simpleSlider-thumb>li:after,
 .gamemap-item:before, .gamemap-item:after{
-    height: 30%;
+    height: 5px;
     display: block;
     position: absolute;
     bottom: 0;
@@ -24,30 +13,105 @@
     background-color: transparent;
 }
 
-.simpleSlider-thumb>li:after{
-    bottom: auto;
-    top: 0;
+
+.gamemap-length{
+    margin-bottom: 0;
 }
 
-/*.simpleSlider-thumb>li:first-child:before{
-    background-color: rgba(0, 102, 255, 1);
-}
-
-.simpleSlider-thumb>li:last-child:before{
-    background-color: rgba(163, 78, 36, 1);
-}*/
-
-.simpleSlider-thumb>li:hover:before, .simpleSlider-thumb>li.active:before{
-    -webkit-box-shadow: 0 0 10px 10px rgba(28,42,56,1) inset;
-    box-shadow: 0 0 10px 10px rgba(28,42,56,1) inset;
-}
-
-
-.simpleSlider-container>li img{
+.gamemap-pathpreview{
+    list-style: none;
+    margin: 0;
     display: inline-block;
-    max-width: 100%;
-    max-height: 100%;
+    text-align: left;
+    padding: 54px 10px;
 }
+
+.gamemap-pathpreview>li{
+    display: block;
+    width:100%;
+    min-height: 10px;
+    text-align: left;
+}
+
+.gamemap-pathpreview>li:nth-child(even){
+   /* text-align: right;*/
+}
+
+.gamemap-pathpreview-node{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 30px;
+    margin: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    padding-top: 13px;
+    color: white;
+    text-shadow: 1px 1px 0 rgba(140,140,140,0.4) , -1px -1px 1px rgba(0,0,0,0.2);
+    position: relative;
+
+    border: 4px solid rgba(203, 203, 193, 0.4);
+    background-color: rgba(40,40,40,0.1);
+    box-shadow:
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
+    /*transform: perspective(100%);*/
+    -webkit-transition: all .1s;
+    transition: all .1s;
+    outline: none;
+    -webkit-user-select: none!important;
+}
+
+.gamemap-pathpreview-node:hover,
+.gamemap-pathpreview-node.active{
+    background-color: #f39c12!important;
+    opacity: .8;
+}
+
+.gamemap-pathpreview-node:after,
+.gamemap-pathpreview-node:before{
+    position: absolute;
+    content: "";
+    display: block;
+}
+
+.gamemap-pathpreview-node:after,
+.gamemap-pathpreview>li:nth-child(even) .gamemap-pathpreview-node:first-child:before{
+    width: 10px;
+    height: 3px;
+    top: 20px;
+    right: -14px;
+    border: 2px solid rgba(203, 203, 193, 0.4);
+    background-color: rgba(40,40,40,0.1);
+    box-shadow:
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.gamemap-pathpreview>li .gamemap-pathpreview-node:last-child:after{
+    visibility: hidden;
+}
+
+
+.gamemap-pathpreview>li:nth-child(odd) .gamemap-pathpreview-node:last-child:after{
+    top: initial;
+    right: 19px;
+    bottom: -14px;
+    visibility: visible;
+    width: 3px;
+    height: 10px;
+}
+
+.gamemap-pathpreview>li:nth-child(even) .gamemap-pathpreview-node:first-child:before{
+    visibility: visible;
+    width: 3px;
+    height: 10px;
+    right: 19px;
+    top: initial;
+    bottom: -14px;
+}
+
 
 .pathPreviewItem{
     width:100%;
@@ -73,10 +137,47 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.8em;
+    font-size: 12px;
     color: rgba(40,40,40, .6);
     text-shadow: 1px 1px 0 rgba(255,255,255,0.2) ;
+    background-color: rgba(226,226,226,0.6);
 }
+
+.gamemap-item .gBox-img{
+    visibility: hidden;
+    display: inline-block;
+    max-width: 100%;
+    max-height: 80px;
+    position: relative;
+    z-index: 1;
+    margin-top: 18px;
+}
+
+
+.gamemap-item .gBox-detail{
+    font-size:  10px;
+    display: block;
+    background-color: rgba(255,255,255,0.6);
+    color: rgba(30,30,30, .6);
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.2) ;
+    position: absolute;
+    bottom: 0;
+    left:0;
+    right: 0;
+    padding-bottom: 5px;
+}
+
+.gamemap-item .gBox-detail span{
+    display: block;
+}
+
+.gamemap-item .gBox-detail-spec{
+    width: 100%;
+    margin: 0;
+}
+
+.gamemap-item .gBox-detail-profit{color: #0193B7;}
+.gamemap-item .gBox-detail-negative{color: #ea7d24;}
 
 .gamemap-item{
     left:0;
@@ -97,23 +198,26 @@
     -o-transform: scale(1);
     -ms-transform: scale(1);
     transform: scale(1);
+
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .gamemap-item:before{
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
-    -webkit-transform-origin: -20px 0 0;
+    /*-webkit-transform-origin: -20px 0 0;
     transform-origin: -20px 0 0;
     -webkit-transform: rotateZ(30deg);
-    transform: rotateZ(30deg);
+    transform: rotateZ(30deg);*/
 }
 
 .gamemap-item:after{
     bottom: auto;
     top: 0;
-    -webkit-transform-origin: -15px 40px 0;
+    /*-webkit-transform-origin: -15px 40px 0;
     transform-origin: -15px 40px 0;
     -webkit-transform: rotateZ(-30deg);
-    transform: rotateZ(-30deg);
+    transform: rotateZ(-30deg);*/
 }
 
 .gamemap-item.gamemap-item-wavein{
@@ -130,11 +234,11 @@
 }
 
 .neutral.gamemap-item:before,
-.simpleSlider-thumb>li.neutral{
+.gamemap-pathpreview-node.neutral{
     background-color: #b6aea1;
 }
 
-.own.gamemap-item:after,
+/*.own.gamemap-item:after,
 .simpleSlider-thumb>li.own:after{
     background-color: #f2d100;
     box-shadow: 0 -1px 2px 0 rgba(0,0,0,0.2) inset;
@@ -144,9 +248,22 @@
 .simpleSlider-thumb>li.positive, .simpleSlider-thumb>li.own{
     background-color: #8DC900;
 }
+*/
+
+.own.gamemap-item:before,
+.gamemap-pathpreview-node.own{
+    background-color: #f2d100;
+}
+
+
+.positive.gamemap-item:before,
+.gamemap-pathpreview-node.positive{
+    background-color: #0193B7;
+}
+
 
 .negative.gamemap-item:before,
-.simpleSlider-thumb>li.negative{
+.gamemap-pathpreview-node.negative{
     background-color: #ea7d24;
 }
 

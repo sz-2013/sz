@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.http import Http404
+from django.core.exceptions import ValidationError
 from rest_framework import permissions, status
 from rest_framework.reverse import reverse
-from sz import settings
 from sz.api import forms, posts, serializers
 from sz.api.response import Response as sz_api_response
 from sz.api.views import SzApiView, news_feed_service,\
@@ -11,8 +11,7 @@ from sz.place import models
 
 
 class PlaceRoot(SzApiView):
-    if not settings.LEBOWSKI_MODE_TEST:
-        permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated, )
     LIMIT = 10
 
     def _serialize_item(self, item, user):
@@ -204,3 +203,15 @@ class GameMapTile(PlaceRoot):
         data['place_gamemap_position'] = data['place_gamemap_position'] or \
             [params['x'], params['y']]
         return sz_api_response(data)
+
+
+class GameMapUpdatePath(PlaceRoot):
+    """Update gamemap path for user.
+    In request.POST:
+        - path [[1, 1],..., [1, 2]] - user path positions
+    Returns:
+        - 200 if path was updated
+        - 400 in case of error"""
+    def post(self, request):
+        user = request.user
+        gamemap_service.update_user_gamemap()

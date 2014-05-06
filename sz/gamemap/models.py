@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.gis.db import models
 from sz.gamemap.fields import GameMapBoxesField
-from django.core.exceptions import ValidationError
 
 
 class UserPathManager(models.Manager):
@@ -30,7 +29,6 @@ class UserPath(models.Model):
     path = GameMapBoxesField()
 
     def update(self, path=None, city_id=None):
-        print 'update'
         self.city_id = city_id or self.city_id
         self.path = path or self.path
         self.save()

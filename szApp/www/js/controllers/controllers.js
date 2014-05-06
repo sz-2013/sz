@@ -49,17 +49,12 @@ var navigationPaths = {
     map_backtopath: 'partials/navs/navigation/map/backtopath.html',
     map_runpath: 'partials/navs/navigation/map/runpath.html',
     map_ppcontrol: 'partials/navs/navigation/map/ppcontrol.html',
+    map_custompath: 'partials/navs/navigation/map/custompath.html',
 }
 
 
 var partials = {
-    'regConfirm':'partials/registration-confirmation.html',
 }
-
-/*var pageHeaders = {
-    'main': 'main-header',
-    'messageAdd': 'messageadd-header'
-}*/
 
 function objPop(obj) {
   for (var key in obj) {
@@ -250,6 +245,8 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.map_runPath = function(){$scope.$broadcast('runPath', true) }
     $scope.map_ppcontrol_add = function($event){$scope.$broadcast('ppcontrol_add', $event.currentTarget) }
     $scope.map_ppcontrol_remove = function($event){$scope.$broadcast('ppcontrol_remove', $event.currentTarget) }
+    $scope.map_customPath = function(){$scope.$broadcast('customPath')}
+    $scope.map_gBoxDetail = function(){$scope.$broadcast('gBoxDetail')}
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];

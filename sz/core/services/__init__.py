@@ -9,6 +9,7 @@ from sz.core.services.parameters import names as params_names
 from sz.core.gis import venue
 from sz.core import queries, gis as gis_core
 from sz.core.models import User as modelUser
+from sz.gamemap.models import UserPath as modelUserPath
 from sz.message.models import Message as modelMessage
 from sz.place.models import Place as modelPlace
 
@@ -287,14 +288,18 @@ class GameMapService(FeedService):
 
         params = parameters.PlaceSearchParametersFactory.create(
             kwargs, self.city_service)
-        user = modelUser.objects.get(email=user)
+        params_dict = params.get_db_params()
         places_list = filter(
             lambda p: p.gamemap_position,
-            queries.search_places(**params.get_db_params()))
+            queries.search_places(**params_dict))
         curr = places_list and places_list[0] or None
         prev = places_list and random.choice(places_list) or None
+        path = _get_path(prev, curr)
+        # create/update path for user in db
+        self.update_user_gamemap(modelUser.objects.get(email=user), path,
+                                 params_dict[params_names.CITY_ID])
         return dict(
-            path=_get_path(prev, curr),
+            path=path,
             prev_box=self._make_place_distance_item(prev, params),
             current_box=self._make_place_distance_item(curr, params),
         )
@@ -311,6 +316,10 @@ class GameMapService(FeedService):
         place = queries.get_place(
             kwargs.get('x'), kwargs.get('y'), **params.get_db_params())
         return self._make_place_distance_item(place, params)
+
+    def update_user_gamemap(self, user, path, city_id):
+        modelUserPath.objects.create_or_update_path(
+            path=path, user=user, city_id=city_id)
 
 
 class MessageService(FeedService):

@@ -1,3 +1,18 @@
+function drawTile(gBox){
+    var img = gBox.castle ? ('//192.168.0.101:8080/!/' + gBox.castle.img) : '';
+    var tile = '<h3>' + gBox.name + '</h3>'/* + '<img src="' + img + '" class="gBox-img">'*/;
+    if(gBox.castle && gBox.castle.img){
+        var tile = tile + '<div class="gBox-detail">' + [
+            '<span >' + 'The Sieve of Eratosthenes' + ' ' + gBox.lvl[0] + '/' + gBox.lvl[1] + '</span>'
+            /*, + '</span>' + '<span class="gBox-detail"><i class="fa fa-tachometer"></i>'*/
+            /*,gBox.buildings[0] + '/' + gBox.buildings[1] + '</span>' + '<span class="gBox-detail"><i class="fa fa-building-o"></i>'*/
+            ,'<span class="gBox-detail-spec gBox-detail-profit">' + gBox.profit + '</span>'
+            ,'<span class="gBox-detail-spec gBox-detail-negative">' + gBox.negative + '</span>'
+        ].join('')
+    }
+    return {tile: tile, img: img || ''}
+}
+
 L.GM = L.Class.extend({
     options: {
         zero: {x: 20971, y: 20971}
@@ -62,9 +77,9 @@ L.GM = L.Class.extend({
         var tile = this.getTile( gBox.pos[0], gBox.pos[1] )
         //рисуем внутрености у tile
         if( tile ){
-            tile.innerHTML = '<div class="gamemap-item hideitem ' + gBox.owner + '">' +
-                                '<h3>' + gBox.name + '</h3>' +
-                                '<img src="' + (gBox.castle ? gBox.castle.img : '') + '" >' +
+            var inner = drawTile(gBox)
+            tile.innerHTML = '<div class="gamemap-item hideitem ' + gBox.owner + '" style="background-image:url(' + inner.img + ')">' +
+                                inner.tile +
                              '</div>'
             setTimeout(function(){L.DomUtil.removeClass(tile.querySelector('.gamemap-item'), 'hideitem')}, 100);
             this._map.tileLayer.markReady(tile, this.gmReady)
@@ -181,14 +196,27 @@ L.GM.prototype.gameBox = function(options){
     this.name = options.name || options.place_name || empty_name,
     this.pos = options.pos;
 
-    var ownerArr = ['neutral', 'negative', 'positive', 'nobody']
+    var ownerArr = ['neutral', 'negative', 'positive', 'nobody'];
     if(this.name != empty_name){
         this.owner = ownerArr[Math.floor(Math.random()*ownerArr.length)]
         if( Math.floor(Math.random()*10) == 1) this.owner = 'own'
     } else { this.owner = 'nobody' }
     this.castle = {
-        img: this.owner !== 'nobody' ? 'img/' + Math.floor(Math.random()*10 + 1) + '.png' : ''
+        /*img: this.owner !== 'nobody' ? 'img/ms/' + Math.floor(Math.random()*21 + 1) + '.jpg' : ''*/
+        img: this.owner !== 'nobody' ? 'img/ms/' + 1 + '.png' : ''
     }
+    if(this.owner == 'negative') this.castle.img = 'img/ms/amadeus/' + '3.png'
+    if(this.owner == 'positive') this.castle.img = 'img/ms/united/' + 1 + '.png'
+
+    this.profit = '+' + Math.floor(Math.random()*50 + 1) + 'HP';
+    this.negative = '-' + Math.floor(Math.random()*50 + 1) + 'HP';
+
+    var maxLvl = 3;
+    this.lvl = [Math.floor(Math.random()*3+1), maxLvl];
+
+    var buildings = {1: 0, 2: 6, 3: 9};
+    var maxB = buildings[this.lvl[0]];
+    this.buildings = [Math.floor(Math.random()*(maxB-1)+1), maxB]
 }
 
 

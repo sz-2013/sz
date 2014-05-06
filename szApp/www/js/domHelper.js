@@ -1,3 +1,7 @@
+function isArray(val){
+    return Object.prototype.toString.call( val ) === '[object Array]'
+}
+
 function trim(str){
     return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
 }
@@ -33,6 +37,8 @@ function hasClass(el, name) {
 
 function addClass(id, name){
     var el = typeof id == 'string' ? document.getElementById(id) : id;
+    var namesList = isArray( name ) ? name : [name];
+    var name = namesList.pop();
     if (el.classList !== undefined) {
         var classes = splitWords(name);
         for (var i = 0, len = classes.length; i < len; i++) {
@@ -42,6 +48,7 @@ function addClass(id, name){
         var className = getClass(el);
         setClass(el, (className ? className + ' ' : '') + name);
     }
+    if(namesList.length) return addClass(el, namesList)
 }
 
 
@@ -95,6 +102,11 @@ Array.prototype.compare = function (array) {
     return true;
 }
 
+String.prototype.toIntArray = function(separate){
+    var array = this.split(separate || ',');
+    return array.map(function(el){return parseInt(el, 10)})
+}
+
 
 function getMouse (e) {
     if(e.changedTouches) var e = e.changedTouches[0];
@@ -108,4 +120,5 @@ function findParent(parentSellector, el, nodes){
            parent != document ? findParent(parentSellector, parent, nodes) :
            null
 }
+
 

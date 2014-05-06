@@ -2,73 +2,80 @@ angular.module('map-directive', [])
     .directive('mapPathPreview', [function(){
         return {
             scope: {
-                isshow: '=isshow',
-                ppoints: '=ppoints', //[gBox, gBox]
+                ppoints: '=ppoints', //[gBox, gBox, ...]
                 center: '=center', //[x, y]
             },
             restrict: 'E',
             template:
-                '<div class="simpleSlider">' +
-                    '<nav>' +
-                        '<button class="btn circle-btn btn-default" ng-click="slider.spreadNav()">' +
-                            '<i class="fa fa-times"></i>' +
-                        '</button>' +
-                        '<button class="btn circle-btn btn-default">' +
-                            '<i class="fa fa-ellipsis-h"></i>' +
-                        '</button>' +
-                        '<button class="btn circle-btn btn-default" ng-click="showGameMap()">' +
-                            '<i class="fa fa-cogs"></i>' +
-                        '</button>' +
-                    '</nav>' +
-                    '<ul class="simpleSlider-container gamemap-item">' +
-                    '</ul>' +
+                '<div>' +
+                    '<h5 class="gamemap-length">Path length: {{ppoints.length}}</h5>' +
+                    /*'<ul class="simpleSlider-container gamemap-item"></ul>' +*/
+                    '<ul class="gamemap-pathpreview"></ul>'+
                 '</div>',
             replace: true,
             transclude: true,
             link: function($scope, element, attrs) {
-                var startLabel = 'mapbox-start-label';
-                var endLabel = 'mapbox-end-label';
-                simpleSlider.prototype._update_active_el = function() {
-                    $scope.$emit('setActivePoint', this.active._gBox.pos)
-                };
+                var elem = element[0].querySelector('.gamemap-pathpreview');
+                var activePos, nodeClass = 'gamemap-pathpreview-node';
 
-                $scope.slider = new simpleSlider( element[0], $scope )
-                var points;
+                $scope.$on('customPath', function(e){$scope.$emit('setGameMap', true);});
+                $scope.$on('gBoxDetail', function(e){console.log('gBoxDetail')});
 
-                $scope.showGameMap = function(){
-                    $scope.slider.spreadNav()
-                    $scope.$emit('setGameMap', true);
+                function setNodeActive( node ){
+                    if(!node) return
+                    node2array( elem.querySelectorAll('.' + nodeClass) ).map(
+                        function(el){removeClass(el, 'active')}) ;
+                    addClass(node, 'active');
                 }
 
-                function init(){
-                    var center = $scope.center;
-                    $scope.slider.empty()
-                    points = $scope.ppoints.map(function(gBox){
-                        var el = '<div>' +
-                                    '<h3>' + gBox.name + '</h3>' +
-                                    '<img src="' + gBox.castle.img + '" >' +
-                                 '</div>';
-                        el._gBox = gBox;
-                        $scope.slider.update( el, gBox )
-                    });
-                    updateCenter()
+                function createNode( gBox ){
+                    var node = document.createElement('span');
+                    node.setAttribute('data-pos', gBox.pos);
+                    addClass(node, gBox.owner);
+                    addClass(node, nodeClass);
+                    node.onclick = function(){
+                        setNodeActive(this)
+                        $scope.$emit('setActivePoint', this.getAttribute('data-pos').toIntArray())
+                    }
+                    if( gBox.pos.compare(activePos) ) setNodeActive(node)
+                    return node
                 }
 
-                function updateCenter(){
-                    var pos = $scope.center;
-                    if( pos.compare( $scope.slider.active._gBox.pos ) ) return
-                    var item;
-                    for (var i = $scope.slider.items.length - 1; i >= 0; i--) {
-                        var _item = $scope.slider.items[i];
-                        if( pos.compare(_item._gBox.pos) ) var item = _item;
+
+                function createPathPreview(ppoints){
+                    if(!ppoints) return
+                    elem.innerHTML = '';
+                    var elemStyle = document.defaultView.getComputedStyle(elem, null), padding = (parseInt(elemStyle['padding-left']) + parseInt(elemStyle['padding-left'])),
+                        ppointsLen = ppoints.length, nodeWidth = 60, width = (element[0].offsetWidth - padding),
+                        nodesInRow = Math.floor(width/nodeWidth), rowWidth = nodesInRow*nodeWidth + padding, rowValue = Math.ceil(ppointsLen/nodesInRow);
+                    elem.style.width = rowWidth + 'px';
+                    //console.log([width/nodeWidth, nodesInRow, rowWidth, width, element[0].offsetWidth, parseInt(elemStyle['padding-left'])])
+                    //console.log([nodesInRow, rowValue])
+                    for (var i = 0; i < rowValue; i++) {
+                        var row = document.createElement( 'li' );
+                        for (var j = 0; j < nodesInRow; j++) {
+                            var num = ((i % 2) ? (nodesInRow-j-1) : j) + i*nodesInRow;
+                            if (num < ppointsLen){
+                                var node = createNode( ppoints[num] );
+                                node.innerHTML = num + 1;
+                                if( num == (ppointsLen-1) ) addClass(node, ['hideBefore', 'hideAfter'])
+                                row.appendChild( node )
+                            }
+                        };
+                        elem.appendChild( row )
                     };
-                    if(!item) return
-                    $scope.slider._setActive(item)
                 }
 
-                $scope.$watch('ppoints', function(val){if(val) init() });
-                $scope.$watch('center', function(pos){if(pos&&$scope.slider.active) updateCenter() });
-                $scope.$watch('isshow', function(val){if(val) $scope.$emit('setMapInCenter', true) });
+                window.addEventListener("orientationchange", function() {
+                    if( $scope.ppoints ) createPathPreview( $scope.ppoints )
+                }, false);
+
+                $scope.$watch( 'ppoints', createPathPreview );
+
+                $scope.$watch( 'center', function( activePos ){
+                    if(activePos && !elem.querySelector('.active')) setNodeActive(elem.querySelector('[data-pos="' + activePos.toString() + '"]'))
+                });
+
             }
         };
     }])
@@ -100,9 +107,6 @@ angular.module('map-directive', [])
                     var gBox = this.findGbox([x, y]);
                     if(!gBox) $scope.$emit('getGBoxFromApi', x, y, 'setGBox')
                     else $scope.map.gm.drawTile( false, gBox )
-                };
-                L.GM.prototype.gmReady = function() {
-                    //console.log(1)
                 };
                 L.GM.prototype.createPath = function() {
                     var pathLen = this.pathPositions.length;
