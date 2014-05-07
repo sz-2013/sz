@@ -1,5 +1,5 @@
 function drawTile(gBox){
-    var img = gBox.castle ? ('//192.168.0.101:8080/!/' + gBox.castle.img) : '';
+    var img = gBox.ms.img;
     var tile = '<h3>' + gBox.name + '</h3>'/* + '<img src="' + img + '" class="gBox-img">'*/;
     if(gBox.castle && gBox.castle.img){
         var tile = tile + '<div class="gBox-detail">' + [
@@ -48,7 +48,7 @@ L.GM = L.Class.extend({
 
     getGameBox: function (point){
         var pos = this.project2gm(point);
-        this.getGameBoxFromApi(pos.x, pos.y)
+        return this.getGameBoxFromApi(pos.x, pos.y)
     },
 
     findGbox: function (pos){
@@ -78,9 +78,8 @@ L.GM = L.Class.extend({
         //рисуем внутрености у tile
         if( tile ){
             var inner = drawTile(gBox)
-            tile.innerHTML = '<div class="gamemap-item hideitem ' + gBox.owner + '" style="background-image:url(' + inner.img + ')">' +
-                                inner.tile +
-                             '</div>'
+            tile.innerHTML = ['<div class="gamemap-item hideitem ', gBox.owner,'"', inner.img ? ' style="background-image:url(' + inner.img + ')"' : '' , '>' ,
+                               inner.tile, '</div>'].join('')
             setTimeout(function(){L.DomUtil.removeClass(tile.querySelector('.gamemap-item'), 'hideitem')}, 100);
             this._map.tileLayer.markReady(tile, this.gmReady)
         }
@@ -192,31 +191,23 @@ L.GM = L.Class.extend({
 
 
 L.GM.prototype.gameBox = function(options){
+    //Options:
+    //name - str
+    //owner - str (['neutral', 'negative', 'positive', 'nobody', 'own'])
+    //profit - str ('+10HP, +1Int, +2Agl')
+    //negative - str ('-10HP, -1Int, -2Agl')
+    //lvl - array, [currLvl, maxLvl]
+    //buildings - array, [currVal, maxVal]
     var empty_name = 'Empty box';
     this.name = options.name || options.place_name || empty_name,
     this.pos = options.pos;
-
-    var ownerArr = ['neutral', 'negative', 'positive', 'nobody'];
-    if(this.name != empty_name){
-        this.owner = ownerArr[Math.floor(Math.random()*ownerArr.length)]
-        if( Math.floor(Math.random()*10) == 1) this.owner = 'own'
-    } else { this.owner = 'nobody' }
-    this.castle = {
-        /*img: this.owner !== 'nobody' ? 'img/ms/' + Math.floor(Math.random()*21 + 1) + '.jpg' : ''*/
-        img: this.owner !== 'nobody' ? 'img/ms/' + 1 + '.png' : ''
-    }
-    if(this.owner == 'negative') this.castle.img = 'img/ms/amadeus/' + '3.png'
-    if(this.owner == 'positive') this.castle.img = 'img/ms/united/' + 1 + '.png'
-
-    this.profit = '+' + Math.floor(Math.random()*50 + 1) + 'HP';
-    this.negative = '-' + Math.floor(Math.random()*50 + 1) + 'HP';
-
-    var maxLvl = 3;
-    this.lvl = [Math.floor(Math.random()*3+1), maxLvl];
-
-    var buildings = {1: 0, 2: 6, 3: 9};
-    var maxB = buildings[this.lvl[0]];
-    this.buildings = [Math.floor(Math.random()*(maxB-1)+1), maxB]
+    this.owner = options.place_owner;
+    this.profit = options.place_profit;
+    this.negative = options.place_negative;
+    this.negative = options.place_negative;
+    this.ms = {img: options.place_ms ? options.place_ms.reduced : ''}
+    this.lvl = options.place_lvl;
+    this.buildings = options.place_buildings;
 }
 
 

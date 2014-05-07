@@ -73,6 +73,8 @@ class ApiRoot(SzApiView):
                 'place_detail_messages': reverse(
                     'place-detail-messages',
                     request=request, kwargs={'pk': 22}),
+                'place_detail': reverse(
+                    'place-detail', request=request, kwargs={'pk': 22}),
                 # 'places-search': reverse('place-search', request=request),
             },
             'auth': {

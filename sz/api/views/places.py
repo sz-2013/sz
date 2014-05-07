@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.http import Http404
 from django.core.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework.reverse import reverse
 from sz.api import forms, posts, serializers
@@ -8,6 +9,7 @@ from sz.api.response import Response as sz_api_response
 from sz.api.views import SzApiView, news_feed_service,\
     place_service, gamemap_service
 from sz.place import models
+from sz.static.models import BuildingImage as modelsBuildingImage
 
 
 class PlaceRoot(SzApiView):
@@ -38,6 +40,15 @@ class PlaceRoot(SzApiView):
             self.form, query)
         params['limit'] = self.LIMIT
         return params
+
+    def _get_detail(self, request, place, user=None):
+        data = self._serialize_item(place, user)
+        engine_data = posts.fake_get_place_data(data)
+        data.update(engine_data)
+        data['place_ms'] = modelsBuildingImage.objects.get_ms(
+            engine_data['place_lvl'], engine_data['place_owner_race'],
+            reverse('client-index', request=request))
+        return data
 
 
 class PlaceRootNews(SzApiView):
@@ -165,6 +176,13 @@ class PlaceInstanceMessages(SzApiView):
 #         return sz_api_response(data)
 
 
+class PlaceDetail(PlaceRoot):
+    def get(self, request, pk, format=None,):
+        place = get_object_or_404(models.Place, pk=pk)
+        data = self._get_detail(request, place)
+        return sz_api_response(data)
+
+
 class GameMapPath(PlaceRoot):
     """For example,[new position
     (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082)."""
@@ -197,7 +215,7 @@ class GameMapTile(PlaceRoot):
         user = request.user
         # return {<place>, distance}
         tile = gamemap_service.get_gamemap_tile(user, **params)
-        data = self._serialize_item(tile, user)
+        data = self._get_detail(request, tile, user)
         # Если у объекта нет gamemap_position значит это шаблон,
         # но без gamemap_position я не смогу найти его на карте
         data['place_gamemap_position'] = data['place_gamemap_position'] or \

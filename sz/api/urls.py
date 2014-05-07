@@ -46,6 +46,8 @@ urlpatterns = patterns(
         places.PlaceVenueExplore.as_view(), name='place-explore-in-venues'),
     # url(r'^places/(?P<pk>\w+)/newsfeed/?$',
     #    places.PlaceInstanceNewsFeed.as_view(), name='place-detail-news'),
+    url(r'^places/(?P<pk>\w+)/?$',
+        places.PlaceDetail.as_view(), name='place-detail'),
     url(r'^places/(?P<pk>\w+)/messages/?$',
         places.PlaceInstanceMessages.as_view(), name='place-detail-messages'),
     # url(r'^places/(?P<pk>\w+)/?$',

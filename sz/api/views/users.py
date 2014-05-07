@@ -30,14 +30,14 @@ class UsersRoot(SzApiView):
         serializer = serializers.RegistrationSerializer(data=request.DATA)
         if serializer.is_valid():
             user = serializer.object
-            # user_data = USDS(instance=user).data
-            # engine_data = posts.users_create(user_data)
-            # if engine_data['status'] == status.HTTP_201_CREATED:
-            user = user.create_in_engine()
-            data = serializers.AuthUserSerializer(instance=user).data
-            return sz_api_response(
-                data=data, status=status.HTTP_201_CREATED)
-            # return engine_data
+            user_data = USDS(instance=user).data
+            engine_data = posts.UserPost().create(user_data)
+            if engine_data['status'] == status.HTTP_201_CREATED:
+                user = user.create_in_engine()
+                data = serializers.AuthUserSerializer(instance=user).data
+                return sz_api_response(
+                    data=data, status=status.HTTP_201_CREATED)
+            return engine_data
         return sz_api_response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

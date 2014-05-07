@@ -5,86 +5,118 @@ from sz import blsettings as settings
 from sz.core.utils import reverse_data
 from sz.settings import LEBOWSKI_MODE_TEST
 
+
+# ----------------------------------------------------------------------------
+# ----------------------------   FAKE   ----------------------------
+from random import choice, randint
+owners_options = ['neutral', 'negative', 'positive'] + \
+    map(lambda i: 'nobody', xrange(3))
+races = ['futuri', 'united', 'amadeus']
+_rand = lambda max=10: randint(0, max) == 1
+
+
+def get_fake_place_data(pk, name, need_owner=True):
+    def _generator(is_p=True, max_length=5, length=None):
+        length = length or randint(1, max_length)
+        options = ['intl', 'strn', 'aglt', 'stmn', 'frtn', 'slen', 'vish',
+                   'clr', 'shdw', 'prcn', 'ddg', 'ortr', 'hp', 'rgnr']
+        val = ['', '%']
+        gen = lambda i: '%s%s%s %s' % (
+            '+' if is_p else '-', randint(1, 20), choice(val), choice(options))
+        return map(gen, xrange(length))
+
+    if need_owner:
+        owner = 'own' if _rand() else choice(owners_options)
+        openner = '' if owner == 'nobody' and _rand(2) else choice(races)
+        lvl = randint(0, 3)
+    else:
+        owner = 'nobody'
+        openner = ''
+        lvl = 0
+    buildings = {0: 0, 1: 0, 2: 6, 3: 9}
+    owner_sp = randint(100, 1000)
+    sp = randint(1, owner_sp-1) if _rand(5) else 0
+    return dict(
+        place_id=pk, place_name=name, place_owner=owner, place_lvl=lvl,
+        place_profit=_generator(), place_negative=_generator(False),
+        place_buildings=[randint(0, buildings[lvl]), buildings[lvl]],
+        place_sp=[owner_sp if owner == 'own' else sp, owner_sp],
+        place_openner_race=openner,
+        place_owner_race=choice(races) if owner != 'nobody' else '')
+
+
+def get_fake_user_data(user_data):
+    zc = randint(0, 1000)
+    hp = randint(10, 1000)
+    _stat = [randint(4, 10), None if _rand(5) else randint(100, 1000)/10.0]
+    user_data.update(
+        user_places=randint(0, 10), user_zc=[zc/10.0, 0],
+        user_intl=_stat(), user_strn=_stat(), user_aglt=_stat(),
+        user_stmn=_stat(), user_frtn=_stat(), user_slen=randint(10, 30),
+        user_vish=randint(1, 5), user_clr=randint(10, 30)/10.0,
+        user_shdw=randint(0, 1000)/10, user_prcn=randint(3, 10),
+        user_ddg=randint(0, 300)/10.0, user_ortr=randint(3, 10),
+        user_hp=[randint(1, hp), hp], user_rgnr=randint(10/100)/10.0
+        )
+    return user_data
+# ----------------------------------------------------------------------------
+
+
 ENGINE_URL = "http://%(host)s:%(port)s/" % {
     'host': settings.LEBOWSKI['HOST'], 'port': settings.LEBOWSKI['PORT']}
 
 
-def get_data(response):
-    try:
-        code = response.get('code') or response.get('status')
-        if code:
-            return dict(
-                data=response.get('data'),
-                status=code)
-        else:
-            return dict(
-                data="no 'status' in server's answer: %s" % response,
-                status=400)
-    except Exception, e:
-        return dict(
-            data="something wrong with 'get_data' function: %s" % e,
-            status=httpStatus.HTTP_400_BAD_REQUEST)
+class MainPost(object):
+    PREFIX = dict('CREATE'='')
+
+    def _request(self, prefix, sending_data=None):
+        req = urllib2.Request(ENGINE_URL + prefix)
+        req.add_header('Content-Type', 'application/json')
+        try:
+            data = urllib2.urlopen(req, sending_data).read()
+            if isinstance(data, basestring):
+                data = json.loads(data)
+            return dict(data=data, status=answer.code)
+        except (urllib2.HTTPError, urllib2.URLError), e:
+            return dict(data=str(e.reason), status=e.code if isinstance(
+                e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST)
+
+    def _get(self, data, prefix):
+        return self._request(prefix)
+
+    def _post(self, data, prefix):
+        """
+        Do post on BigLebowski
+
+        Args:
+        data:  a data, what will be transformed with json to the BL.
+        prefix: an url prefix for this data.
+
+        Returns:
+        {"status": ANSWER_STATUS, "data": ANSWER}
+
+        if BL is not available return:
+        {"status": e.code or 400, "data": e.reason}
+        """
+        sending_data = json.dumps(data)
+        return self._request(prefix, sending_data)
+
+    def create(self, data):
+        return _post(PREFIX['CREATE'], data)
+
+    def get_detail(self, data, pk):
+        return _get(PREFIX['DETAIL'](pk), data)
 
 
-def main_post(data, prefix):
-    """
-Do post on BigLebowski
+class UserPost(MainPost):
+    PREFIX = settings.LEBOWSKI['URLS']['USERS']
 
-Args:
-data: data, which will be transformed into json and sended to BL.
-prefix: url prefix for this data.
-
-Returns:
-{"status": ANSWER_STATUS, "data": ANSWER}
-
-if BL is not available return:
-{"status": e.code or 400, "data": e.reason}
-
-LEBOWSKI_MODE_TEST:
-returns:
-{
-"status": ANSWER_STATUS,
-"data": {"receive": ANSWER, "tranceive": Args.data}
-}
-"""
-    send_data = json.dumps(data)
-    # print data
-    # print '----------------'
-    req = urllib2.Request(ENGINE_URL + prefix)
-    req.add_header('Content-Type', 'application/json')
-    try:
-        answer = urllib2.urlopen(req, send_data)
-        r = answer.read()
-        # print [r]
-        data = json.loads(r)
-        status = answer.code
-    except (urllib2.HTTPError, urllib2.URLError), e:
-        data = str(e.reason)
-        status = e.code if isinstance(
-            e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST
-    main_data = dict(data=data, status=status)
-    if LEBOWSKI_MODE_TEST:
-        main_data['data'] = dict(
-            receive=main_data['data'], tranceive=send_data)
-    return main_data
+    def create(self, data):
+        return dict(status=201, data=data)
 
 
-def main_get(data, prefix):
-    req = urllib2.Request(ENGINE_URL + prefix)
-    req.add_header('Content-Type', 'application/json')
-    return urllib2.urlopen(req).read()
+class PlacePost(MainPost):
+    PREFIX = settings.LEBOWSKI['URLS']['PLACES']
 
-
-def users_create(data):
-    response = main_post(data, settings.LEBOWSKI['URLS']['USERS']['CREATE'])
-    return get_data(response)
-
-
-def places_create(data):
-    response = main_post(data, settings.LEBOWSKI['URLS']['PLACES']['CREATE'])
-    return get_data(response)
-
-
-def messages_create(data):
-    response = main_post(data, settings.LEBOWSKI['URLS']['MESSAGES']['CREATE'])
-    return get_data(response)
+    def create(self, data):
+        return

@@ -237,16 +237,37 @@ class PlaceStandartDataSerializer(serializers.Serializer):
         source="get_last_message_date", required=False)
     place_state = serializers.BooleanField(source="is_active")
     place_fsqid = serializers.CharField(source="fsq_id", required=False)
-    # place_lvl = serializers.Field(source="lvl")
+    place_lvl = serializers.IntegerField(source="lvl")
     # place_owner = IntFloatListField(
     #     required=False, source="get_fake_owner_data")  # [id, 0.0]
     place_owner_race = serializers.CharField(
         source="get_owner_race", required=False)
+    place_openner_race = serializers.CharField(
+        source="openner_race.name", required=False)
 
     def validate(self, attrs):
         attrs = super(PlaceStandartDataSerializer, self).validate(attrs)
         return get_place(
             attrs.get('latitude'), attrs.get('longitude'), attrs.get('name'))
+
+
+class PlaceNoGameSerializer(serializers.Serializer):
+    place_id = serializers.IntegerField(source="id")
+    place_name = serializers.CharField(source="name", required=True)
+    place_city = serializers.Field(source="city_id")
+    place_latitude = serializers.FloatField(
+        source="latitude", required=True)
+    place_longitude = serializers.FloatField(
+        source="longitude", required=True)
+    place_address = serializers.CharField(source="address", required=False)
+    place_gamemap_position = serializers.Field(
+        source="get_gamemap_position", )  # [x, y]
+    place_role = serializers.Field(source="role.name")
+    place_date = StringDataField(source="date_is_active")
+    place_last_message_date = StringDataField(
+        source="get_last_message_date", required=False)
+    place_state = serializers.BooleanField(source="is_active")
+    place_fsqid = serializers.CharField(source="fsq_id", required=False)
 
 
 class PlaceStandartDataShortSerializer(serializers.Serializer):
