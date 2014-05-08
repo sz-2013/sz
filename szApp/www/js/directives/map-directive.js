@@ -36,6 +36,7 @@ angular.module('map-directive', [])
                     node.onclick = function(){
                         setNodeActive(this)
                         $scope.$emit('setActivePoint', this.getAttribute('data-pos').toIntArray())
+                        $scope.$emit('setCurrentGBox', gBox)
                     }
                     if( gBox.pos.compare(activePos) ) setNodeActive(node)
                     return node
@@ -58,7 +59,10 @@ angular.module('map-directive', [])
                             if (num < ppointsLen){
                                 var node = createNode( ppoints[num] );
                                 node.innerHTML = num + 1;
-                                if( num == (ppointsLen-1) ) addClass(node, ['hideBefore', 'hideAfter'])
+                                if( num == (ppointsLen-1) ){
+                                    addClass(node, 'hideBefore')
+                                    if(~i % 2) addClass(node, 'hideAfter')
+                                }
                                 row.appendChild( node )
                             }
                         };
@@ -134,19 +138,16 @@ angular.module('map-directive', [])
                         if ( e.originalEvent.target.localName == 'circle' ) return
                         var gPoint = $scope.map.gm.latlng2gm(e.latlng);
                         var tile = $scope.map.gm.getTile(gPoint.x, gPoint.y);
-                        if(!tile) return
-                        var inner = tile.querySelector('.gamemap-item');
                         var gBox = $scope.map.gm.findGbox([gPoint.x, gPoint.y]);
-
                         //добавляем новую точку если нужно
                         if( $scope.map.gm._newPoint ) return $scope.$apply( function(){$scope.map.gm.pushNewPPoint( gBox ) } )
 
-                        if( gBox.owner == 'nobody' ) return
-
-                        addClass(inner, 'gmtile-inner-wavein');
-                        inner.addEventListener( 'webkitTransitionEnd', function( e ) {
-                            removeClass(inner, 'gmtile-inner-wavein');
+                        addClass(tile, 'gmtile-inner-wavein');
+                        tile.addEventListener( 'webkitTransitionEnd', function( e ) {
+                            removeClass(tile, 'gmtile-inner-wavein');
                         }, false );
+                        $scope.map.setTileActive(tile);
+                        $scope.$emit('setCurrentGBox', gBox)
                     });
                 }
 

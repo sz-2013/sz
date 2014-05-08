@@ -16,6 +16,7 @@ L.GM.prototype.pushNewPPoint = function(gBox) {
     //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
     //если в ответ придет false - откатываться
     this.setPPoints()
+    return true
 };
 
 
@@ -43,7 +44,7 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
         'stroke-width' : 3,
         'fill'         : '#f1c40f',
         'fill-opacity' : .8,
-        'r'            : gm._getTileSize()/4,
+        'r'            : gm._getTileSize()/5,
     };
     if( is_start ){
         options.stroke = 'rgba(0, 102, 255, 1)';
@@ -63,10 +64,10 @@ L.GM.prototype._pathPoint = function(params){// pos, is_end, is_start, pre
     };
     var viewOpt = {
         'stroke'       : options.stroke,
-        'stroke-width' : options['stroke-width']+1,
+        'stroke-width' : options['stroke-width'],
         'fill'         : options.fill,
         'fill-opacity' : 1,
-        'r'            : options.r*1.2,
+        'r'            : options.r,
     };
 
     function _showhideConn(self, show, attr){

@@ -22,19 +22,19 @@ def _create_from_list(model, arr, params_factory=None):
         model.objects.get_or_create(**params_factory(el))
 
 
-def createRaces():
+def create_races():
     _create_from_list(Races, RACES_LIST)
 
 
-def createGenders():
+def create_genders():
     _create_from_list(Gender, GENDERS_LIST)
 
 
-def createFaces():
+def create_faces():
     _create_from_list(Face, EMOTION_CHOICES, lambda e: dict(emotion=e[0]))
 
 
-def createPlaces():
+def create_places():
     user = User.objects.all()[0]
     for radius in xrange(RADIUS, RADIUS_MAX, RADIUS_STEP):
         count = 0
@@ -47,14 +47,26 @@ def createPlaces():
             radius, Place.objects.all().count(), count)
 
 
+def update_gamemap():
+    gamemap_service.update_gamemap(
+        dict(latitude=LATITUDE,
+             longitude=LONGITUDE))
+
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sz.settings")
 
     from sz.static.models import Face, Races, Gender, EMOTION_CHOICES
     from sz.core.models import User
     from sz.place.models import Place
+    from sz.gamemap.models import UserPath
     from sz.api.views import place_service
-    createRaces()
-    createGenders()
-    createFaces()
-    createPlaces()
+    from sz.api.views import gamemap_service
+    # create_races()
+    # create_genders()
+    # create_faces()
+    # create_places()
+    update_gamemap()
+    # UserPath.objects.create_or_update_path(
+    #     user=User.objects.all()[0], city_id=1,
+    #     path=[[1, 1], [2, 2], [3, 3], [4, 40]])

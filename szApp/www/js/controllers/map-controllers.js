@@ -32,7 +32,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             $scope.$emit('navigation-setBR', 'map_custompath');
         }
     });
-    //$scope.$on('setMapInCenter', function(e, val){$scope.mapInCenter = val; })
+    $scope.$on('setCurrentGBox', function(e, gbox){$scope.gameMap.currentGBox=gbox})
 
     $scope.$on('runPath', function(e, val){console.log('run!') })
 
@@ -73,10 +73,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         $rootScope.showLoader = true;
         var params = $scope.coordinates;
         params.radius = 250;
-        $timeout(function() {
-            _explore_r({places_explored: 10})
-        }, 100);
-        /*placeService.exploreInVenues(params, _explore_r);*/
+        placeService.exploreInVenues(params, _explore_r);
     }
 
     /*------------------------------------------------------------------------*/

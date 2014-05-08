@@ -1,5 +1,12 @@
 import os
+import uuid
 from sz import settings
+
+
+def get_photo_path(filename, directory):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join(directory, filename)
 
 
 def get_img_absolute_urls(host_url="", img=None):

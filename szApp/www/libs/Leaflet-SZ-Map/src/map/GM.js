@@ -1,9 +1,9 @@
 function drawTile(gBox){
     var img = gBox.ms.img;
     var tile = '<h3>' + gBox.name + '</h3>'/* + '<img src="' + img + '" class="gBox-img">'*/;
-    if(gBox.castle && gBox.castle.img){
+    if(gBox.ms && gBox.ms.img){
         var tile = tile + '<div class="gBox-detail">' + [
-            '<span >' + 'The Sieve of Eratosthenes' + ' ' + gBox.lvl[0] + '/' + gBox.lvl[1] + '</span>'
+            '<span >' + 'The Sieve of Eratosthenes' + ' ' + gBox.lvl + '/' + 3 + '</span>'
             /*, + '</span>' + '<span class="gBox-detail"><i class="fa fa-tachometer"></i>'*/
             /*,gBox.buildings[0] + '/' + gBox.buildings[1] + '</span>' + '<span class="gBox-detail"><i class="fa fa-building-o"></i>'*/
             ,'<span class="gBox-detail-spec gBox-detail-profit">' + gBox.profit + '</span>'
@@ -51,7 +51,7 @@ L.GM = L.Class.extend({
         return this.getGameBoxFromApi(pos.x, pos.y)
     },
 
-    findGbox: function (pos){
+    findGbox: function (pos){ //[x, y]
         return this.gboxes.filter(function(gBox){return gBox.pos.compare( pos )})[0]
     },
 
@@ -204,7 +204,6 @@ L.GM.prototype.gameBox = function(options){
     this.owner = options.place_owner;
     this.profit = options.place_profit;
     this.negative = options.place_negative;
-    this.negative = options.place_negative;
     this.ms = {img: options.place_ms ? options.place_ms.reduced : ''}
     this.lvl = options.place_lvl;
     this.buildings = options.place_buildings;
@@ -349,12 +348,13 @@ L.GM.prototype._updatePConnections = function(){
 
 L.GM.prototype.setView = function(pos) { //[x, y]
     this.clearView();
-    var points = this.ppoints.filter(function(p){
+    var center_points = this.ppoints.filter(function(p){
         return  p._gBox.pos.compare(pos)
     });
-    points.forEach(function(p){p.setView()});
+    center_points.forEach(function(p){p.setView()});
+    var center_tile = this.getTile(pos[0], pos[1]);
+    this._map.setTileActive(center_tile)
 };
-
 
 
 L.GM.prototype.updatePpointsPos = function() {

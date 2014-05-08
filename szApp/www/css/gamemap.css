@@ -34,7 +34,7 @@
 }
 
 .gamemap-pathpreview>li:nth-child(even){
-   /* text-align: right;*/
+    text-align: right;
 }
 
 .gamemap-pathpreview-node{
@@ -65,7 +65,7 @@
 
 .gamemap-pathpreview-node:hover,
 .gamemap-pathpreview-node.active{
-    background-color: #f39c12!important;
+    background-color: #2c3e50!important;
     opacity: .8;
 }
 
@@ -174,6 +174,10 @@
 .gamemap-item .gBox-detail-spec{
     width: 100%;
     margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 9px;
 }
 
 .gamemap-item .gBox-detail-profit{color: #0193B7;}
@@ -203,21 +207,22 @@
     background-size: contain;
 }
 
+.gmtile{
+    -webkit-transition: all .3s ease-in;
+    transition: all .3s ease-in;
+}
+
+.gmtile.active .gamemap-item{
+    border-color: #2c3e50
+}
+
 .gamemap-item:before{
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
-    /*-webkit-transform-origin: -20px 0 0;
-    transform-origin: -20px 0 0;
-    -webkit-transform: rotateZ(30deg);
-    transform: rotateZ(30deg);*/
 }
 
 .gamemap-item:after{
     bottom: auto;
     top: 0;
-    /*-webkit-transform-origin: -15px 40px 0;
-    transform-origin: -15px 40px 0;
-    -webkit-transform: rotateZ(-30deg);
-    transform: rotateZ(-30deg);*/
 }
 
 .gamemap-item.gamemap-item-wavein{
@@ -267,6 +272,11 @@
     background-color: #ea7d24;
 }
 
+
+.gmtile-inner-wavein{
+    -webkit-transform: rotateY(30deg);
+    transform: rotateY(30deg);
+}
 
 
 

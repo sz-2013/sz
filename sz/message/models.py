@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-import os
 import time
-import uuid
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from imagekit import models as imagekit_models
 from imagekit import processors
 from sz.core.models import User
 from sz.core.image_utils import unface_photo
-from sz.core.utils import get_string_date, get_img_dict_absolute_url
+from sz.core.utils import get_string_date, get_img_dict_absolute_url, \
+    get_photo_path
 from sz.static.models import Face
 
 
@@ -64,10 +63,8 @@ class MessagePreview(models.Model):
             return None
 
     def get_photo_path(self, filename):
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
         directory = time.strftime("CACHE/images/photos/%Y/%m/%d")
-        return os.path.join(directory, filename)
+        return get_photo_path(filename, directory)
 
     photo = imagekit_models.ProcessedImageField(
         upload_to=get_photo_path,
@@ -105,10 +102,8 @@ class Message(models.Model):
     face = models.ForeignKey('static.Face', null=True, blank=True)
 
     def get_photo_path(self, filename):
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
         directory = time.strftime("photos/%Y/%m/%d")
-        return os.path.join(directory, filename)
+        return get_photo_path(filename, directory)
 
     def get_photo_absolute_urls(self, photo_host_url=""):
         if self.photo:

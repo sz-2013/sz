@@ -67,16 +67,16 @@ ENGINE_URL = "http://%(host)s:%(port)s/" % {
 
 
 class MainPost(object):
-    PREFIX = dict('CREATE'='')
+    PREFIX = dict(CREATE='')
 
     def _request(self, prefix, sending_data=None):
         req = urllib2.Request(ENGINE_URL + prefix)
         req.add_header('Content-Type', 'application/json')
         try:
-            data = urllib2.urlopen(req, sending_data).read()
+            data = urllib2.urlopen(req, sending_data)
             if isinstance(data, basestring):
-                data = json.loads(data)
-            return dict(data=data, status=answer.code)
+                data = json.loads(data.read())
+            return dict(data=data, status=data.code)
         except (urllib2.HTTPError, urllib2.URLError), e:
             return dict(data=str(e.reason), status=e.code if isinstance(
                 e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST)
@@ -102,10 +102,10 @@ class MainPost(object):
         return self._request(prefix, sending_data)
 
     def create(self, data):
-        return _post(PREFIX['CREATE'], data)
+        return self._post(self.PREFIX['CREATE'], data)
 
     def get_detail(self, data, pk):
-        return _get(PREFIX['DETAIL'](pk), data)
+        return self._get(self.PREFIX['DETAIL'](pk), data)
 
 
 class UserPost(MainPost):
@@ -119,4 +119,7 @@ class PlacePost(MainPost):
     PREFIX = settings.LEBOWSKI['URLS']['PLACES']
 
     def create(self, data):
-        return
+        return get_fake_place_data(data.get('place_id'), data.get('place_name'))
+
+    def get_detail(self, data):
+        return get_fake_place_data(data.get('place_id'), data.get('place_name'))

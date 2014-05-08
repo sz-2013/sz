@@ -4,7 +4,8 @@ from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from imagekit import models as imagekit_models
 from imagekit import processors
-from sz.core.utils import get_img_absolute_urls, get_system_path_media
+from sz.core.utils import get_img_absolute_urls, get_system_path_media, \
+    get_photo_path, get_img_dict_absolute_url
 from sz.core.image_utils import FitImage
 
 STANDART_ROLE_PLACE_NAME = "shop"
@@ -28,6 +29,10 @@ EMOTION_CHOICES = (
     ("bad", "Bad"),
     ("indifferent", "Indifferent")
 )
+
+BUILDING_TYPE = [
+    ("ms", "MatherShip"),
+]
 
 
 class Face(models.Model):
@@ -115,3 +120,50 @@ class RolePlace(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class BuildingImageManager(models.Manager):
+    def _get_image(self, b_type, race_name, lvl, host=''):
+        if race_name:
+            img = self.filter(
+                b_type=b_type, lvl=lvl, race=Races.objects.get(name=race_name))
+            return img and img[0].get_photo_absolute_urls(host) or None
+        # return 'random fake image here'
+
+    def get_ms(self, lvl, place_race, host):
+        return self._get_image('ms', place_race, lvl, host)
+
+
+class BuildingImage(models.Model):
+    b_type = models.CharField(
+        max_length=32, choices=BUILDING_TYPE)
+    race = models.ForeignKey(Races, blank=True, null=True)
+    lvl = models.PositiveIntegerField()
+    objects = BuildingImageManager()
+
+    def get_photo_path(self, filename):
+        directory = 'buildings'
+        return get_photo_path(filename, directory)
+
+    def get_photo_absolute_urls(self, photo_host_url=""):
+        img_dict = dict(full=self.img, reduced=self.reduced,
+                        thumbnail=self.thumbnail)
+        return get_img_dict_absolute_url(img_dict, photo_host_url)
+
+    img = imagekit_models.ProcessedImageField(
+        upload_to=get_photo_path,
+        processors=[processors.ResizeToFit(1000, 1000), ],
+        options={"quality": 85}
+    )
+    reduced = imagekit_models.ImageSpecField(
+        [processors.ResizeToFit(400), ],
+        source="img", options={"quality": 85})
+    thumbnail = imagekit_models.ImageSpecField(
+        [processors.ResizeToFill(150, 150), ],
+        source="img", options={"quality": 85})
+
+    class Meta:
+        unique_together = ('race', 'b_type', 'lvl')
+
+    def __unicode__(self):
+        return "%s - %s (%s)" % (self.race, self.b_type, self.lvl)

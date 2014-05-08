@@ -43,7 +43,7 @@ class PlaceRoot(SzApiView):
 
     def _get_detail(self, request, place, user=None):
         data = self._serialize_item(place, user)
-        engine_data = posts.fake_get_place_data(data)
+        engine_data = posts.PlacePost().get_detail(data)
         data.update(engine_data)
         data['place_ms'] = modelsBuildingImage.objects.get_ms(
             engine_data['place_lvl'], engine_data['place_owner_race'],
@@ -103,7 +103,7 @@ class PlaceVenueExplore(PlaceRoot):
             places_tuples = map(
                 lambda data: (str(data.get('place_id')), data), places_list)
             bl_data['places'] = dict(places_tuples)
-            engine_answer = posts.places_create(bl_data)
+            engine_answer = posts.Place.create(bl_data)
             code = engine_answer.get("status")
             engine_data = engine_answer.get("data", {})
             if code != status.HTTP_201_CREATED:

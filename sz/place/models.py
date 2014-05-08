@@ -24,6 +24,7 @@ class PlaceManager(models.GeoManager):
 
 
 class Place(models.Model):
+    objects = PlaceManager()
     #name&position - уникальный индификатор
     name = models.CharField(max_length=128, verbose_name=u"название",
                             blank=True, null=True)
@@ -31,36 +32,22 @@ class Place(models.Model):
     # то позиция может быть пустой
     position = models.PointField(
         verbose_name=u"координаты", blank=True, null=True)
-    objects = PlaceManager()
-
     city_id = models.IntegerField(
         db_index=True, null=False, blank=False,
-        verbose_name=u"идентификатор в GeoNames",)
+        help_text=u"идентификатор в GeoNames",)
     is_active = models.BooleanField(
-        _('active'),
-        default=False,
-        help_text=_(
+        default=False, help_text=_(
             'Designates whether this place should be treated as '
             'active. Unselect this instead of place has no owner too long'
             ' (by engine initiate).'
         )
-    )
-    role = models.ForeignKey(
-        'static.RolePlace', verbose_name=_('role'), blank=True, null=True
     )
     date = models.DateTimeField(
         default=timezone.now, verbose_name=u"дата создания")
     date_is_active = models.DateTimeField(
         default=timezone.now, verbose_name=u"дата активации")
 
-    # lvl = models.IntegerField(default=None,
-    #     null=True, blank=True, verbose_name=u"lvl in a engine",)
-    gamemap_position = models.CommaSeparatedIntegerField(
-        max_length=7, default=None, null=True, blank=True,
-        verbose_name="position 'x,y' in a gamemap")
-    owner = models.ForeignKey(
-        'core.User', verbose_name=_('owner of a place'), blank=True, null=True)
-
+    # IRL stuff
     address = models.CharField(
         max_length=128, null=True, blank=True, verbose_name=u"адрес",)
     crossStreet = models.CharField(
@@ -69,6 +56,21 @@ class Place(models.Model):
     contact = models.CharField(
         max_length=512, null=True, blank=True, verbose_name=u"контакты",)
 
+    # Game stuff
+    role = models.ForeignKey(
+        'static.RolePlace', verbose_name=_('role'), blank=True, null=True
+    )
+    gamemap_position = models.CommaSeparatedIntegerField(
+        max_length=7, default=None, null=True, blank=True,
+        verbose_name="position 'x,y' in a gamemap")
+    owner = models.ForeignKey(
+        'core.User', help_text='owner of a place', blank=True, null=True)
+    openner_race = models.ForeignKey(
+        'static.Races', help_text='genotype of a place', blank=True, null=True)
+    lvl = models.PositiveIntegerField(
+        default=0, help_text="Lvl of a place's ms or a place's mine")
+
+    #4sk stuff
     fsq_id = models.CharField(
         max_length=24, null=True, blank=True,
         verbose_name=u"идентификатор в Foursquare",)

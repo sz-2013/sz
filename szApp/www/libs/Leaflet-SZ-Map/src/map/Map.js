@@ -656,7 +656,18 @@ L.Map = L.Evented.extend({
 
 	getColor: function(isOpacity){
 		return this.gm.getColor(isOpacity)
-	}
+	},
+
+	setTileActive: function(tile){
+		this.setAllTilesUnactive()
+		L.DomUtil.addClass(tile, 'active')
+	},
+	setAllTilesUnactive: function(){
+		var tiles = this.tileLayer._tiles;
+		for(key in tiles){
+            if(tiles.hasOwnProperty(key)) L.DomUtil.removeClass(tiles[key], 'active')
+		}
+	},
 });
 
 L.map = function (id, options) {
