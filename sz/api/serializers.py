@@ -13,7 +13,7 @@ from sz.message.models import Message as modelMessage, \
     MessagePreview as modelMessagePreview
 from sz.place.models import Place as modelPlace
 from sz.static.models import Races as modelRaces, Gender as modelGender, \
-    Face as modelFace, RoleUser as modelRoleUser
+    Face as modelFace, RoleUser as modelRoleUser, CharImage as modelCharImage
 
 
 class RacesSerializer(serializers.ModelSerializer):
@@ -36,6 +36,10 @@ class RoleUserSerializer(serializers.ModelSerializer):
         model = modelRoleUser
 
 
+class CharImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = modelCharImage
+        depth = 1
 """
 Auth section
 """

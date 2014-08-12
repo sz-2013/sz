@@ -12,7 +12,7 @@ from random import choice, randint
 owners_options = ['neutral', 'negative', 'positive'] + \
     map(lambda i: 'nobody', xrange(3))
 races = ['futuri', 'united', 'amadeus']
-_rand = lambda max=10: randint(0, max) == 1
+_rand = lambda maximum=10: randint(0, maximum) == 1
 
 
 def get_fake_place_data(pk, name, need_owner=True):
@@ -25,21 +25,26 @@ def get_fake_place_data(pk, name, need_owner=True):
             '+' if is_p else '-', randint(1, 20), choice(val), choice(options))
         return map(gen, xrange(length))
 
+    openner = ''
+    lvl = 0
     if need_owner:
         owner = 'own' if _rand() else choice(owners_options)
         openner = '' if owner == 'nobody' and _rand(2) else choice(races)
-        lvl = randint(0, 3)
-    else:
+        if openner:
+            lvl = randint(0, 3)
+    if not need_owner or owner == 'nobody':
         owner = 'nobody'
-        openner = ''
-        lvl = 0
-    buildings = {0: 0, 1: 0, 2: 6, 3: 9}
+    buildings = {0: 0, 1: 0, 2: 5, 3: 7}
     owner_sp = randint(100, 1000)
     sp = randint(1, owner_sp-1) if _rand(5) else 0
+    buildings_type = ["lh", "tp", "hp", "sl", "gl", "bs", "sl", "sl", "gl"]
     return dict(
         place_id=pk, place_name=name, place_owner=owner, place_lvl=lvl,
         place_profit=_generator(), place_negative=_generator(False),
-        place_buildings=[randint(0, buildings[lvl]), buildings[lvl]],
+        # place_buildings=map(lambda i: [choice(buildings_type), 0],
+        #                     # xrange(randint(buildings[lvl]/2, buildings[lvl]))),
+        #                     xrange(buildings[lvl])),
+        place_buildings=openner and [["lh", 0], ["tp", 0], ["hp", 0], ["sl", 0], ["gl", 0], ["bs", 0], ["sl", 0]] or [],
         place_sp=[owner_sp if owner == 'own' else sp, owner_sp],
         place_openner_race=openner,
         place_owner_race=choice(races) if owner != 'nobody' else '')

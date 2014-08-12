@@ -58,6 +58,8 @@ class ApiRoot(SzApiView):
                 'static_faces': reverse('static-faces', request=request),
                 'static_rolesuser': reverse(
                     'static-roles-user', request=request),
+                'static_charimages': reverse(
+                    'static-charimages', request=request),
                 # 'categories': reverse('category-list', request=request),
             },
             # 'test_mode': {

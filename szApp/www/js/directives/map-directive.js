@@ -17,10 +17,6 @@ angular.module('map-directive', [])
             link: function($scope, element, attrs) {
                 var elem = element[0].querySelector('.gamemap-pathpreview');
                 var activePos, nodeClass = 'gamemap-pathpreview-node';
-
-                $scope.$on('customPath', function(e){$scope.$emit('setGameMap', true);});
-                $scope.$on('gBoxDetail', function(e){console.log('gBoxDetail')});
-
                 function setNodeActive( node ){
                     if(!node) return
                     node2array( elem.querySelectorAll('.' + nodeClass) ).map(
@@ -35,8 +31,11 @@ angular.module('map-directive', [])
                     addClass(node, nodeClass);
                     node.onclick = function(){
                         setNodeActive(this)
-                        $scope.$emit('setActivePoint', this.getAttribute('data-pos').toIntArray())
-                        $scope.$emit('setCurrentGBox', gBox)
+                        var pos = this.getAttribute('data-pos').toIntArray();
+                        var thisGBox = $scope.ppoints.filter(function(p){return p.pos.compare(pos) });
+                        $scope.$emit('setActivePoint', pos) //отцентровываем карту, чтобы когда мы на нее перейдем, активная точка была в центре)
+                        $scope.$emit('setCurrentGBox', thisGBox[0]) //теперь можно посмотреть детальную инфу по данной точке.
+                        //Они не совмещены, потому что верхнее вызывается только дл точек из паф, а эта функция - для все клеток.
                     }
                     if( gBox.pos.compare(activePos) ) setNodeActive(node)
                     return node
@@ -110,7 +109,7 @@ angular.module('map-directive', [])
                 L.GM.prototype.getGameBoxFromApi = function ( x, y ){
                     var gBox = this.findGbox([x, y]);
                     if(!gBox) $scope.$emit('getGBoxFromApi', x, y, 'setGBox')
-                    else $scope.map.gm.drawTile( false, gBox )
+                    //else $scope.map.gm.drawTile( false, gBox )
                 };
                 L.GM.prototype.createPath = function() {
                     var pathLen = this.pathPositions.length;
@@ -119,9 +118,10 @@ angular.module('map-directive', [])
                     };
                     $scope.$emit('setPPoints', $scope.map.gm.ppoints);
                     $scope.$emit('setGameMap', false);
+                    var tile = $scope.map.gm.getTile($scope.center[0], $scope.center[1]);
+                    if(tile) $scope.map.setTileActive(tile);
+                    $scope.$emit('setCurrentGBox', $scope.map.gm.ppoints[0] && $scope.map.gm.ppoints[0]._gBox)
                 };
-
-
 
                 $scope.$on('setGBox', function( e, data ){ $scope.map.gm.drawTile( data ) });
 
@@ -159,6 +159,8 @@ angular.module('map-directive', [])
                 }
 
                 function _getGboxes4path(){
+                    //на случай, если точки пути выходят за пределы уже отрисованной карты
+                    console.log('_getGboxes4path')
                     if(!$scope.pathPositions || !$scope.map || $scope.map.gm.pathPositions) return
                     $scope.map.gm.pathPositions2ppoints($scope.pathPositions)
                 }
@@ -197,9 +199,13 @@ angular.module('map-directive', [])
                 })
 
 
-                $scope.$watch('pathPositions', _getGboxes4path );
-
+          /*      $scope.$watch('pathPositions', function(){
+                    console.log('pathPositions')
+                    _getGboxes4path()
+                } );
+*/
                 $scope.$watch('center', function(pos){
+                    console.log('center')
                     if(!pos) return
                     if(!$scope.map) _init()
                     var center = $scope.map.gm.latlng2gm( $scope.map.getCenter() );

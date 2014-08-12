@@ -676,8 +676,9 @@ L.map = function (id, options) {
 
 
 L.szMap = function(id, center){ //id, [x, y]
+	console.log('szMap')
 	var map = L.map(id);
-    map.tileLayer = L.tileLayer('', {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+    map.tileLayer = L.tileLayer('', {}).addTo(map);
 	map.gm = L.gm();
 	map.gm._map = map;
 	/*map.dragging._draggable._getMapPixelBounds = function(){
