@@ -1,10 +1,57 @@
 <div class="content-inner">
     <form class="form-group" name="general" role="form">
-        <h2 class="page-header">Registration</h2>
+        <h2 class="page-header">Регистрация</h2>
+
+        <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race.length}">
+            <label for="radioRace" class="control-label">Выберите расу и пол</label>
+
+            <p class="help-block">
+                Раса будет определять ваши таланты и характеристики. Будте внимательны, потому что вы не сможете сменить расу или пол в будущем.
+                <a href="urls.wiki"> Читать больше о расах на вики</a>
+            </p><!-- /.help-block -->
+
+            <div class="text-danger" id="registration-races-alert">
+                <span ng-repeat="alert in loginAlert.race">{{alert}}</span>
+            </div><!-- /#registration-races-alert -->
+
+            <div class="form-group" id="registration-genders">
+                <div id="registration-genders-options">
+                    <button class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress"
+                           ng-class="user.gender == 'f' && 'active'" ng-click="user.gender='f'"  type="button">
+                            <span><i class="fa fa-female"></i></span>
+                    </button><!-- /.registration-genders-option -->
+
+                    <button class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress"
+                        ng-class="user.gender !== 'f' && 'active'" ng-click="user.gender='m'" type="button">
+                            <span><i class="fa fa-male"></i></span>
+                    </button><!-- /.registration-genders-option -->
+                </div><!-- /#registration-genders-options -->
+            </div><!-- /#registration-genders -->
+
+            <div class="form-group">
+                <div id="registration-races-options">
+                    <label class="btn btn-default circle-btn"
+                        ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races" sz-radio-btn ng-class="user.race.id == r.id && 'active'">
+                        <input name="options" type="radio"><span><i>{{r.name}}</i></span>
+                    </label>
+                </div><!-- /#registration-races-options -->
+
+                <div ng-show="user.race" class="text-center margin-top-nm" id="registration-raceDescription">
+                    <div id="registration-raceDescription-blazon"  >
+                        <div id="registration-raceDescription-bg-blur" style="background-image: url({{user.race.img.img}});"></div>
+                        <div id="registration-raceDescription-bg" style="background-image: url({{user.race.img.img}});"></div>
+                        <div id="registration-raceDescription-char" style="background-image: url({{getCharImg()}});"></div>
+                    </div>
+                </div><!-- /#registration-raceDescription -->
+            </div><!-- /#registration-races -->
+        </div>
 
         <div class="form-group" id="registration-nonFieldErrors" ng-show="loginAlert.non_field_errors">
             <p class="text-danger" ng-repeat="alert in loginAlert.non_field_errors">{{alert}}</p>
         </div><!-- #registration-nonFieldErrors -->
+
+        <label for="radioRace" class="control-label">Укажите e-mail и пароль</label>
+            <p class="help-block">Мы не будем слать вам письма, если вы сами нас об этом не попросите. Пароль на устойчивость мы тоже проверять не будем, но настройки в базе данных требуют, чтобы он был от 3 до 128 символов.</p>
 
         <div class="form-group" id="registration-email" ng-class="{'has-error':isEmailAlert(general.email.$error.maxlength)}">
             <i class="fa fa-envelope-o fa-fw"></i>
@@ -35,103 +82,17 @@
         </div><!-- /#registration-pswd -->
 
         <div class="form-group" id="registration-pswd2" ng-class="{'has-error': isPswd2Alert()}">
-                <i class="fa fa-key fa-fw"> </i>
-                <input class="form-control" id="inputPassword2" name="password2" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password2" placeholder="Password again" required="" type="password">
-
             <div class="text-danger" id="registration-pswd2-alert">
                 <span ng-repeat="alert in loginAlert.password2">{{alert}}<br></span>
                 <span ng-show="user.password1!=user.password2">
                     {{tmlText.errorsText.password.notmatch}}</span>
             </div><!-- /#registration-pswd2-alert -->
+            <i class="fa fa-key fa-fw"> </i>
+            <input class="form-control" id="inputPassword2" name="password2" ng-disabled="inProgress" ng-maxlength="128" ng-minlength="3" ng-model="user.password2" placeholder="Password again" required="" type="password">
+
         </div>
 
-        <div class="form-group" id="registration-genders">
-            <label class="control-label">Choose your gender</label>
 
-            <p class="help-block">If it is a secret or if you are not sure - choose "Smile".</p>
-
-            <div id="registration-genders-options">
-                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='f'" sz-radio-btn>
-                    <input id="f" name="options" type="radio">
-                        <span><i class="fa fa-female"></i></span>
-                </label><!-- /.registration-genders-option -->
-
-                <label class="btn btn-default circle-btn registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='m'" sz-radio-btn>
-                    <input id="m" name="options" type="radio">
-                        <span><i class="fa fa-male"></i></span>
-                </label><!-- /.registration-genders-option -->
-
-                <label class="btn btn-default circle-btn active registration-genders-option" ng-disabled="inProgress" ng-click="user.gender='u'" sz-radio-btn>
-                    <input id="u" name="options" type="radio">
-                        <span><i class="fa fa-smile-o"></i></span>
-                </label><!-- /.registration-genders-option -->
-            </div><!-- /#registration-genders-options -->
-        </div><!-- /#registration-genders -->
-
-        <div class="form-group" id="registration-races" ng-class="{'has-error':loginAlert.race.length}">
-            <label for="radioRace" class="control-label">Choose your race</label>
-
-            <p class="help-block">
-                A race will determine your characteristics and talents. Be attentively, because you will can not change it in the future.
-                <a href="urls.wiki"> See more about it on wiki.</a>
-            </p><!-- /.help-block -->
-
-            <div class="text-danger" id="registration-races-alert">
-                <span ng-repeat="alert in loginAlert.race">{{alert}}</span>
-            </div><!-- /#registration-races-alert -->
-
-            <div id="registration-races-options">
-                <label class="btn btn-default circle-btn"
-                    ng-disabled="inProgress" ng-click="user.race=r" ng-repeat="r in races" sz-radio-btn>
-                    <input name="options" type="radio"><span><i>{{r.name}}</i></span>
-                </label>
-            </div><!-- /#registration-races-options -->
-
-            <div ng-show="user.race" class="text-center margin-top-nm" id="registration-raceDescription">
-                <div id="registration-raceDescription-blazon" style="background: url({{user.race.blazon}}) 100% 100% no-repeat"></div>
-
-                <div id="registration-raceDescription-stats" class="margin-top-nm">
-                    <div class="pull-left" id="registration-raceDescription-stats-names">
-                        <span>Fortune: </span>
-                        <span>Agillity: </span>
-                        <span>Strength: </span>
-                        <span>Intellect: </span>
-                    </div><!-- /#registration-raceDescription-stats-names -->
-
-                    <div class="progress registration-raceDescription-stats-value">
-                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.fortune*10}}
-                            class="progress-bar color1"
-                            ng-style="{width:user.race.fortune*10+'%'}" role="progressbar">
-                            <span>{{user.race.fortune}}</span>
-                        </div>
-                    </div><!-- /.registration-raceDescription-stats-value -->
-
-                    <div class="progress registration-raceDescription-stats-value">
-                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.agillity*10}}
-                            class="progress-bar color2"
-                            ng-style="{width:user.race.agillity*10+'%'}" role="progressbar">
-                        <span>{{user.race.agillity}}</span>
-                    </div><!-- /.registration-raceDescription-stats-value -->
-
-                    </div>
-                    <div class="progress registration-raceDescription-stats-value">
-                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.strength*10}}
-                            class="progress-bar color3"
-                            ng-style="{width:user.race.strength*10+'%'}" role="progressbar">
-                        <span>{{user.race.strength}}</span>
-                      </div>
-                    </div><!-- /.registration-raceDescription-stats-value -->
-
-                    <div class="progress registration-raceDescription-stats-value">
-                        <div aria-valuemax="100" aria-valuemin="0" aria-valuenow={{user.race.intellect*10}}
-                            class="progress-bar color4"
-                            ng-style="{width:user.race.intellect*10+'%'}" role="progressbar">
-                        <span>{{user.race.intellect}}</span>
-                      </div>
-                    </div><!-- /.registration-raceDescription-stats-value -->
-                </div><!-- /#registration-raceDescription-stats -->
-            </div><!-- /#registration-raceDescription -->
-        </div><!-- /#registration-races -->
     </form>
 
     <div class="margin-top-lg">

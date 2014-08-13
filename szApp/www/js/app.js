@@ -12,6 +12,7 @@ var szApp = angular.module(
     /*'sz.raphael.directives',*/
     /*'navs-directive',*/
     'map-directive',
+    'spslideshow-directive',
   /*  'leaflet-directive',
     ,*/
     /*'gamemap-directive',*/

@@ -3,17 +3,18 @@
 
 var szServices = angular.module('sz.client.services', ['ngResource']);
 
-var ip = '192.168.0.104:8080'
+var ip = '192.168.0.101:8080'
 //var ip = '91.142.158.33:8080'
-var apiIp = (window.location.protocol=="http:") ? 
+var apiIp = (window.location.protocol=="http:") ?
     window.location.origin : ('http://' + ip);
 
 szServices.factory('staticValueService', function($resource){
-    return $resource(apiIp + '/api/static/:listCtrl', {}, {
+    return $resource(apiIp + '/api/static/:listCtrl/:ctrl', {ctrl:''}, {
         categories: { method:'GET', params:{listCtrl: 'categories'}, isArray:false },
         races: { method:'GET', params:{listCtrl: 'races'}, isArray:false },
         genders: { method:'GET', params:{listCtrl: 'genders'}, isArray:false },
         faces: { method:'GET', params:{listCtrl: 'faces'}, isArray:false },
+        charsImg: { method:'GET', params:{listCtrl: 'chars', ctrl: 'images'}, isArray:false },
     });
 });
 

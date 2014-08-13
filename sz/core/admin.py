@@ -21,6 +21,14 @@ admin.site.register(Place, PlaceAdmin)
 admin.site.register(RoleUser)
 admin.site.register(RolePlace)
 admin.site.register(Face)
-admin.site.register(BuildingImage)
+
+
+class BuildingImageAdmin(admin.ModelAdmin):
+    list_display = ['b_type', 'race', 'lvl', 'img', 'description']
+    list_filter = ['b_type', 'race', 'lvl', ]
+    list_editable = ['img', 'description']
+
+admin.site.register(BuildingImage, BuildingImageAdmin)
+admin.site.register(CharImage)
 # admin.site.register(Category)
 admin.site.register(MessagePreview)

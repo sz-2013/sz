@@ -160,7 +160,6 @@ angular.module('map-directive', [])
 
                 function _getGboxes4path(){
                     //на случай, если точки пути выходят за пределы уже отрисованной карты
-                    console.log('_getGboxes4path')
                     if(!$scope.pathPositions || !$scope.map || $scope.map.gm.pathPositions) return
                     $scope.map.gm.pathPositions2ppoints($scope.pathPositions)
                 }
@@ -205,7 +204,6 @@ angular.module('map-directive', [])
                 } );
 */
                 $scope.$watch('center', function(pos){
-                    console.log('center')
                     if(!pos) return
                     if(!$scope.map) _init()
                     var center = $scope.map.gm.latlng2gm( $scope.map.getCenter() );

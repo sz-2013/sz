@@ -8,7 +8,10 @@ from sz.static import models
 
 class StaticObjects(SzApiView):
     def get_data(self, obj, root_url):
-        return self.serializer(instance=obj).data
+        data = self.serializer(instance=obj).data
+        if hasattr(obj, 'img'):
+            data['img'] = obj.get_img_absolute_urls(root_url)
+        return data
 
     def get(self, request, format=None):
         objects = self.model.objects.all()
@@ -20,11 +23,6 @@ class StaticObjects(SzApiView):
 class RacesRoot(StaticObjects):
     model = models.Races
     serializer = serializers.RacesSerializer
-
-    def get_data(self, obj, root_url):
-        data = self.serializer(instance=obj).data
-        data['blazon'] = obj.get_img_absolute_urls(root_url)
-        return data
 
 
 class GendersRoot(StaticObjects):
@@ -45,3 +43,8 @@ class FacesRoot(StaticObjects):
 class RolesUserRoot(StaticObjects):
     model = models.RoleUser
     serializer = serializers.RoleUserSerializer
+
+
+class CharImagesRoot(StaticObjects):
+    model = models.CharImage
+    serializer = serializers.CharImageSerializer

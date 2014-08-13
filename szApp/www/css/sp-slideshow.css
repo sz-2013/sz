@@ -1,0 +1,184 @@
+.sp-slideshow {
+    position: relative;
+    margin: 10px auto;
+    width: 100%;
+    height: 100%;
+    margin-top: -10px;
+}
+
+.sp-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.sp-parallax-bg {
+    background-repeat: repeat-x;
+    background-position-y: 100%;
+    -webkit-background-size: 270%;
+    -moz-background-size: 270%;
+    background-size: 270%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.sp-content-body{
+    position: absolute;
+    bottom: 35px;
+    left: -15px;
+    right: 0;
+    text-align: center;
+    z-index: 300;
+}
+
+.sp-content-body .sp-button-label {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    z-index: 1000;
+    margin-left: 15px;
+    border: 4px solid rgb(44, 62, 80);
+    -webkit-transition: background-color linear 0.1s;
+    -moz-transition: background-color linear 0.1s;
+    -o-transition: background-color linear 0.1s;
+    -ms-transition: background-color linear 0.1s;
+    transition: background-color linear 0.1s;
+    text-shadow: 0 0 3px rgba(255,255,255, 0.5), 0 0 5px rgba(30,30,30, .4);
+}
+.sp-button-label[data-active='active'] {
+    background-color: #fff;
+    background-color: rgba(44, 62, 80,0.9);
+}
+
+.sp-arrow {
+    position: absolute;
+    top: 50%;
+    margin-top: -19px;
+    display: none;
+    opacity: 0.8;
+    cursor: pointer;
+    z-index: 1000;
+    -webkit-transition: opacity linear 0.3s;
+    -moz-transition: opacity linear 0.3s;
+    -o-transition: opacity linear 0.3s;
+    -ms-transition: opacity linear 0.3s;
+    transition: opacity linear 0.3s;
+    color: rgb(44, 62, 80);
+    text-shadow: 0 0 3px rgba(255,255,255, 0.5), 0 0 5px rgba(30,30,30, .4);
+}
+.sp-arrow:hover{
+    opacity: 1;
+}
+.sp-arrow:active{
+    margin-top: -18px;
+}
+.sp-arrow.sp-arrow-right{
+    right: 15px;
+    display: block;
+    background-position: top right;
+    /*width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #fff;*/
+}
+.sp-arrow.sp-arrow-left{
+    left: 15px;
+    display: block;
+    background-position: top left;
+    /*width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right:20px solid #fff;*/
+}
+
+.sp-slideshow .sp-content .sp-parallax-bg {
+    -webkit-transition: background-position linear 0.7s;
+    -moz-transition: background-position linear 0.7s;
+    -o-transition: background-position linear 0.7s;
+    -ms-transition: background-position linear 0.7s;
+    transition: background-position linear 0.7s;
+}
+
+.sp-slider {
+    position: relative;
+    left: 0;
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    -webkit-transition: left ease-in 0.8s;
+    -moz-transition: left ease-in 0.8s;
+    -o-transition: left ease-in 0.8s;
+    -ms-transition: left ease-in 0.8s;
+    transition: left ease-in 0.8s;
+}
+
+.sp-slider > li {
+    color: #fff;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0 60px;
+    float: left;
+    text-align: center;
+    opacity: 0.4;
+    -webkit-transition: opacity ease-in 0.4s 0.8s;
+    -moz-transition: opacity ease-in 0.4s 0.8s;
+    -o-transition: opacity ease-in 0.4s 0.8s;
+    -ms-transition: opacity ease-in 0.4s 0.8s;
+    transition: opacity ease-in 0.4s 0.8s;
+}
+.sp-slider > li img{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    margin: 0 auto;
+    padding: 40px 0 50px 0;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.sp-slider > li > .sp-slider-element-des{
+    height: 100px;
+    margin-bottom: 50px;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 1);
+}
+
+@media (max-height: 404px){
+    .sp-slider > li > .sp-slider-element-des{
+         display: inline-block;
+        width: 150px;
+        margin-bottom: 0px;
+        padding: 40px 0 50px 0;
+        box-sizing: content-box;
+        height: 150px;
+    }
+
+    .sp-slider > li img{
+        display: inline-block;
+    }
+
+    .sp-parallax-bg {
+        background-position-y: 75%;
+        -webkit-background-size: 150%;
+        -moz-background-size: 150%;
+        background-size: 150%;
+    }
+
+    .sp-content-body{
+        bottom: 15px;
+    }
+}

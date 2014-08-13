@@ -676,7 +676,6 @@ L.map = function (id, options) {
 
 
 L.szMap = function(id, center){ //id, [x, y]
-	console.log('szMap')
 	var map = L.map(id);
     map.tileLayer = L.tileLayer('', {}).addTo(map);
 	map.gm = L.gm();

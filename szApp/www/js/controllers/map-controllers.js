@@ -60,7 +60,6 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     }
 
     function _getGameBox(place){
-        console.log('_getGameBox')
         return getGameBox(place.place_gamemap_position, $scope.gameMap.points)
     }
 

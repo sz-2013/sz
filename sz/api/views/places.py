@@ -44,10 +44,15 @@ class PlaceRoot(SzApiView):
     def _get_detail(self, request, place, user=None):
         data = self._serialize_item(place, user)
         engine_data = posts.PlacePost().get_detail(data)
+        url = reverse('client-index', request=request)
+        get_bld = lambda lvl, b_type='ms': \
+            modelsBuildingImage.objects.get_building(
+                lvl, engine_data['place_openner_race'], url, b_type)
         data.update(engine_data)
-        data['place_ms'] = modelsBuildingImage.objects.get_ms(
-            engine_data['place_lvl'], engine_data['place_owner_race'],
-            reverse('client-index', request=request))
+        data['place_ms'] = get_bld(engine_data['place_lvl'])
+        data['place_buildings'] = map(
+            lambda (b_type, lvl): get_bld(0, b_type),
+            engine_data['place_buildings'])
         return data
 
 

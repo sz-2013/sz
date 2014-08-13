@@ -122,3 +122,10 @@ function findParent(parentSellector, el, nodes){
 }
 
 
+function random(min,max){
+    return Math.floor(Math.random()*(min || 2)+(max||0))
+}
+
+function choice(array){
+    return array[random(0, array.length-1)]
+}

@@ -54,9 +54,9 @@ function LoginController($scope, $location, sessionService, $rootScope){
 }
 
 
-function RigistrationController($scope, userService, $rootScope, $location){
+function RigistrationController($scope, userService, $rootScope, $location, staticValueService){
     $scope.$emit('navigation-hideall');
-    $scope.user = {'gender':'u'};
+    $scope.user = {gender: random() ? 'm' : 'f'};
     var errorsText = {
         email:{
             'nullvalue':'You must give a some email to us',
@@ -76,8 +76,29 @@ function RigistrationController($scope, userService, $rootScope, $location){
     $scope.tmlText = {}
     $scope.tmlText.errorsText = errorsText
 
-    $scope.inProgress = false;
-    $rootScope.showLoader = false;
+    $scope.charsImgs = new Array;
+
+
+
+    $scope.$watch('races', function(races){
+        if(races){
+            $scope.user.race = choice(races)
+            staticValueService.charsImg(function(r){
+                $scope.charsImgs = r.data
+                $scope.inProgress = false;
+                $rootScope.showLoader = false;
+            })
+        }
+    })
+
+    $scope.getCharImg = function(){
+        if( $scope.genders && $scope.races && $scope.charsImgs && $scope.user.gender && $scope.user.race){
+            var ch = $scope.charsImgs.filter(function(c){return c.gender.name == $scope.user.gender && c.race.name == $scope.user.race.name})[0]
+            return ch ? ch.img.img : ''
+        }
+        return ''
+    }
+
     $scope.isEmailAlert = function(maxlength){
         return ($scope.user.email && $scope.loginAlert && $scope.user.email.length!=0) ||
                maxlength

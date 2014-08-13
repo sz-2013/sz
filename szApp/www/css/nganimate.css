@@ -97,6 +97,13 @@
     transform: translate3d(0, 100%, 0);
 }
 
+/*-----------FallTop---------*/
+.animate-fall-top.ng-hide-add.ng-hide-add-active,
+.animate-fall-top.ng-hide-remove {
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+}
+
 /*-----------FallLeft----------*/
 .animate-fall-left.ng-hide-add.ng-hide-add-active,
 .animate-fall-left.ng-hide-remove {

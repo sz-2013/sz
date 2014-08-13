@@ -1,14 +1,16 @@
 function drawTile(gBox){
+    console.log(gBox.sp)
     var img = gBox.ms && gBox.ms.img.thumbnail || '';
+    var sp = gBox.sp ? gBox.sp[0]*100/gBox.sp[1] : 0
     var tile = '<h3>' + gBox.name + '</h3>'/* + '<img src="' + img + '" class="gBox-img">'*/;
     if(gBox.ms && gBox.ms.img){
-        var tile = tile + '<div class="gBox-detail" data-owner="' + gBox.toString() + '">' + [
-            '<span >' + 'The Sieve of Eratosthenes' + ' ' + gBox.lvl + '/' + 3 + '</span>'
+        var tile = tile + '<div class="gBox-detail" >' + [
+            /*'<span >' + 'The Sieve of Eratosthenes' + ' ' + gBox.lvl + '/' + 3 + '</span>'*/
             /*, + '</span>' + '<span class="gBox-detail"><i class="fa fa-tachometer"></i>'*/
             /*,gBox.buildings[0] + '/' + gBox.buildings[1] + '</span>' + '<span class="gBox-detail"><i class="fa fa-building-o"></i>'*/
             ,'<span class="gBox-detail-spec gBox-detail-profit">' + gBox.profit + '</span>'
             ,'<span class="gBox-detail-spec gBox-detail-negative">' + gBox.negative + '</span>'
-        ].join('') + '<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="30" class="gBox-sp-value"> </div>'
+        ].join('') + '</div><div class="gBox-sp-value" style="width:' + sp + '%;">'
     }
     return {tile: tile, img: img || ''}
 }
@@ -47,15 +49,12 @@ L.GM = L.Class.extend({
     },
 
     getGameBox: function (point){
-        console.log('getGameBox')
         var pos = this.project2gm(point);
         return this.getGameBoxFromApi(pos.x, pos.y)
     },
 
     findGbox: function (pos){ //[x, y]
-        var i = this.gboxes.filter(function(gBox){return gBox.pos.compare( pos )})
-        console.log(i.length)
-        return i[0]
+        return this.gboxes.filter(function(gBox){return gBox.pos.compare( pos )})[0]
     },
 
     getTile: function (x, y){ //game x, y; -> tile
@@ -75,7 +74,7 @@ L.GM = L.Class.extend({
         if(!gBox){
             place_data.pos = place_data.place_gamemap_position;
             //проверяем, что gBox еще не создан
-            if( this.gboxes.filter(function(g){return g.pos.compare( place_data.pos )}).length ) return
+            if( this.findGbox(place_data.pos) ) return
             var gBox = new this.gameBox( place_data );
             this.gboxes.push(gBox)
         }
@@ -111,7 +110,7 @@ L.GM = L.Class.extend({
         //если путь игрока длиннее, чем загруженная карта - останутся не полученные с апи точки
         for (var i = pathPositions.length - 1; i >= 0; i--) {
             var pos = pathPositions[i];
-            if( !this.gboxes.filter(function(gbox){return gbox.pos.compare.pos}).length ) this.getGameBoxFromApi( pos[0], pos[1] )
+            if( !this.findGbox(pos) ) this.getGameBoxFromApi( pos[0], pos[1] )
         };
         //если path полностью наполнился - те его длина сравнялась с pathPositions
         //начинаем отрисовывать path
@@ -222,6 +221,7 @@ L.GM.prototype.gameBox = function(options){
     this.profit = options.place_profit;
     this.negative = options.place_negative;
     this.ms = ''
+    this.sp = options.place_sp
     if(options.place_ms && options.place_ms.img){this.ms = options.place_ms}
     this.lvl = options.place_lvl;
     this.buildings = options.place_buildings;

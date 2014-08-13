@@ -41,7 +41,7 @@
     display: inline-block;
     width: 50px;
     height: 50px;
-    border-radius: 30px;
+    /*border-radius: 30px;*/
     margin: 5px;
     cursor: pointer;
     text-align: center;
@@ -164,20 +164,40 @@
     bottom: 0;
     left:0;
     right: 0;
+    max-height: 0;
+    -webkit-transition: all 300ms ease-in;
+    -moz-transition: all 300ms ease-in;
+    -o-transition: all 300ms ease-in;
+    transition: all 300ms ease-in;
+    /*-webkit-transition: all 300ms ease-in;
+    -moz-transition: all 300ms ease-in;
+    -o-transition: all 300ms ease-in;
+    transition: all 300ms ease-in;*/
+    overflow: hidden;
+}
+
+.gamemap-item .gBox-sp-value{
+    position: absolute;
+    height: 5px;
+    background-color: rgba(242,209,0,.6);
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.active .gamemap-item .gBox-detail{
+    max-height: 200px;
     padding-bottom: 5px;
 }
 
-.gamemap-item .gBox-detail span{
-    display: block;
-}
-
 .gamemap-item .gBox-detail-spec{
+    display: block;
     width: 100%;
     margin: 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: 9px;
+    font-size: 10px;
 }
 
 .gamemap-item .gBox-detail-profit{color: #0193B7;}
@@ -260,6 +280,10 @@
     background-color: #f2d100;
 }
 
+.own.gamemap-item .gBox-sp-value{
+    display: none;
+}
+
 
 .positive.gamemap-item:before,
 .gamemap-pathpreview-node.positive{
@@ -279,5 +303,18 @@
 }
 
 
+.gBoxDetail{
+    position: absolute;
+    right: 0;
+    top:0;
+    left:0;
+    min-height: 100%;
+    z-index: 1000;
+    background-color: white;
+}
 
+.gBoxDetail .closeDetail{
+    position: absolute;
+    bottom: 0;
+}
 /*--------------------------------*/

@@ -36,7 +36,7 @@ def get_fake_place_data(pk, name, need_owner=True):
         owner = 'nobody'
     buildings = {0: 0, 1: 0, 2: 5, 3: 7}
     owner_sp = randint(100, 1000)
-    sp = randint(1, owner_sp-1) if _rand(5) else 0
+    sp = randint(1, owner_sp-1) if owner != 'nobody' else 0
     buildings_type = ["lh", "tp", "hp", "sl", "gl", "bs", "sl", "sl", "gl"]
     return dict(
         place_id=pk, place_name=name, place_owner=owner, place_lvl=lvl,

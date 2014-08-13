@@ -32,7 +32,46 @@ EMOTION_CHOICES = (
 
 BUILDING_TYPE = [
     ("ms", "MatherShip"),
+    ("lh", "LightHouse"),
+    ("tp", "Teleport"),
+    ("hp", "Hospital"),
+    ("sl", "Slowler"),
+    ("gl", "Golodusha"),
+    ("bs", "Bathyscaphe"),
+    ("mt", "Market"),
+    ("st", "Storage"),
 ]
+
+CHAR_POSITION = [
+    ('nrm', 'normal')
+]
+
+
+class ImagesModel(models.Model):
+    DIRECTORY = lambda self: ''
+    IMG_SIZE = (600, 600)
+
+    def get_image_path(self, filename):
+        return os.path.join(self.DIRECTORY(), filename)
+
+    def get_img_absolute_urls(self, photo_host_url=""):
+        img_dict = dict()
+        for n in ['img', 'thumbnail', 'reduced']:
+            if hasattr(self, n):
+                img_dict[n] = getattr(self, n)
+        return get_img_dict_absolute_url(img_dict, photo_host_url)
+
+    class Meta:
+        abstract = True
+
+    img = imagekit_models.ProcessedImageField(
+        upload_to=get_image_path,
+        processors=[processors.ResizeToFit(*IMG_SIZE), ],
+        options={"quality": 85}
+    )
+    thumbnail = imagekit_models.ImageSpecField(
+        [processors.ResizeToFill(150, 150), ],
+        source="img", options={"quality": 85})
 
 
 class Face(models.Model):
@@ -72,24 +111,12 @@ class Face(models.Model):
         verbose_name_plural = _('face')
 
 
-class Races(models.Model):
+class Races(ImagesModel):
     """user race: {'futuri':1,'amadeus':2, 'united':3} """
+    DIRECTORY = lambda self: 'races'
+
     description = models.CharField(max_length=256, null=True, blank=True)
 
-    def get_img_absolute_urls(self, host_url="", img=None):
-        return get_img_absolute_urls(host_url, self.blazon)
-
-    def get_blazon_path(self, filename):
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (self.name, ext)
-        directory = 'blazons'
-        return os.path.join(directory, filename)
-
-    blazon = imagekit_models.ProcessedImageField(
-        upload_to=get_blazon_path, null=False, blank=True, default=None,
-        processors=[processors.ResizeToFit(150, 150), ],
-        options={'quality': 85}
-    )
     name = models.CharField(max_length=32)
 
     def __unicode__(self):
@@ -127,39 +154,38 @@ class BuildingImageManager(models.Manager):
         if race_name:
             img = self.filter(
                 b_type=b_type, lvl=lvl, race=Races.objects.get(name=race_name))
-            return img and img[0].get_photo_absolute_urls(host) or None
+            return img and img[0].get_img_absolute_urls(host) or None
         # return 'random fake image here'
 
-    def get_ms(self, lvl, place_race, host):
-        return self._get_image('ms', place_race, lvl, host)
+    def get_building(self, lvl, place_race, host, b_type='ms'):
+        race = Races.objects.filter(name=place_race)
+        if race:
+            bld_image = self.filter(b_type=b_type, lvl=lvl, race=race[0])
+            null_image = self.filter(b_type='ms', lvl=0, race=race[0])
+            data = dict(bg=null_image[0].get_img_absolute_urls(host),
+                        lvl=lvl, description=bld_image[0].description)
+            if bld_image:
+                data['img'] = bld_image[0].get_img_absolute_urls(host)
+            return data
+        return dict(img=None)
 
 
-class BuildingImage(models.Model):
+class BuildingImage(ImagesModel):
+    DIRECTORY = lambda self: 'buildings/%s' % self.race.name
+
+    def get_image_path(self, filename):
+        return os.path.join(self.DIRECTORY(), '%s_%s.%s' % (
+            self.b_type, self.lvl, filename.split('.')[1]))
+
     b_type = models.CharField(
         max_length=32, choices=BUILDING_TYPE)
     race = models.ForeignKey(Races, blank=True, null=True)
-    lvl = models.PositiveIntegerField()
+    lvl = models.PositiveIntegerField(default=0)
     objects = BuildingImageManager()
+    description = models.TextField()
 
-    def get_photo_path(self, filename):
-        directory = 'buildings'
-        return get_photo_path(filename, directory)
-
-    def get_photo_absolute_urls(self, photo_host_url=""):
-        img_dict = dict(full=self.img, reduced=self.reduced,
-                        thumbnail=self.thumbnail)
-        return get_img_dict_absolute_url(img_dict, photo_host_url)
-
-    img = imagekit_models.ProcessedImageField(
-        upload_to=get_photo_path,
-        processors=[processors.ResizeToFit(1000, 1000), ],
-        options={"quality": 85}
-    )
     reduced = imagekit_models.ImageSpecField(
         [processors.ResizeToFit(400), ],
-        source="img", options={"quality": 85})
-    thumbnail = imagekit_models.ImageSpecField(
-        [processors.ResizeToFill(150, 150), ],
         source="img", options={"quality": 85})
 
     class Meta:
@@ -167,3 +193,16 @@ class BuildingImage(models.Model):
 
     def __unicode__(self):
         return "%s - %s (%s)" % (self.race, self.b_type, self.lvl)
+
+
+class CharImage(ImagesModel):
+    position = models.CharField(
+        max_length=64, choices=CHAR_POSITION, default='nrm')
+    race = models.ForeignKey(Races)
+    gender = models.ForeignKey(Gender)
+
+    class Meta:
+        unique_together = ('position', 'race', 'gender')
+
+    def __unicode__(self):
+        return "%s/%s (%s)" % (self.race, self.gender, self.position)
