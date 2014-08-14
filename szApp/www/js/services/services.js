@@ -43,6 +43,7 @@ szServices.factory('gameMapService', function($resource){
         /*getMap: { method:'GET' , isArray:true },*/
         getPath: { method:'GET' , isArray:false, params: {cntrl: 'path'} },
         getTile: { method:'GET' , isArray:false, params: {cntrl: 'tile'} },
+        postPath: { method:'POST' , isArray:false, params: {cntrl: 'path'} },
     });
 });
 

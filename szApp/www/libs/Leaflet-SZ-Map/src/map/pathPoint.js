@@ -13,8 +13,7 @@ L.GM.prototype.pushNewPPoint = function(gBox) {
     this._updatePConnections()
     this.clearView();
     this._newPoint = undefined;
-    //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
-    //если в ответ придет false - откатываться
+    //проверяем только на клиенте - проверку на сервере проведем уже после отправки
     this.setPPoints()
     return true
 };

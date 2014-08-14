@@ -8,8 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 class GameMapBoxesField(models.CharField):
     """Хранит позиции мест в ввиде строки типа "[[1, 1], ..., [10, 10]]".
     Считается, что одно позиция занимает до 12 символов,
-    т.к. максимальная позиция "[9999, 9999]" плюс еще символа между разными
-    позициями, итого 14*30 =  420 максимальная длина поля"""
+    т.к. максимальная позиция "[9999, 9999]" плюс еще символы между разными
+    позициями, итого 14*30 =  420 - максимальная длина поля"""
     description = _("A list of places gamemap positons in a user's path from" +
                     " a last checkin point to a current point.")
 
@@ -31,9 +31,9 @@ class GameMapBoxesField(models.CharField):
         # Проверяем, что все клетки идут непрерывно, т.е между соседними
         # разброс по х, у не больше 1
         value = getattr(model_instance, self.attname)
-        notvalid = lambda a, b, i: abs(a[i] - b[i]) > 1
+        is_notvalid = lambda a, b: len([i for i, el in enumerate(a)
+                                        if abs(el - b[i]) > 1])
         for i, pos in enumerate(value):
-            pre = value[i and i-1]
-            if notvalid(pos, pre, 0) or notvalid(pos, pre, 1):
+            if i and is_notvalid(pos, value[i-1]):
                 raise ValidationError(self.notvalidError)
         return super(GameMapBoxesField, self).pre_save(model_instance, add)

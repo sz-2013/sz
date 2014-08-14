@@ -109,7 +109,9 @@ angular.module('map-directive', [])
                 L.GM.prototype.getGameBoxFromApi = function ( x, y ){
                     var gBox = this.findGbox([x, y]);
                     if(!gBox) $scope.$emit('getGBoxFromApi', x, y, 'setGBox')
-                    //else $scope.map.gm.drawTile( false, gBox )
+                    //если смещается центр - то заново перезапрашиваются все точки
+                    //если они уже есть в списке - то их просто нужно перерисовать
+                    else $scope.map.gm.drawTile( false, gBox )
                 };
                 L.GM.prototype.createPath = function() {
                     var pathLen = this.pathPositions.length;

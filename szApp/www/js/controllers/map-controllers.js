@@ -15,11 +15,15 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
 
     $scope.$on('setGameMap', setGameMap);
     $scope.$on('setCurrentGBox', function(e, gbox){
-        console.log(gbox)
         if($rootScope.showLoader) $rootScope.showLoader = false;
         $scope.gameMap.currentGBox = gbox})
 
-    $scope.$on('runPath', function(e, val){console.log('run!') })
+    $scope.$on('runPath', function(e, val){
+        var path = JSON.stringify($scope.gameMap.ppoints.map(function(gbox){return gbox.pos}))
+        gameMapService.postPath({path: path}, function(r){
+            console.log(r)
+        })
+    })
 
     $scope.$on('gBoxDetail', function(e){
         if($scope.gameMap.currentGBox &&

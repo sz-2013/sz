@@ -3,13 +3,14 @@
         ng-show="showGamePath" ></map-path-preview>
     <game-map center='activePoint' coordinates="coordinates" path-positions='gameMap.pathPositions'
         class="animate-from-left" ng-show="showGameMap"></game-map>
-    <div class="gBoxDetail animate-fall-top" ng-show="showDetail" style="position: fixed;">
+    <div class="gBoxDetail animate-fall-top" ng-show="showDetail" >
         <!-- {{gameMap.currentGBox}} -->
         <div class="form-group content-inner">
             <button class="closeDetail btn btn-default circle-btn" ng-click="setHideDetail()">
                 <i class="fa fa-times"></i>
             </button>
-            <sp-slideshow array="gameMap.currentGBox.buildings" bg="gameMap.currentGBox.ms.bg"></sp-slideshow>
+            <sp-slideshow array="gameMap.currentGBox.buildings"></sp-slideshow>
+
         </div>
     </div>
 </div>

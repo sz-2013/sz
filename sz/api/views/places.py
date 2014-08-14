@@ -189,7 +189,7 @@ class PlaceDetail(PlaceRoot):
 
 
 class GameMapPath(PlaceRoot):
-    """For example,[new position
+    """Return path from prev_box to current_box.For example,[new position
     (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082)."""
     form = forms.GameMapPathRequestForm
 
@@ -203,6 +203,13 @@ class GameMapPath(PlaceRoot):
             path=gamemap.get('path')
         )
         return sz_api_response(data)
+
+    def post(self, request):
+        user = request.user
+        params = self.validate_and_get_params(
+            forms.GameMapPathPostRequestForm, request.DATA)
+        print params
+        return sz_api_response({})
 
 
 class GameMapTile(PlaceRoot):
@@ -228,13 +235,13 @@ class GameMapTile(PlaceRoot):
         return sz_api_response(data)
 
 
-class GameMapUpdatePath(PlaceRoot):
-    """Update gamemap path for user.
-    In request.POST:
-        - path [[1, 1],..., [1, 2]] - user path positions
-    Returns:
-        - 200 if path was updated
-        - 400 in case of error"""
-    def post(self, request):
-        user = request.user
-        gamemap_service.update_user_gamemap()
+# class GameMapUpdatePath(PlaceRoot):
+#     """Update gamemap path for user.
+#     In request.POST:
+#         - path [[1, 1],..., [1, 2]] - user path positions
+#     Returns:
+#         - 200 if path was updated
+#         - 400 in case of error"""
+#     def post(self, request):
+#         user = request.user
+#         gamemap_service.update_user_gamemap()

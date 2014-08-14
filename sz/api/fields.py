@@ -5,6 +5,7 @@ from rest_framework import relations
 from rest_framework import serializers
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 # from sz.api import pagination
 # from sz.api import services
 
@@ -51,9 +52,9 @@ class FacesListInstanceForm(forms.Form):
     face_id = forms.IntegerField(required=True)
 
 
-class FacesListField(forms.Field):
+class ListField(forms.Field):
     default_error_messages = {
-        'wrong_type': _(u'faces_list must be a list instance'),
+        'wrong_type': _(u'ListField must be a list instance'),
     }
 
     def _to_list(self, value):
@@ -64,14 +65,34 @@ class FacesListField(forms.Field):
             return None
         return self._to_list(value)
 
-    def validate(self, faces_list):
-        if faces_list:
-            if not isinstance(faces_list, list):
+    def _validate_elements(self, value):
+        pass
+
+    def validate(self, value):
+        if value:
+            if not isinstance(value, list):
                 raise forms.ValidationError(self.error_messages['wrong_type'])
-            for f in faces_list:
-                request_form = FacesListInstanceForm(data=f)
-                if not request_form.is_valid():
-                    raise forms.ValidationError(request_form.errors)
+            self._validate_elements(value)
+
+
+class FacesListField(ListField):
+    def _validate_elements(self, faces_list):
+        for f in faces_list:
+            request_form = FacesListInstanceForm(data=f)
+            if not request_form.is_valid():
+                raise forms.ValidationError(request_form.errors)
+
+
+class GameMapPathField(ListField):
+    notvalidError = 'This list can\'t to be a path: ' + \
+                    'a path should contains only continuous boxes.'
+
+    def _validate_elements(self, path):
+        is_notvalid = lambda a, b: len([i for i, el in enumerate(a)
+                                        if abs(el - b[i]) > 1])
+        for i, pos in enumerate(path):
+            if i and is_notvalid(pos, path[i-1]):
+                raise ValidationError(self.notvalidError)
 
 
 class IdListField(serializers.WritableField):

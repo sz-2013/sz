@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from sz import settings
-from sz.core import models
-from sz.api.fields import FacesListField
+# from sz.core import models
+from sz.api.fields import FacesListField, GameMapPathField
 
 
 class PositionRequestForm(forms.Form):
@@ -79,3 +79,7 @@ class MessageAddRequestForm(PositionRequestForm):
     text = forms.CharField(required=False)
     photo_id = forms.IntegerField(required=False)
     faces_list = FacesListField(required=False)
+
+
+class GameMapPathPostRequestForm(forms.Form):
+    path = GameMapPathField(required=True)

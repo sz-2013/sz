@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.gis.db import models
 from sz.gamemap.fields import GameMapBoxesField
+from django.core.exceptions import ValidationError
 
 
 class UserPathManager(models.Manager):
@@ -13,10 +14,15 @@ class UserPathManager(models.Manager):
                     where [1, 1] - it is last checkin box,
                           [10, 10] - current checkin box
         """
-        if hasattr(user, 'userpath'):
-            return user.userpath.update(path=path, city_id=city_id)
-        else:
-            self.create(user=user, path=path, city_id=city_id)
+        if user.last_box and user.last_box.get_gamemap_position() != path[0]:
+            return False
+        try:
+            if hasattr(user, 'userpath'):
+                return user.userpath.update(path=path, city_id=city_id)
+            else:
+                return self.create(user=user, path=path, city_id=city_id)
+        except ValidationError:
+            return False
 
 
 class UserPath(models.Model):

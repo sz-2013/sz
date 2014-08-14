@@ -1,5 +1,4 @@
 function drawTile(gBox){
-    console.log(gBox.sp)
     var img = gBox.ms && gBox.ms.img.thumbnail || '';
     var sp = gBox.sp ? gBox.sp[0]*100/gBox.sp[1] : 0
     var tile = '<h3>' + gBox.name + '</h3>'/* + '<img src="' + img + '" class="gBox-img">'*/;
