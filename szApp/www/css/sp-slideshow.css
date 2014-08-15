@@ -16,9 +16,9 @@
 .sp-parallax-bg {
     background-repeat: repeat-x;
     background-position-y: 100%;
-    -webkit-background-size: 270%;
-    -moz-background-size: 270%;
-    background-size: 270%;
+    -webkit-background-size: 250%;
+    -moz-background-size: 250%;
+    background-size: 250%;
     position: absolute;
     top: 0;
     left: 0;

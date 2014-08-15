@@ -118,7 +118,7 @@ angular.module('spslideshow-directive', [])
             '<div class="sp-slideshow">' +
                 '<div class="sp-content-body"></div>' +
                 '<div class="sp-content">'+
-                    '<div class="sp-parallax-bg" style="background-image: url({{bg.img}})"></div>'+
+                    '<div class="sp-parallax-bg" style="background-image: url({{bg.reduced}})"></div>'+
                     '<ul class="sp-slider">'+
                         '<li ng-repeat="el in array" data-nav="none">'+
                             '<img ng-src="{{el.img.thumbnail}}" align="top"/>'+
@@ -132,6 +132,7 @@ angular.module('spslideshow-directive', [])
         link: function($scope, element, attrs) {
             $scope.$watch('array', function(val){
                 if(val && val.length){
+                    console.log($scope.bg)
                     if($scope.slider) $scope.slider.remove()
                     $scope.slider = new paralaxSlider(element[0])
                 } else{

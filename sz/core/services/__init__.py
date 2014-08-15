@@ -317,7 +317,13 @@ class GameMapService(FeedService):
             kwargs.get('x'), kwargs.get('y'), **params.get_db_params())
         return self._make_place_distance_item(place, params)
 
-    def update_user_gamemap(self, user, path, city_id):
+    def update_user_gamemap(self, user, path, city_id=None, pos=None):
+        """
+            pos - {latitude: LAT, longitude: LNG}
+        """
+        if city_id is None:
+            city_id = parameters.PlaceSearchParametersFactory.create(
+                pos, self.city_service).get_db_params()[params_names.CITY_ID]
         modelUserPath.objects.create_or_update_path(
             path=path, user=user, city_id=city_id)
 

@@ -208,7 +208,6 @@ class GameMapPath(PlaceRoot):
         user = request.user
         params = self.validate_and_get_params(
             forms.GameMapPathPostRequestForm, request.DATA)
-        print params
         return sz_api_response({})
 
 

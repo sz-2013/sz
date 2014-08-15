@@ -21,6 +21,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.$on('runPath', function(e, val){
         var path = JSON.stringify($scope.gameMap.ppoints.map(function(gbox){return gbox.pos}))
         gameMapService.postPath({path: path}, function(r){
+            $scope.showGamePath = false;
             console.log(r)
         })
     })
