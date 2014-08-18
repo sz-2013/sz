@@ -13,20 +13,35 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         $scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox});
     });
 
+    function disabledGBox(cls){
+        $rootScope.disablegBoxDetail = cls;
+    }
+
     $scope.$on('setGameMap', setGameMap);
     $scope.$on('setCurrentGBox', function(e, gbox){
         if($rootScope.showLoader) $rootScope.showLoader = false;
-        $scope.gameMap.currentGBox = gbox})
+        $scope.gameMap.currentGBox = gbox;
+        if(!$scope.gameMap.currentGBox ||
+           !$scope.gameMap.currentGBox.buildings ||
+           !$scope.gameMap.currentGBox.buildings.length){
+                disabledGBox('disabled')
+        } else{
+            disabledGBox('')
+        }
+    })
 
     $scope.$on('runPath', function(e, val){
         var path = JSON.stringify($scope.gameMap.ppoints.map(function(gbox){return gbox.pos}))
         gameMapService.postPath({path: path}, function(r){
-            $scope.showGamePath = false;
+            $scope.gameMap.pathPositions = []
+            setGameMap(null, true)
+            setUsualMapMenu()
             console.log(r)
         })
     })
 
     $scope.$on('gBoxDetail', function(e){
+        console.log(1)
         if($scope.gameMap.currentGBox &&
            $scope.gameMap.currentGBox.buildings &&
            $scope.gameMap.currentGBox.buildings.length){
@@ -47,21 +62,30 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
     $scope.gameMap = {}
 
     /*------------------------------------------------------------------------*/
-    function setNormalMenu(){
+    function setPathPreviewMenu(){
         $scope.$emit('navigation-setNormal');
         $scope.$emit('navigation-setTR', 'map_runpath');
-        $scope.$emit('navigation-setBR', 'map_custompath');
+        $scope.$emit('navigation-setTL', 'map_custompath');
+        $scope.$emit('navigation-setBR', 'map_gboxdetail');
+    }
+
+    function setUsualMapMenu(){
+        $scope.$emit('navigation-setNormal');
+        $scope.$emit('navigation-setBR', 'map_gboxdetail');
+    }
+
+    function setMathWithPathMenu(){
+        $scope.$emit('navigation-hideall');
+        $scope.$emit('navigation-setTL', 'map_backtopath');
+        $scope.$emit('navigation-setTR', 'map_ppcontrol');
+        $scope.$emit('navigation-setBR', 'map_gboxdetail');
     }
 
     function setGameMap(e, val){
         $scope.showGameMap = val;
         $scope.showGamePath = !val;
-        if( val ){
-            $scope.$emit('navigation-hideall');
-            //$scope.$emit('navigation-setTL', 'map_backtopath');
-            $scope.$emit('navigation-setTR', 'map_ppcontrol');
-            $scope.$emit('navigation-setBR', 'map_custompath');
-        } else{ setNormalMenu() }
+        if( val ) setMathWithPathMenu();
+        else setPathPreviewMenu();
     }
 
     function _getGameBox(place){
@@ -95,7 +119,7 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
 
     $scope.setHideDetail = function(){
         $scope.showDetail = false
-        setNormalMenu()
+        setPathPreviewMenu()
     }
 
     /*------------------------------------------------------------------------*/

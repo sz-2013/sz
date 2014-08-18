@@ -16,6 +16,9 @@
 
 .gamemap-length{
     margin-bottom: 0;
+    font-weight: normal;
+    font-size: 1.1em;
+    margin-top: 7px;
 }
 
 .gamemap-pathpreview{
@@ -23,7 +26,7 @@
     margin: 0;
     display: inline-block;
     text-align: left;
-    padding: 20px 10px 54px 20px
+    padding: 20px 10px 54px 10px
 }
 
 .gamemap-pathpreview>li{

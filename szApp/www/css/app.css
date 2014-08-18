@@ -100,7 +100,16 @@ html{
     /*text-shadow: 2px -2px 1px rgba(255, 255, 255, 0.2);*/
     background-color: #fff;
 }
+.navigation span:hover{
+    background-color: transparent;
+}
 
+.navigation a.disabled{
+    color: red;
+    border-color: red;
+    pointer-events: none;
+    cursor: default;
+}
 
 #loader{
     position: absolute;

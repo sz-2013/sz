@@ -124,7 +124,7 @@ L.GM = L.Class.extend({
         return this.points_positions[Math.floor(Math.random() * this.points_positions.length)]
     },*/
 
-    generatePath: function(start){
+    /*generatePath: function(start){
         var start = start || this.getRandomGP(), end = this.getRandomGP();
         //var start = start, end = [start[0] + 8, start[1]];
         //var start = start, end = [start[0] - 8, start[1]];
@@ -142,6 +142,15 @@ L.GM = L.Class.extend({
         //var path = [[8, 8], [8, 7], [9, 7], [10, 7], [10, 8], [11, 8], ];
         //var path = [[8, 9], [9, 8], [9, 7]];
         return path
+    },*/
+
+    removePath: function(){
+        this.path = []
+        for (var i = this.ppoints.length - 1; i >= 0; i--) {
+            var ppoint = this.ppoints[i]
+            ppoint._canRemove = true;
+            this.removePPoint(ppoint)
+        };
     },
 
     //convert methods

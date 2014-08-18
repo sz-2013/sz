@@ -23,8 +23,6 @@ L.GM.prototype.removePPoint = function(point) {
     if( !point._canRemove ) return
     this.ppoints.splice( this._getPointIndex( point ), 1 )
     point.remove()
-    //@TODO: здесь нужно делать пост на сервер и сообщать о новом положении кружочка
-    //если в ответ придет false - откатываться
     this._updatePConnections()
     this.focusCanBeRemove()
     this.setPPoints()

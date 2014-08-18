@@ -42,14 +42,15 @@ var urls = {
 }
 
 var navigationPaths = {
-    mainTL: '',
-    mainTR: '',
+    mainTL: 'partials/navs/navigation/main/score.html',
+    mainTR: 'partials/navs/navigation/main/add.html',
     mainBL: 'partials/navs/navigation/main/menu.html',
-    mainBR: 'partials/navs/navigation/main/score.html',
+    mainBR: '',
     map_backtopath: 'partials/navs/navigation/map/backtopath.html',
     map_runpath: 'partials/navs/navigation/map/runpath.html',
     map_ppcontrol: 'partials/navs/navigation/map/ppcontrol.html',
     map_custompath: 'partials/navs/navigation/map/custompath.html',
+    map_gboxdetail: 'partials/navs/navigation/map/gboxdetail.html',
 }
 
 
@@ -214,7 +215,8 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
             },
             setNormal: function(){
                 this.hideAll();
-                this.setBR('mainBR')
+                this.setTL('mainTL')
+                this.setTR('mainTR')
                 this.setBL('mainBL')
             }
         }
@@ -237,7 +239,13 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         $scope.bodyScroll = true;
     });
 
-    $scope.$on('setBodyScroll', function(e, val){$scope.bodyScroll = val;})
+    $scope.$on('setBodyScroll', function(e, val){$scope.bodyScroll = val;});
+
+/*    $scope.$on('map-disablegBoxDetail', function(e, isDisable){
+        var cls = isDisable ? 'disabled' : ''
+        console.log(cls)
+        $scope.disablegBoxDetail = cls;
+    });*/
 
     $scope.map_setHideGameMapShowPath = function(){
         $scope.$broadcast('setGameMap', false);

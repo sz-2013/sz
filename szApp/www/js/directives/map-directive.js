@@ -8,7 +8,7 @@ angular.module('map-directive', [])
             restrict: 'E',
             template:
                 '<div>' +
-                    '<h5 class="gamemap-length">Path length: {{ppoints.length}}</h5>' +
+                    '<h5 class="gamemap-length">Вы совершили перемещение <br> Длина пути: {{ppoints.length}} клеток</h5>' +
                     /*'<ul class="simpleSlider-container gamemap-item"></ul>' +*/
                     '<ul class="gamemap-pathpreview"></ul>'+
                 '</div>',
@@ -96,10 +96,10 @@ angular.module('map-directive', [])
             replace: true,
             link: function($scope, element, attrs) {
                 L.GM.prototype.setPPoints = function() {
-                    for (var i = this.ppoints.length - 1; i >= 0; i--) {
+            /*        for (var i = this.ppoints.length - 1; i >= 0; i--) {
                         var pos = this.ppoints[i]._gBox.pos
                         var tile = this.getTile(pos[0], pos[1]);
-                    };
+                    };*/
                     $scope.$emit('setPPoints', $scope.map.gm.ppoints)
                 };
                 L.GM.prototype.moveCenter = function( point ) {
@@ -210,6 +210,10 @@ angular.module('map-directive', [])
                     if(!$scope.map) _init()
                     var center = $scope.map.gm.latlng2gm( $scope.map.getCenter() );
                     if( !pos.compare( center )  ) _setCenter()
+                });
+
+                $scope.$watch('pathPositions', function(val, oldval){
+                    if(oldval && (!val || !val.length)) $scope.map.gm.removePath()
                 });
 
             }

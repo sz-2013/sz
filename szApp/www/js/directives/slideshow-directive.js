@@ -132,7 +132,6 @@ angular.module('spslideshow-directive', [])
         link: function($scope, element, attrs) {
             $scope.$watch('array', function(val){
                 if(val && val.length){
-                    console.log($scope.bg)
                     if($scope.slider) $scope.slider.remove()
                     $scope.slider = new paralaxSlider(element[0])
                 } else{
