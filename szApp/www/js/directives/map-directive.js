@@ -8,7 +8,7 @@ angular.module('map-directive', [])
             restrict: 'E',
             template:
                 '<div>' +
-                    '<h5 class="gamemap-length">Вы совершили перемещение <br> Длина пути: {{ppoints.length}} клеток</h5>' +
+                    '<h5 class="page-header">Вы совершили перемещение <br> Длина пути: {{ppoints.length}} клеток</h5>' +
                     /*'<ul class="simpleSlider-container gamemap-item"></ul>' +*/
                     '<ul class="gamemap-pathpreview"></ul>'+
                 '</div>',

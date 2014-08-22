@@ -12,10 +12,11 @@ var urls = {
     search :'#/',
     placeSelect :'#/places/select',
     map :'#/map',
-    messageAdd: '#/messages/add/',
+    messageAdd: function(id){
+        return '#/places/' + id + '/messages/add'
+    },
     place :function(id){
-        var url = '#/places/' + id
-        return url
+        return '#/places/' + id
     },
     user :'#',
     login :'#/login',
@@ -99,7 +100,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     var races = staticValueService.races({}, function(r) {$scope.races = r.data.map(function(race){return randomSets(race) }); });
     var genders = staticValueService.genders({}, function(r) { $scope.genders = r.data; });
     var faces = staticValueService.faces({}, function(r) {$scope.faces = r.data; });
-    var coords = {latitude: 40.7755555, longitude: -73.9747221}
+    var coords = {latitude: 41.086739, longitude: -73.8051486334}
     geolocation.getCurrentPosition(
         function (position) {
             //$scope.coordinates = position.coords;

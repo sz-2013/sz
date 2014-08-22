@@ -25,8 +25,9 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/', {templateUrl: 'partials/map.html', controller: MapController})
         .when('/login', {templateUrl: 'partials/login.html', controller: LoginController})
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
-        .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
         .when('/map', {templateUrl: 'partials/map.html', controller: MapController})
+        .when('/places/select/', {templateUrl: 'partials/places-select.html', controller: PlaceSelectController})
+        .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
         /*
 
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})
@@ -37,7 +38,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
 
         //.when('/raphael', {templateUrl: 'raphael.html', controller: RaphaelController})
         .when('/newsfeed', {templateUrl: 'partials/newsfeed.html', controller: NewsFeedController})*/
-        .otherwise({redirectTo: '/'});
+        //.otherwise({redirectTo: '/'});
 }]);
 
 szApp.config(['$httpProvider', function($httpProvider, $rootScope){

@@ -60,8 +60,8 @@ class PlaceRootNews(SzApiView):
     """
     News feed that represents a list of places of whom
     somebody recently left a message
-    For example, [news feed for location (50.2616113, 127.5266082)]
-    (?latitude=50.2616113&longitude=127.5266082).
+    For example, [news feed for location (41.086739, -73.805148)]
+    (?latitude=41.086739&longitude=-73.805148).
     """
 
     def get(self, request, format=None):
@@ -79,8 +79,8 @@ class PlaceVenueExplore(PlaceRoot):
     """
     Wrapper for Venue explore - get places list from 4sk and create it in db
     For example,
-    [places for position (50.2616113, 127.5266082) radius 250]
-    (?latitude=50.2616113&longitude=127.5266082&radius=250).
+    [places for position (41.086739, -73.805148) radius 250]
+    (?latitude=41.086739&longitude=-73.805148&radius=250).
 
     Returns:
         ?????
@@ -130,8 +130,7 @@ class PlaceVenueSearch(PlaceRoot):
     """
     Wrapper for Venue search - get places list from db
     For example,
-    [places for position (50.2616113, 127.5266082) radius 250]
-    (?latitude=50.2616113&longitude=127.5266082&radius=250).
+    [places for position (41.086739, -73.805148) radius 250](?latitude=41.086739&longitude=-73.805148&radius=250).
 
     Returns:
         [self._serialize_item(item, request.user), ..]
@@ -140,6 +139,7 @@ class PlaceVenueSearch(PlaceRoot):
 
     def get(self, request, format=None):
         params = self.validate_req_params(request.QUERY_PARAMS)
+        params['limit'] = 10
         places_list = place_service.search_in_venue(**params)
         place_response = map(
             lambda item: self._serialize_item(item, request.user), places_list)
@@ -169,7 +169,7 @@ class PlaceInstanceMessages(SzApiView):
 
 # class GameMapRoot(PlaceRoot):
 #     """For example,[map
-#     (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082).
+#     (41.086739, -73.805148)](?latitude=41.086739&longitude=-73.805148).
 #     (I need position for a distance calculate)"""
 #     form = forms.GameMapRequestForm
 
@@ -190,7 +190,7 @@ class PlaceDetail(PlaceRoot):
 
 class GameMapPath(PlaceRoot):
     """Return path from prev_box to current_box.For example,[new position
-    (50.2616113, 127.5266082)](?latitude=50.2616113&longitude=127.5266082)."""
+    (41.086739, -73.805148)](?latitude=41.086739&longitude=-73.805148)."""
     form = forms.GameMapPathRequestForm
 
     def get(self, request, format=None):
@@ -213,7 +213,7 @@ class GameMapPath(PlaceRoot):
 
 class GameMapTile(PlaceRoot):
     """For example,[new tile
-    (1, 1)](?x=1&y=1&latitude=50.2616113&longitude=127.5266082)."""
+    (1, 1)](?x=1&y=1&latitude=41.086739&longitude=-73.805148)."""
     form = forms.GameMapTileRequestForm
 
     def get(self, request, format=None):

@@ -185,6 +185,22 @@ class PlaceNameDecorator(ParametersGroupDecorator):
         return params
 
 
+class LimitDecorator(ParametersGroupDecorator):
+    def __init__(self, params, component=None):
+        ParametersGroupDecorator.__init__(self, params, component)
+        self.__limit = params.get(params_names.LIMIT, None)
+
+    def get_db_params(self):
+        params = ParametersGroupDecorator.get_db_params(self)
+        params[params_names.LIMIT] = self.__limit
+        return params
+
+    def get_api_params(self):
+        params = ParametersGroupDecorator.get_api_params(self)
+        params[params_names.LIMIT] = self.__limit
+        return params
+
+
 class PlaceMessagesParametersFactory:
 
     @classmethod
@@ -223,4 +239,5 @@ class PlaceSearchParametersFactory:
     def create(cls, params, city_service):
         location_group = LocationAlwaysWithCityDecorator(params, city_service)
         place_name_group = PlaceNameDecorator(params, location_group)
-        return place_name_group
+        limit_group = LimitDecorator(params, place_name_group)
+        return limit_group

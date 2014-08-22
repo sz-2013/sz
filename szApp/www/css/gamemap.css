@@ -14,12 +14,6 @@
 }
 
 
-.gamemap-length{
-    margin-bottom: 0;
-    font-weight: normal;
-    font-size: .9em;
-    margin-top: 7px;
-}
 
 .gamemap-pathpreview{
     list-style: none;
@@ -59,6 +53,9 @@
     box-shadow:
         0 2px 1px rgba(0, 0, 0, 0.2),
         inset 0 2px 1px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow::
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
     /*transform: perspective(100%);*/
     -webkit-transition: all .1s;
     transition: all .1s;
@@ -88,6 +85,9 @@
     border: 2px solid rgba(203, 203, 193, 0.4);
     background-color: rgba(40,40,40,0.1);
     box-shadow:
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow::
         0 2px 1px rgba(0, 0, 0, 0.2),
         inset 0 2px 1px rgba(0, 0, 0, 0.2);
 }
@@ -216,6 +216,9 @@
     box-shadow:
         0 2px 1px rgba(0, 0, 0, 0.2),
         inset 0 2px 1px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow::
+        0 2px 1px rgba(0, 0, 0, 0.2),
+        inset 0 2px 1px rgba(0, 0, 0, 0.2);
     /*transform: perspective(100%);*/
     -webkit-transition: all .3s ease-in;
     transition: all .3s ease-in;
@@ -241,6 +244,7 @@
 
 .gamemap-item:before{
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
+    -webkit-box-shadow:: 0 1px 2px 0 rgba(0,0,0,0.2) inset;
 }
 
 .gamemap-item:after{
@@ -259,6 +263,7 @@
 .nobody.gamemap-item:before{
     background-color: transparent;
     box-shadow: none;
+    -webkit-box-shadow:: none;
 }
 
 .neutral.gamemap-item:before,
