@@ -12,9 +12,7 @@ var urls = {
     search :'#/',
     placeSelect :'#/places/select',
     map :'#/map',
-    messageAdd :function(){
-        return '#/messages/add/'
-    },
+    messageAdd: '#/messages/add/',
     place :function(id){
         var url = '#/places/' + id
         return url
@@ -150,7 +148,10 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         var tmChange = 1000;
         var tmShow = 10000;
         function _getBadgesExplored(value){
-            return {header: 'Wow!', body: 'You explored ' + value.places + ' new places', cls: 'success'}
+            return {header: 'Ого!', body: 'Вы открыли ' + value.places + ' новых мест', cls: 'success'}
+        }
+        function _getBadgesafterPath(value){
+            return {header: 'Результат пути', body: value.result , cls: 'success'}
         }
         return {
             _in_show: false,
@@ -180,6 +181,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
             setBadges: function(value){
                 var badge;
                 if(value.name=='explored') var badge = _getBadgesExplored(value)
+                if(value.name=='afterPath') var badge = _getBadgesafterPath(value)
 
                 if(badge) $scope.badges.update(badge)
             }

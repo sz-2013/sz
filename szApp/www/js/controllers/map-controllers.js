@@ -13,21 +13,10 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
         $scope.gameMap.ppoints = ppoints.map(function(p){return p._gBox});
     });
 
-    function disabledGBox(cls){
-        $rootScope.disablegBoxDetail = cls;
-    }
-
     $scope.$on('setGameMap', setGameMap);
     $scope.$on('setCurrentGBox', function(e, gbox){
         if($rootScope.showLoader) $rootScope.showLoader = false;
         $scope.gameMap.currentGBox = gbox;
-        if(!$scope.gameMap.currentGBox ||
-           !$scope.gameMap.currentGBox.buildings ||
-           !$scope.gameMap.currentGBox.buildings.length){
-                disabledGBox('disabled')
-        } else{
-            disabledGBox('')
-        }
     })
 
     $scope.$on('runPath', function(e, val){
@@ -36,6 +25,8 @@ function MapController($scope, gameMapService, $rootScope, placeService, $rootSc
             $scope.gameMap.pathPositions = []
             setGameMap(null, true)
             setUsualMapMenu()
+            var result = 'Пройдя весь мастерски выбранный путь, вы смогли  изменить ваши характеристики: +10XP; +2Int'
+            $scope.badges.setBadges({name:'afterPath', result: result});
             console.log(r)
         })
     })
