@@ -67,21 +67,20 @@ def get_fake_user_data(user_data):
 # ----------------------------------------------------------------------------
 
 
-ENGINE_URL = "http://%(host)s:%(port)s/" % {
-    'host': settings.LEBOWSKI['HOST'], 'port': settings.LEBOWSKI['PORT']}
-
-
 class MainPost(object):
     PREFIX = dict(CREATE='')
+    ENGINE_URL = "http://%(host)s:%(port)s/" % {
+        'host': settings.LEBOWSKI['HOST'], 'port': settings.LEBOWSKI['PORT']}
 
     def _request(self, prefix, sending_data=None):
-        req = urllib2.Request(ENGINE_URL + prefix)
+        req = urllib2.Request(self.ENGINE_URL + prefix)
         req.add_header('Content-Type', 'application/json')
         try:
-            data = urllib2.urlopen(req, sending_data)
+            response = urllib2.urlopen(req, sending_data)
+            data = response.read()
             if isinstance(data, basestring):
-                data = json.loads(data.read())
-            return dict(data=data, status=data.code)
+                data = json.loads(data)
+            return dict(data=data, status=response.code)
         except (urllib2.HTTPError, urllib2.URLError), e:
             return dict(data=str(e.reason), status=e.code if isinstance(
                 e, urllib2.HTTPError) else httpStatus.HTTP_400_BAD_REQUEST)
