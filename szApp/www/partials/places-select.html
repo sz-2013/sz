@@ -1,6 +1,6 @@
 <input class="form-control placesSelect-placesquery" ng-disabled="inProgress" ng-model="query" placeholder="Найти место" >
 <ul class="placesSelect-placeslist">
-    <li ng-repeat="place in placesList">
+    <li ng-repeat="place in placesList" >
         <a href="{{urls.messageAdd(place.place_id)}}">
             <span class="placesSelect-place-choose"><i class="fa fa-angle-double-right fa-lg"></i></span>
             <span class="placesSelect-place-distance">{{ place.distance|| 0 }} м</span>

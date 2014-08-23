@@ -12,11 +12,17 @@ function PlaceSelectController($scope, placeService){
 
     function _get_places_list(){
         var params = $scope.coordinates;
-        params.radius = 3000;
+        params.query = $scope.query || ''
+        if(!$scope.query) params.radius = 3000;
         placeService.searchInVenues(params, function(r){
             $scope.placesList = r.places
         });
     }
+
+    $scope.$watch('query', function(val, oldval){
+        if(val && val.length>2) _get_places_list()
+        else{ if (oldval) _get_places_list()}
+    });
 
     $scope.$watch('coordinates', function(coordinates){
         if(coordinates){
