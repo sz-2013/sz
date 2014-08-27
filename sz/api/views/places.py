@@ -156,7 +156,7 @@ class PlaceInstanceMessages(SzApiView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        return {}
+        return sz_api_response({})
         # params = self.validate_and_get_params(
         #    forms.MessageRequestForm, request.QUERY_PARAMS)
         # place = self.get_object(pk)
@@ -166,6 +166,19 @@ class PlaceInstanceMessages(SzApiView):
         #    photo_host, request)
         # return sz_api_response(response_builder.build(place, messages))
 
+
+class PlaceInstanceShort(SzApiView):
+
+    def get_object(self, pk):
+        try:
+            return models.Place.objects.get(pk=pk)
+        except models.Place.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        place = self.get_object(pk)
+        data = serializers.PlaceNoGameSerializer(instance=place).data
+        return sz_api_response(data)
 
 # class GameMapRoot(PlaceRoot):
 #     """For example,[map

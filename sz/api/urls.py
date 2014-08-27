@@ -50,8 +50,10 @@ urlpatterns = patterns(
         places.PlaceDetail.as_view(), name='place-detail'),
     url(r'^places/(?P<pk>\w+)/messages/?$',
         places.PlaceInstanceMessages.as_view(), name='place-detail-messages'),
-    # url(r'^places/(?P<pk>\w+)/?$',
-    #    places.PlaceInstance.as_view(), name='place-detail'),
+    url(r'^places/(?P<pk>\w+)/detail/short/?$',
+        places.PlaceInstanceShort.as_view(), name='place-detail-short'),
+    # url(r'^places/(?P<pk>\w+)/detail/long/?$',
+    #     places.PlaceInstance.as_view(), name='place-detail-long'),
 
     url(r'^static/races/$',
         static.RacesRoot.as_view(), name='static-races'),

@@ -1,10 +1,30 @@
 <input class="form-control placesSelect-placesquery" ng-disabled="inProgress" ng-model="query" placeholder="Найти место" >
 <ul class="placesSelect-placeslist">
     <li ng-repeat="place in placesList" >
-        <a href="{{urls.messageAdd(place.place_id)}}">
-            <span class="placesSelect-place-choose"><i class="fa fa-angle-double-right fa-lg"></i></span>
+        <div class="placeSelect-place-main">
             <span class="placesSelect-place-distance">{{ place.distance|| 0 }} м</span>
             <div class="placesSelect-place-name">{{ place.place_name }}</div>
-        </a>
+        </div>
+        <div class="placeSelect-place-btns">
+            <!-- загрузка изображения для фонегапа (камера) -->
+            <div>
+                <a class="btn btn-link" href="{{urls.messageAdd(place.place_id, false)}}" >
+                    <i class="fa fa-camera fa-lg"></i>
+                </a>
+            </div>
+
+            <!-- загрузка изображения для фонегапа (библиотека) -->
+            <div>
+                <a class="btn btn-link" href="{{urls.messageAdd(place.place_id, true)}}" >
+                    <i class="fa fa-picture-o fa-lg"></i>
+                </a>
+            </div>
+
+            <div>
+                <a class="btn btn-link" href="{{}}"  >
+                    <i class="fa fa-external-link fa-lg"></i>
+                </a>
+            </div>
+        </div>
     </li>
 </ul>
