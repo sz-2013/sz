@@ -75,6 +75,8 @@ class ImagesModel(models.Model):
 
 
 class Face(models.Model):
+    directory = 'faces'
+
     emotion = models.CharField(
         max_length=16, verbose_name=_('emotion'), choices=EMOTION_CHOICES)
     race = models.ForeignKey(
@@ -83,15 +85,26 @@ class Face(models.Model):
     def get_img_absolute_urls(self, host_url="", img=None):
         return get_img_absolute_urls(host_url, self.face)
 
-    def get_face_path(self, filename):
+    def _get_filename(self, filename):
         race_name = self.race and self.race.name or 'all'
         ext = filename.split('.')[-1]
-        filename = "%s-%s.%s" % (self.emotion, race_name, ext)
-        directory = 'faces'
-        return os.path.join(directory, filename)
+        return ("%s-%s" % (self.emotion, race_name), ext)
+
+    def get_face_path(self, filename):
+        filename = '%s.%s' % self._get_filename(filename)
+        return os.path.join(self.directory, filename)
+
+    def get_sim_path(self, filename):
+        filename = '%s-sim.%s' % self._get_filename(filename)
+        return os.path.join(self.directory, filename)
 
     face = imagekit_models.ProcessedImageField(
         upload_to=get_face_path, null=False, blank=True,
+        # processors=[processors.ResizeToFit(150, 150), ],
+        options={'quality': 85}
+    )
+    simulacrum = imagekit_models.ProcessedImageField(
+        upload_to=get_sim_path, null=False, blank=True,
         # processors=[processors.ResizeToFit(150, 150), ],
         options={'quality': 85}
     )
