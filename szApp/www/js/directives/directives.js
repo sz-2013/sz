@@ -1,42 +1,6 @@
 'use strict';
 
 /* Directives */
-var Helpers = {
-    failHandler: function(e){console.log(e.toString())},
-    photoPreview: function(scope, fileModel){
-        var $photoCont = $('.photo-container');
-        var $img = $photoCont.children('img');
-        var setImgMaxH = function(){
-            var min = 150;
-            var photoH = $(window).height() - 190;
-            var h = (photoH > min) ? photoH : min;
-            $img.css('maxHeight', h + 'px')
-            $(window).resize(function(){setImgMaxH();});
-        }
-        return {
-            setImgMaxH: setImgMaxH,
-            setImagePreviw: function(src, title, file){
-                $img.attr('src', src);
-                if(title) $img.attr('title', title);
-                /*scope.$apply(function(){*/
-                scope[fileModel] = file;
-                scope.showEditPhoto = !scope.showEditPhoto;
-            },
-        }
-    },
-    dataURItoBlob: function(dataURI) {
-        //http://stackoverflow.com/a/15754051/3235213
-        var byteString = atob(dataURI.split(',')[1]);
-        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-        var ab = new ArrayBuffer(byteString.length);
-        var ia = new Uint8Array(ab);
-        for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    }
-}
-
 
 angular.module('sz.client.directives', [])
     .directive('szScroll', function(){
@@ -97,12 +61,12 @@ angular.module('sz.client.directives', [])
             })
         }
     })
-    .directive('szAutoResizeTextArea', function() {
+    /*.directive('szAutoResizeTextArea', function() {
         //enable autoresize for textarea
         return function(scope, element, attrs) {
             element.autoResize();
         };
-    })
+    })*/
     .directive('szModal', function($interval) {
         //enable autoresize for textarea
         return function(scope, element, attrs) {
@@ -151,38 +115,7 @@ angular.module('sz.client.directives', [])
             }
         }
     })
-    .directive('szFileModel', function($rootScope) {
-        //show preview for uploaded photo
-        //and show photo modal window
-        return function(scope, element, attrs) {
-            var helper = Helpers.photoPreview(scope, attrs.szFileModel);
-            helper.setImgMaxH();
-
-            scope.$watch(attrs.szFileModel, function() {
-                var el = element[0];
-                angular.element(el).bind('change', function(){
-                    if (angular.isUndefined(el.files))
-                    {throw new Error("This browser does not support HTML5 File API.");}
-                    if (el.files.length == 1){
-                        var photo = el.files[0];
-                        if (photo.type.match('image.*')) {
-                            var reader = new FileReader();
-                            reader.onload = (function(theFile) {
-                                return function(e) {
-                                    scope.$apply(function(){
-                                        helper.setImagePreviw(e.target.result, escape(photo.name), photo)
-                                    });
-
-                                };
-                            })(photo);
-                            reader.readAsDataURL(photo);
-                        }
-                        else{alert('Недопустимый формат')}
-                    }
-                });
-            });
-        }
-    })
+    
     .directive('szSelectPlace', function() {
         //the directive for a selected place modal window
         return function(scope, element, attrs) {
