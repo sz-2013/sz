@@ -1,25 +1,4 @@
-
-function MessageAddController($scope, messageService, $routeParams, $location, placeService, $rootScope){  
-    $rootScope.showLoader = false;
-    $scope.$emit("setHeader", "messageAdd");
-
-    function _getPlacesList(){
-        $rootScope.showLoader = true;
-        var params = {}
-        params.latitude = $scope.coordinates.latitude 
-        params.longitude = $scope.coordinates.longitude
-        params.radius = 250
-        var places_list = placeService.searchInVenues(params, function(r) { 
-            $scope.places_list = r.places
-            $scope.showPlaceSelect = true;
-            $rootScope.showLoader = false;
-        });    
-    }    
-    $scope.$watch('coordinates',
-        function(){if($scope.coordinates) _getPlacesList()}
-    )
-
-    $scope.showStandartFileModel = true;
+/*$scope.showStandartFileModel = true;
     $scope.$on("selectItem", function(e, item){
         $scope.messagePlace = item;
         $scope.showPlaceSelect = undefined;
@@ -81,6 +60,73 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
                 }
             );
         })
+*/
 
 
+function MessageAddController($scope, messageService, $routeParams, $location, placeService, $rootScope, camera){
+    $rootScope.showLoader = false;
+
+    function setNavs(){
+        $scope.$emit('navigation-setTR', 'message_send');
+        $scope.$emit('navigation-setTL', '');
+        $scope.$emit('navigation-setBR', 'message_custom');
+    }
+
+    $scope.setShowPhotoPreview = function(val){
+        $scope.showPhotoPreview = val;
+        if(val) $scope.$emit('navigation-hideall');
+        else setNavs()
+    }
+
+    setNavs()
+
+    $scope.$on('messageSend', function(e){
+        /*$rootScope.showLoader = true;*/
+        console.log($scope.photo)
+        var message = new Object;
+        message.latitude = $scope.coordinates.latitude;
+        message.longitude = $scope.coordinates.longitude;
+        message.place = $scope.messagePlace.place_id;
+        message.photo = {img: $scope.photo, width: '', height: ''}
+        message.face = $scope.activeFace
+        message.facesList = [] //[{x, y, w, h}]
+        message.faceSimulacrum = {width: '', height: ''}
+        message.faceSimulacrumPoints = [] //[[x, y], ..]
+        /*messageService.create(message,
+            function(r){
+                console.log(r)
+                $rootScope.showLoader = false;
+                $scope.urls.getPath('afterMessageAdd($scope.messagePlace.place_id)')
+            }
+        );*/
+    });
+    $scope.$on('setphotoSuccessHandler', function(e, fn){$scope.photoSuccessHandler = fn; });
+    $scope.$on('setphotoFailHandler', function(e, fn){$scope.photoFailHandler = fn });
+    $scope.$on('setshowStandartFileModel', function(e, val){$scope.showStandartFileModel = val;});
+    $scope.$on('setCropPreview', function(e, fn){$scope.cropPreview = fn;});
+    $scope.$on('setShowPhotoPreview', function(e, val){$scope.setShowPhotoPreview(val) });
+    $scope.$on('setFileModelSrc', function(e, el){$scope.photoSrc = el;});
+    $scope.$on('setPhoto', function(e, data){$scope.photo = data; console.log($scope.photo)});
+
+    function _getMessagePlaceInfo(){
+        var placeId = $routeParams.placeId;
+        placeService.detailShort({placeId: placeId}, function(r){
+            $scope.messagePlace = r;
+        });
+    }
+
+
+    $scope.photoSuccessHandler = null;
+    $scope.photoFailHandler = function(err){console.log(err)}
+    function _makePhoto(){
+        if($scope.photoSuccessHandler)
+            camera.getPicture($scope.photoSuccessHandler, $scope.photoFailHandler, $routeParams.library)
+    }
+
+    $scope.$watch('coordinates', function(val){
+        if(val){
+            _getMessagePlaceInfo();
+            _makePhoto();
+        }
+    })
 }

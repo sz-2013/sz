@@ -12,8 +12,8 @@ var urls = {
     search :'#/',
     placeSelect :'#/places/select',
     map :'#/map',
-    messageAdd: function(id){
-        return '#/places/' + id + '/messages/add'
+    messageAdd: function(id, isLibrary){
+        return '#/places/' + id + '/messages/add?library=' + isLibrary
     },
     place :function(id){
         return '#/places/' + id
@@ -50,6 +50,8 @@ var navigationPaths = {
     map_ppcontrol: 'partials/navs/navigation/map/ppcontrol.html',
     map_custompath: 'partials/navs/navigation/map/custompath.html',
     map_gboxdetail: 'partials/navs/navigation/map/gboxdetail.html',
+    message_send: 'partials/navs/navigation/message/send.html',
+    message_custom: 'partials/navs/navigation/message/custom_photo.html',
 }
 
 
@@ -108,7 +110,8 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
         },
         function (error) {
             $scope.coordinates = coords;
-            console.log(error)}
+            console.log(error)
+        }
     )
 
     sessionService.current({}, function(session){
@@ -258,6 +261,8 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.map_ppcontrol_remove = function($event){$scope.$broadcast('ppcontrol_remove', $event.currentTarget) }
     $scope.map_customPath = function(){$scope.$broadcast('customPath')}
     $scope.map_gBoxDetail = function(){$scope.$broadcast('gBoxDetail')}
+    $scope.message_send = function(){$scope.$broadcast('messageSend')}
+    $scope.message_setFileModelSrc = function(el){$scope.$broadcast('setFileModelSrc', el)}
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
