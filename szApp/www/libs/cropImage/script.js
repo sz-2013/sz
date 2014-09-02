@@ -3,10 +3,15 @@ var CropImage = function(body){
     this.settings.useMax = true //указывает использовать размеры родительского контейнера как максимально возможные
     this.settings.croper = {
         border: 10,
-        min: 100,
+        min: 30,
     }
     this._init(body)
 }
+
+CropImage.prototype._getMouse = function(ev) {
+    if(ev.touches) return ev.touches[index]
+    return ev
+};
 
 CropImage.prototype._init = function(body) {
     this.dragok = false;
@@ -21,10 +26,14 @@ CropImage.prototype._init = function(body) {
     this.img = new Object
 
     var self = this
-    body.onmouseup = function(ev){
+
+    function up(ev){
+        var ev = self._getMouse(ev)
         self._clearState(ev)
     }
-    body.onmousemove = function(ev){
+
+    function move(ev){
+        var ev = self._getMouse(ev)
         if(self.dragok){
             var newX = ev.clientX - self.body.offsetLeft - self.startX;
             var newY = ev.clientY - self.body.offsetTop - self.startY;
@@ -40,6 +49,10 @@ CropImage.prototype._init = function(body) {
             self._resizeCrope(ev)
         }
     }
+
+    body.onmouseup = up
+    body.onmousemove = move
+    body.addEventListener("touchmove", move, false);
 };
 
 CropImage.prototype._resizeCrope = function(ev) {
@@ -87,7 +100,9 @@ CropImage.prototype._createCroper = function() {
     var self = this, border = this.settings.croper.border;
     this.croper = croper = document.createElement('div')
     croper.className = 'croper'
-    croper.onmousedown = function(ev){
+
+    function down(ev){
+        var ev = self._getMouse(ev)
         self.startX = ev.offsetX
         self.startY = ev.offsetY
         if( ev.offsetX > border &&
@@ -99,9 +114,15 @@ CropImage.prototype._createCroper = function() {
             self.resizeok = true
         }
     }
-    croper.onmouseup = function(ev){
+
+    function up(ev){
+        var ev = self._getMouse(ev)
         self._clearState(ev)
     }
+
+    croper.onmousedown = down
+    croper.onmouseup = up
+
     this.body.appendChild(croper)
     croper.style.left = (this.w - croper.offsetWidth)/2 + 'px'
     croper.style.top = (this.h - croper.offsetHeight)/2 + 'px'
@@ -125,8 +146,23 @@ CropImage.prototype._clearCanvas = function() {
 }
 
 CropImage.prototype._deleteCroper = function() {
+    if(!this.croper) return
     this.body.removeChild(this.croper)
     this.croper = undefined
+};
+
+
+CropImage.prototype._setBodySize = function(l, w, t, h) {
+    this.body.style.left = l || 0
+    this.body.style.width = w || '100%'
+    this.body.style.top = t || 0
+    this.body.style.height = h || '100%'
+};
+
+
+CropImage.prototype._getK = function(w, h) {
+    this._setBodySize()
+    return Math.max(w/this.body.offsetWidth, h/this.body.offsetHeight)
 };
 
 
@@ -134,25 +170,31 @@ CropImage.prototype._drawImage = function() {
     var data = this.img.data
     var imageObj = new Image();
     var self = this;
+    this._deleteCroper()
+    this._setBodySize()
+
 
     imageObj.onload = function() {
         var originalW = this.width;
         var originalH = this.height;
         var imageW = originalW;
         var imageH = originalH;
+        self.imgSz = undefined;
         if(self.settings.useMax){
             if( originalW > self.body.offsetWidth ||
                 originalH > self.body.offsetHeight){
-                    var wRel = originalW/self.body.offsetWidth;
-                    var hRel = originalH/self.body.offsetHeight;
-                    var k = Math.max(wRel, hRel)
+                    var k = self._getK(originalW,originalH)
                     var imageW = originalW/k;
                     var imageH = originalH/k;
 
-                    self.body.style.left = (self.body.offsetWidth - imageW)/2 + 'px';
-                    self.body.style.width = imageW + 'px'
-                    self.body.style.top = (self.body.offsetHeight - imageH)/2 + 'px';
-                    self.body.style.height = imageH + 'px'
+                    self._setBodySize(
+                        (self.body.offsetWidth - imageW)/2 + 'px',
+                        imageW + 'px',
+                        (self.body.offsetHeight - imageH)/2 + 'px',
+                        imageH + 'px'
+                    )
+
+                    self.imgSz = {h: originalH, w: originalW, k: k}
             }
         }
         self._updateCanvasSize(imageW, imageH);
@@ -162,6 +204,8 @@ CropImage.prototype._drawImage = function() {
     };
     imageObj.src = data;
 };
+
+
 
 CropImage.prototype.draw = function(data, title) {
     this._clearCanvas()
@@ -179,13 +223,15 @@ CropImage.prototype.crop = function() {
     var w = this.croper.offsetWidth, h = this.croper.offsetHeight,
         x = this.croper.offsetLeft, y = this.croper.offsetTop;
 
+    var k = this.imgSz ? this.imgSz.k : 1;
+    var n = this._getK(w, h)
     this._deleteCroper()
 
     imageObj.onload = function() {
-        self._updateCanvasSize(w, h);
+        self._updateCanvasSize(w/n, h/n);
         self.context.drawImage(this,
-                               x, y, w, h, //конфигурация нового куска изображения
-                               0, 0, w, h //конфигурация позиции этого куска на канвасе
+                               x*k, y*k, w*k, h*k, //конфигурация нового куска изображения
+                               0, 0, w/n, h/n //конфигурация позиции этого куска на канвасе
                                );
         var base64ImageData = self.canvas.toDataURL();
         self.updateImage(base64ImageData)
