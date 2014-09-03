@@ -1,72 +1,141 @@
-var CropImage = function(body, isMobile){
-    this.settings = new Object;
-    this.settings.useMax = true //указывает использовать размеры родительского контейнера как максимально возможные
-    this.settings.croper = {
-        border: 20,
-        min: 100,
-    }
-    this._init(body, isMobile)
-}
+/*Class - OOP funcion from leaflet*/
 
-CropImage.prototype._getMouse = function(ev) {
-    if(ev.touches) return ev.touches[0]
-    return ev
-};
+var Imagable = L.Class.extend({
+    settings:{
+        useMax: true,
+    },
+    initialize: function(body, isMobile){
+        this.dragok = false;
+        this.isMobile = isMobile;
+        this.body = body;
+        this.img = new Object
+        this._createCanvas();
+
+        this.sub_initialize(body, isMobile)
+    },
+    _getMouse: function(ev){
+        if(ev.touches) return ev.touches[0]
+        return ev
+    },
+    _setBodySize: function(){},
+    _mouseup: function(el, fn) {
+        var self = this;
+        var fn = fn || function(ev){self._clearState()}
+        var ev = this.isMobile ? 'touchend' : 'mouseup'
+        el.addEventListener(ev, fn, false)
+    },
+    _mousedown: function(el, fn) {
+        var ev = this.isMobile ? 'touchstart' : 'mousedown'
+        el.addEventListener(ev, fn, false)
+    },
+    _mousemove: function(el, fn) {
+        var ev = this.isMobile ? 'touchmove' : 'mousemove'
+        el.addEventListener(ev, fn, false)
+    },
+    _createCanvas: function() {
+        this.canvas = canvas = document.createElement('canvas')
+        this.body.appendChild(canvas);
+        this.context = canvas.getContext('2d');
+        this.w = canvas.getAttribute('width');
+        this.h = canvas.getAttribute('height');
+    },
+    _updateCanvasSize: function(w, h) {
+        var c = this.canvas;
+        if(c.getAttribute('width') != w){
+            c.setAttribute('width', w);
+            this.w = w;
+        }
+        if(c.getAttribute('height') != h){
+            c.setAttribute('height', h);
+            this.h = h;
+        }
+    },
+    _clearCanvas: function() {
+        this.context.clearRect(0, 0, this.w, this.h);
+    },
+    _clearState: function(){},
+    _afterDrawImage: function(){},
+    _drawImage: function() {
+        var data = this.img.data
+        var imageObj = new Image();
+        var self = this;
+        this._setBodySize()
 
 
-CropImage.prototype._mouseup = function(el, fn) {
-    var self = this;
-    var fn = fn || function(ev){self._clearState()}
-    var ev = this.isMobile ? 'touchend' : 'mouseup'
-    el.addEventListener(ev, fn, false)
-};
+        imageObj.onload = function() {
+            var originalW = this.width;
+            var originalH = this.height;
+            var imageW = originalW;
+            var imageH = originalH;
+            self.imgSz = undefined;
+            if(self.settings.useMax){
+                if( originalW > self.body.offsetWidth ||
+                    originalH > self.body.offsetHeight){
+                        var k = self._getK(originalW,originalH)
+                        var imageW = originalW/k;
+                        var imageH = originalH/k;
 
-CropImage.prototype._mousedown = function(el, fn) {
-    var ev = this.isMobile ? 'touchstart' : 'mousedown'
-    el.addEventListener(ev, fn, false)
-};
+                        self._setBodySize(
+                            (self.body.offsetWidth - imageW)/2 + 'px',
+                            imageW + 'px',
+                            (self.body.offsetHeight - imageH)/2 + 'px',
+                            imageH + 'px'
+                        )
 
-CropImage.prototype._mousemove = function(el, fn) {
-    var ev = this.isMobile ? 'touchmove' : 'mousemove'
-    el.addEventListener(ev, fn, false)
-};
+                        self.imgSz = {h: originalH, w: originalW, k: k}
+                }
+            }
+            self._updateCanvasSize(imageW, imageH);
+            self.context.drawImage(this, 0, 0, imageW, imageH);
 
-CropImage.prototype._init = function(body, isMobile) {
-    this.dragok = false;
-    this.isMobile = isMobile;
-    this.body = body;
-    /*if(this.settings.useMax){
-        var parent = this.body.parentNode;
-        this.body.style.width = parent.offsetWidth + 'px';
-        this.body.style.height = parent.offsetHeight + 'px';
-    }*/
-    this._createCanvas()
-    this.rectParams = {x: 0, y: 0}
-    this.img = new Object
+            self._afterDrawImage()
+        };
+        imageObj.src = data;
+    },
+    _preDraw: function(){},
+    draw: function(data, title){
+        this._clearCanvas()
+        this.img.data = data;
+        this._preDraw()
+        this._drawImage(data, title)
+    },
+});
 
-    var self = this
 
-    function move(ev){
-        var ev = self._getMouse(ev)
-        if(self.dragok){
-            var newX = ev.clientX - self.body.offsetLeft - self.startX;
-            var newY = ev.clientY - self.body.offsetTop - self.startY;
-            if(newX > 0 &&
-               newX < (self.w - self.croper.offsetWidth) &&
-               newY > 0 &&
-               newY < (self.h - self.croper.offsetHeight)){
-                self.croper.style.left = newX + 'px';
-                self.croper.style.top = newY + 'px';
+var CropImage = Imagable.extend({
+    settings:{
+        croper: {
+            border: 20,
+            min: 100,
+        },
+        useMax: true //указывает использовать размеры родительского контейнера как максимально возможные
+    },
+    sub_initialize: function(body, isMobile){
+        var self = this
+
+        function move(ev){
+            var ev = self._getMouse(ev)
+            if(self.dragok){
+                var newX = ev.clientX - self.body.offsetLeft - self.startX;
+                var newY = ev.clientY - self.body.offsetTop - self.startY;
+                if(newX > 0 &&
+                   newX < (self.w - self.croper.offsetWidth) &&
+                   newY > 0 &&
+                   newY < (self.h - self.croper.offsetHeight)){
+                    self.croper.style.left = newX + 'px';
+                    self.croper.style.top = newY + 'px';
+                }
+            }
+            if(self.resizeok){
+                self._resizeCrope(ev)
             }
         }
-        if(self.resizeok){
-            self._resizeCrope(ev)
-        }
-    }
 
-    this._mousemove(body, move)
-    this._mouseup(body)
-};
+        this._mousemove(body, move)
+        this._mouseup(body)
+    },
+})
+
 
 CropImage.prototype._resizeCrope = function(ev) {
     var croper = this.croper;
@@ -101,14 +170,6 @@ CropImage.prototype._clearState = function() {
 };
 
 
-CropImage.prototype._createCanvas = function() {
-    this.canvas = canvas = document.createElement('canvas')
-    this.body.appendChild(canvas);
-    this.context = canvas.getContext('2d');
-    this.w = canvas.getAttribute('width');
-    this.h = canvas.getAttribute('height');
-};
-
 CropImage.prototype._createCroper = function() {
     var self = this, border = this.settings.croper.border;
     this.croper = croper = document.createElement('div')
@@ -138,21 +199,6 @@ CropImage.prototype._createCroper = function() {
 };
 
 
-CropImage.prototype._updateCanvasSize = function(w, h) {
-    var c = this.canvas;
-    if(c.getAttribute('width') != w){
-        c.setAttribute('width', w);
-        this.w = w;
-    }
-    if(c.getAttribute('height') != h){
-        c.setAttribute('height', h);
-        this.h = h;
-    }
-};
-
-CropImage.prototype._clearCanvas = function() {
-    this.context.clearRect(0, 0, this.w, this.h);
-}
 
 CropImage.prototype._deleteCroper = function() {
     if(!this.croper) return
@@ -174,56 +220,17 @@ CropImage.prototype._getK = function(w, h) {
     return Math.max(w/this.body.offsetWidth, h/this.body.offsetHeight)
 };
 
-
-CropImage.prototype._drawImage = function() {
-    var data = this.img.data
-    var imageObj = new Image();
-    var self = this;
-    this._deleteCroper()
-    this._setBodySize()
-
-
-    imageObj.onload = function() {
-        var originalW = this.width;
-        var originalH = this.height;
-        var imageW = originalW;
-        var imageH = originalH;
-        self.imgSz = undefined;
-        if(self.settings.useMax){
-            if( originalW > self.body.offsetWidth ||
-                originalH > self.body.offsetHeight){
-                    var k = self._getK(originalW,originalH)
-                    var imageW = originalW/k;
-                    var imageH = originalH/k;
-
-                    self._setBodySize(
-                        (self.body.offsetWidth - imageW)/2 + 'px',
-                        imageW + 'px',
-                        (self.body.offsetHeight - imageH)/2 + 'px',
-                        imageH + 'px'
-                    )
-
-                    self.imgSz = {h: originalH, w: originalW, k: k}
-            }
-        }
-        self._updateCanvasSize(imageW, imageH);
-        self.context.drawImage(this, 0, 0, imageW, imageH);
-
-        self._createCroper();
-    };
-    imageObj.src = data;
+CropImage.prototype._afterDrawImage = function() {
+    this._createCroper();
 };
 
 
-
-CropImage.prototype.draw = function(data, title) {
-    this._clearCanvas()
-    this.img.data = data;
-    this._drawImage(data, title)
+CropImage.prototype._preDraw = function() {
+    this._deleteCroper()
 };
 
 CropImage.prototype.updateImage = function(base64ImageData) {
-    // body...
+    // переопределется в дерективе
 };
 
 CropImage.prototype.crop = function() {
@@ -247,3 +254,11 @@ CropImage.prototype.crop = function() {
     }
     imageObj.src = this.img.data;
 };
+
+
+var UnfaceImage = Imagable.extend({
+    sub_initialize: function(body, isMobile){},
+    setActiveFace: function(activeFace){
+        console.log(activeFace)
+    }
+})
