@@ -1,11 +1,11 @@
-var CropImage = function(body){
+var CropImage = function(body, isMobile){
     this.settings = new Object;
     this.settings.useMax = true //указывает использовать размеры родительского контейнера как максимально возможные
     this.settings.croper = {
-        border: 10,
+        border: 20,
         min: 100,
     }
-    this._init(body)
+    this._init(body, isMobile)
 }
 
 CropImage.prototype._getMouse = function(ev) {
@@ -13,8 +13,27 @@ CropImage.prototype._getMouse = function(ev) {
     return ev
 };
 
-CropImage.prototype._init = function(body) {
+
+CropImage.prototype._mouseup = function(el, fn) {
+    var self = this;
+    var fn = fn || function(ev){self._clearState()}
+    var ev = this.isMobile ? 'touchend' : 'mouseup'
+    el.addEventListener(ev, fn, false)
+};
+
+CropImage.prototype._mousedown = function(el, fn) {
+    var ev = this.isMobile ? 'touchstart' : 'mousedown'
+    el.addEventListener(ev, fn, false)
+};
+
+CropImage.prototype._mousemove = function(el, fn) {
+    var ev = this.isMobile ? 'touchmove' : 'mousemove'
+    el.addEventListener(ev, fn, false)
+};
+
+CropImage.prototype._init = function(body, isMobile) {
     this.dragok = false;
+    this.isMobile = isMobile;
     this.body = body;
     /*if(this.settings.useMax){
         var parent = this.body.parentNode;
@@ -27,20 +46,11 @@ CropImage.prototype._init = function(body) {
 
     var self = this
 
-    function up(ev){
-        console.log('body-up')
-        var ev = self._getMouse(ev)
-        self._clearState(ev)
-    }
-
     function move(ev){
         var ev = self._getMouse(ev)
-        console.log('move')
         if(self.dragok){
-            console.log('1-0')
             var newX = ev.clientX - self.body.offsetLeft - self.startX;
             var newY = ev.clientY - self.body.offsetTop - self.startY;
-            console.log(newX + ';' + newY)
             if(newX > 0 &&
                newX < (self.w - self.croper.offsetWidth) &&
                newY > 0 &&
@@ -50,15 +60,12 @@ CropImage.prototype._init = function(body) {
             }
         }
         if(self.resizeok){
-            console.log('2-0')
             self._resizeCrope(ev)
         }
     }
 
-    body.onmouseup = up
-    body.onmousemove = move
-    //body.addEventListener("touchend", up, false);
-    body.addEventListener("touchmove", move, false);
+    this._mousemove(body, move)
+    this._mouseup(body)
 };
 
 CropImage.prototype._resizeCrope = function(ev) {
@@ -108,14 +115,11 @@ CropImage.prototype._createCroper = function() {
     croper.className = 'croper'
 
     function down(ev){
-        console.log(ev)
         self._clearState(ev)
-        console.log('down')
         var ev = self._getMouse(ev)
         if(ev == undefined) return
-        self.startX = x = ev.pageX - self.croper.offsetLeft
-        self.startY = y = ev.pageY - self.croper.offsetTop
-        console.log(x + ';' + y)
+        self.startX = x = ev.pageX - self.croper.offsetLeft - self.body.offsetLeft
+        self.startY = y = ev.pageY - self.croper.offsetTop - self.body.offsetTop
         if( x > border &&
             (x + border) < self.croper.offsetWidth &&
             y > border &&
@@ -124,21 +128,9 @@ CropImage.prototype._createCroper = function() {
         } else{
             self.resizeok = true
         }
-        console.log(self.dragok + ';' + self.resizeok)
     }
-
-    function up(ev){
-        console.log('up')
-        var ev = self._getMouse(ev)
-        self._clearState(ev)
-    }
-
-    //croper.onmousedown = down
-    croper.onmouseup = up
-    //croper.addEventListener("mousedown", down, false);
-    //croper.addEventListener("mouseup", up, false);
-    croper.addEventListener("touchstart", down, false);
-    croper.addEventListener("touchend", up, false);
+    this._mouseup(croper)
+    this._mousedown(croper, down)
 
     this.body.appendChild(croper)
     croper.style.left = (this.w - croper.offsetWidth)/2 + 'px'
