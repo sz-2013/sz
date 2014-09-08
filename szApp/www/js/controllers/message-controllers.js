@@ -106,7 +106,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     $scope.$on('setCropPreview', function(e, fn){$scope.cropPreview = fn;});
     $scope.$on('setShowPhotoPreview', function(e, val){$scope.setShowPhotoPreview(val) });
     $scope.$on('setFileModelSrc', function(e, el){$scope.photoSrc = el;});
-    $scope.$on('setPhoto', function(e, data){$scope.photo = data; console.log($scope.photo)});
+    $scope.$on('setPhoto', function(e, data){$scope.photo = data; $scope.$apply()});
 
     function _getMessagePlaceInfo(){
         var placeId = $routeParams.placeId;
@@ -128,5 +128,10 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
             _getMessagePlaceInfo();
             _makePhoto();
         }
-    })
+    });
+
+
+    $scope.setActiveFace = function(face){
+        $scope.activeFace = face
+    }
 }
