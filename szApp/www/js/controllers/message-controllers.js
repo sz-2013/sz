@@ -67,6 +67,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     $rootScope.showLoader = false;
 
     function setNavs(){
+        $scope.$emit('navigation-setNormal');
         $scope.$emit('navigation-setTR', 'message_send');
         $scope.$emit('navigation-setTL', '');
         $scope.$emit('navigation-setBR', 'message_custom');
@@ -81,17 +82,15 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     setNavs()
 
     $scope.$on('messageSend', function(e){
+        $scope.$broadcast('zipImage')
         /*$rootScope.showLoader = true;*/
-        console.log($scope.photo)
+        /*console.log($scope.photo)
         var message = new Object;
         message.latitude = $scope.coordinates.latitude;
         message.longitude = $scope.coordinates.longitude;
         message.place = $scope.messagePlace.place_id;
         message.photo = {img: $scope.photo, width: '', height: ''}
-        message.face = $scope.activeFace
-        message.facesList = [] //[{x, y, w, h}]
-        message.faceSimulacrum = {width: '', height: ''}
-        message.faceSimulacrumPoints = [] //[[x, y], ..]
+        message.face = $scope.activeFace*/
         /*messageService.create(message,
             function(r){
                 console.log(r)

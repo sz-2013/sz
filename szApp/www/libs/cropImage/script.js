@@ -55,12 +55,10 @@ var Imagable = L.Class.extend({
     },
     _clearState: function(){},
     _afterDrawImage: function(){},
-    _drawImage: function() {
-        var data = this.img.data
+    _drawImage: function(data, imgSz, x, y) {
+        var data = data || this.img.data
         var imageObj = new Image();
         var self = this;
-        this._setBodySize()
-
 
         imageObj.onload = function() {
             var originalW = this.width;
@@ -68,36 +66,41 @@ var Imagable = L.Class.extend({
             var imageW = originalW;
             var imageH = originalH;
             self.imgSz = undefined;
-            if(self.settings.useMax){
-                if( originalW > self.body.offsetWidth ||
-                    originalH > self.body.offsetHeight){
-                        var k = self._getK(originalW,originalH)
-                        var imageW = originalW/k;
-                        var imageH = originalH/k;
+            if(imgSz){
+                var imageW = imgSz.w;
+                var imageH = imgSz.h;
+            } else{
+                if(self.settings.useMax){
+                    if( originalW > self.body.offsetWidth ||
+                        originalH > self.body.offsetHeight){
+                            var k = self._getK(originalW,originalH)
+                            var imageW = originalW/k;
+                            var imageH = originalH/k;
 
-                        self._setBodySize(
-                            (self.body.offsetWidth - imageW)/2 + 'px',
-                            imageW + 'px',
-                            (self.body.offsetHeight - imageH)/2 + 'px',
-                            imageH + 'px'
-                        )
+                            self._setBodySize(
+                                (self.body.offsetWidth - imageW)/2 + 'px',
+                                imageW + 'px',
+                                (self.body.offsetHeight - imageH)/2 + 'px',
+                                imageH + 'px'
+                            )
 
-                        self.imgSz = {h: originalH, w: originalW, k: k}
+                            self.imgSz = {h: originalH, w: originalW, k: k}
+                    }
                 }
             }
-            self._updateCanvasSize(imageW, imageH);
-            self.context.drawImage(this, 0, 0, imageW, imageH);
+            if(!imgSz) self._updateCanvasSize(imageW, imageH);
+            self.context.drawImage(this, x || 0, y || 0, imageW, imageH);
 
             self._afterDrawImage()
         };
         imageObj.src = data;
     },
     _preDraw: function(){},
-    draw: function(data, title){
+    draw: function(data){
         this._clearCanvas()
         this.img.data = data;
         this._preDraw()
-        this._drawImage(data, title)
+        this._drawImage(data)
     },
 });
 
@@ -226,6 +229,7 @@ CropImage.prototype._afterDrawImage = function() {
 
 
 CropImage.prototype._preDraw = function() {
+    this._setBodySize()
     this._deleteCroper()
 };
 
@@ -255,10 +259,3 @@ CropImage.prototype.crop = function() {
     imageObj.src = this.img.data;
 };
 
-
-var UnfaceImage = Imagable.extend({
-    sub_initialize: function(body, isMobile){},
-    setActiveFace: function(activeFace){
-        console.log(activeFace)
-    }
-})

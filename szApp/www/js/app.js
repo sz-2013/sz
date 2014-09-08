@@ -13,6 +13,7 @@ var szApp = angular.module(
     /*'navs-directive',*/
     'map-directive',
     'spslideshow-directive',
+    'photo-directive',
   /*  'leaflet-directive',
     ,*/
     /*'gamemap-directive',*/
@@ -27,7 +28,7 @@ szApp.config(['$routeProvider', function($routeProvider) {
         .when('/registration', {templateUrl: 'partials/registration.html', controller: RigistrationController})
         .when('/map', {templateUrl: 'partials/map.html', controller: MapController})
         .when('/places/select/', {templateUrl: 'partials/places-select.html', controller: PlaceSelectController})
-        .when('/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
+        .when('/places/:placeId/messages/add/', {templateUrl: 'partials/message-add.html', controller: MessageAddController})
         /*
 
         .when('/map', {templateUrl: 'partials/map.html', controller: GameMapController})

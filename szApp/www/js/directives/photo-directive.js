@@ -53,6 +53,7 @@ angular.module("photo-directive", [])
         return {
             scope: {
                 src: '=src', //file
+                ismobile: '=ismobile',
             },
             restrict: 'E',
             template: '<div class="imgCroper"></div>',
@@ -62,38 +63,82 @@ angular.module("photo-directive", [])
                 CropImage.prototype.updateImage = function(base64ImageData) {
                     $scope.$emit('setPhoto', base64ImageData);
                 };
-                var croper = new CropImage(element[0]);
 
-                function drawFn(src, title, file){
-                    croper.draw(src, title)
+                function init(){
+                    var croper = new CropImage(element[0], $scope.ismobile);
+
+                    function drawFn(src, title, file){
+                        croper.draw(src, title)
+                    }
+
+
+                    $scope.$emit('setCropPreview', function(){
+                        $scope.$emit('setShowPhotoPreview', false);
+                        croper.crop()
+                    });
+
+                    if(navigator.camera!==undefined){
+                        $scope.$emit('setphotoSuccessHandler',
+                            function(imageData){
+                                var src = "data:image/png;base64," + imageData;
+                                var photo = Helpers.dataURItoBlob(src);
+                                drawFn(src,  String(Math.random()).slice(2, 12) + '.png')
+                            }
+                        );
+                        $scope.$emit('setphotoFailHandler', function(err){console.log(err)});
+                        //изначально будет пытаться отрабатывать стандартная загрузка фото, если у устройства есть камера - отработает загрузка через фонегап
+                        $scope.$emit('setshowStandartFileModel', false);
+                    } else{
+                        $scope.$emit('setshowStandartFileModel', true);
+                        $scope.$watch('src', function(file) {
+                            if(file){
+                                Helpers.readURL(file, drawFn)
+                                $scope.$emit('setShowPhotoPreview', true);
+                            }
+                        });
+                    }
                 }
 
+                $scope.$watch('ismobile', function(val){
+                    if(val!==undefined) init()
+                })
+            }
+        }
+    })
+    .directive('szPhotoUnface', function() {
+        //unface uploaded photo
+        return {
+            scope: {
+                src: '=', //file
+                ismobile: '=',
+                activeface: '='
+            },
+            restrict: 'E',
+            template: '<div class="imgUnface"></div>',
+            replace: true,
+            transclude: true,
+            link: function($scope, element, attrs) {
+                var el = element[0];
+                el.style.height = el.offsetWidth + 'px';
+                function init(){
+                    $scope.unface = new UnfaceImage(el, $scope.ismobile)
+                    $scope.$watch('src', function(photo, oldphoto){
+                        //if(oldphoto) unface.clear()
+                        if(photo) $scope.unface.setBg(photo)
+                    });
 
-                $scope.$emit('setCropPreview', function(){
-                    $scope.$emit('setShowPhotoPreview', false);
-                    croper.crop()
+                    $scope.$watch('activeface', function(face){
+                        if(face) $scope.unface.setActiveFace(face)
+                    })
+                }
+
+                $scope.$watch('ismobile', function(val){
+                    if(val!==undefined) init()
                 });
 
-                if(navigator.camera!==undefined){
-                    $scope.$emit('setphotoSuccessHandler',
-                        function(imageData){
-                            var src = "data:image/png;base64," + imageData;
-                            var photo = Helpers.dataURItoBlob(src);
-                            drawFn(src,  String(Math.random()).slice(2, 12) + '.png')
-                        }
-                    );
-                    $scope.$emit('setphotoFailHandler', function(err){console.log(err)});
-                    //изначально будет пытаться отрабатывать стандартная загрузка фото, если у устройства есть камера - отработает загрузка через фонегап
-                    $scope.$emit('setshowStandartFileModel', false);
-                } else{
-                    $scope.$emit('setshowStandartFileModel', true);
-                    $scope.$watch('src', function(file) {
-                        if(file){
-                            Helpers.readURL(file, drawFn)
-                            $scope.$emit('setShowPhotoPreview', true);
-                        }
-                    });
-                }
+                $scope.$on('zipImage', function(e){
+                    if($scope.unface) $scope.unface.zip()
+                })
             }
         }
     })

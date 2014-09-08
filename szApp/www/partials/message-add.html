@@ -59,7 +59,7 @@
 
 <div class="photoPreview animate-fall-top" ng-show="showPhotoPreview">
     <div class="photoPreview-inner">
-        <sz-photo-crop src="photoSrc"></sz-photo-crop>
+        <sz-photo-crop src="photoSrc" ismobile="is_mobile"></sz-photo-crop>
         <!-- <div sz-photo-crop= class="imgCroper"></div> -->
     </div>
     <div class="btn-group photoPrevew-btns">
@@ -82,14 +82,13 @@
                 </div> <!-- /#messageAdd-messagePlace -->
             </div>
 
-            <div style="width: 322px;height:322px; overflow:hidden; margin-top: 10px; margin-left: -1px; position: relative;">
-                photo: {{photo}}
-                <img ng-src="{{photo}}">
-                <div  style="position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .6); padding-top: 5px;">
+            <div class="messageAdd-photoCont">
+                <sz-photo-unface src="photo" ismobile="is_mobile" activeface="activeFace"></sz-photo-unface>
+                <div  style="position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .6); padding-top: 5px;z-index: 200;">
                     <div style="height: 60px; overflow-x: scroll; white-space: nowrap;">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px;" ng-click="activeFace = face">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px;" ng-click="activeFace = face">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px;" ng-click="activeFace = face">
+                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
+                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
+                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
                     </div>
                 </div>
             </div>
