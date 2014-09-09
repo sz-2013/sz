@@ -55,8 +55,6 @@ szServices.factory('placeService', function($resource){
     /*    search: { method:'GET', params:{listCtrl: 'search' }, isArray:true },*/
         searchInVenues: { method:'GET', params:{listCtrl: 'search-in-venues' }, isArray:false },
         exploreInVenues:{ method:'GET', params:{listCtrl: 'explore-in-venues' }, isArray:false },
-        detailShort: { method:'GET', params:{docCtrl: 'detail/short' }, isArray:false },
-        /*detail: { method:'GET', params:{docCtrl: 'detail' }, isArray:false },*/
     });
 });
 
