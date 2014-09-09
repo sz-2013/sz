@@ -15,7 +15,7 @@ szPhoneGapService.factory('phonegapReady', function() {
         var impl = function () {
         queue.push(Array.prototype.slice.call(arguments));
     };
-              
+
     document.addEventListener('deviceready', function () {
         console.log('ready')
         queue.forEach(function (args) {
@@ -23,14 +23,14 @@ szPhoneGapService.factory('phonegapReady', function() {
         });
         impl = fn;
     }, false);
-              
+
     return function () {
         return impl.apply(this, arguments);
         };
     };
 });
 
-szPhoneGapService.factory('geolocation', function ($rootScope, phonegapReady) {    
+szPhoneGapService.factory('geolocation', function ($rootScope, phonegapReady) {
   return {
     getCurrentPosition: function (onSuccess, onError, options) {
         navigator.geolocation.getCurrentPosition(
@@ -98,7 +98,7 @@ szPhoneGapService.factory('camera', function ($rootScope, phonegapReady) {
                             onSuccess.apply(that, args);
                         });
                     }
-                }, 
+                },
                 function () {
                     var that = this,
                     args = arguments;
