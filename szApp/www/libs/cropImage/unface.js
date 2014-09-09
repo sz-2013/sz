@@ -74,7 +74,7 @@ var UnfaceImage = Imagable.extend({
             }, self.settings.tm);
         });
         this._mouseup(face);
-        this.body.appendChild(face);
+        this.facesArea.appendChild(face);
         return face
     },
     _clearTimer: function(){
@@ -99,7 +99,11 @@ var UnfaceImage = Imagable.extend({
         for (var i = this.facesList.length - 1; i >= 0; i--) {
             var f = this.facesList[i]
             if(!~this.usedFaces.indexOf(f.face)) this.usedFaces.push(f.face)
+            this._drawImage(f.getAttribute('src'), {w: f.offsetWidth, h: f.offsetHeight}, f.offsetLeft, f.offsetTop)
+            this.facesArea.removeChild(f)
         };
+        this.facesArea = new Array;
+
     },
     setActiveFace: function(activeFace){
         this.activeFace = activeFace;
@@ -114,6 +118,7 @@ var UnfaceImage = Imagable.extend({
     },
     zip: function(){
         this._movedFacesToCanvas()
-        console.log(this.usedFaces)
+        var base64ImageData = this.canvas.toDataURL();
+        this.updateImage(base64ImageData)
     },
 })

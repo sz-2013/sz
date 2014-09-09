@@ -102,6 +102,9 @@ var Imagable = L.Class.extend({
         this._preDraw()
         this._drawImage(data)
     },
+    updateImage: function(base64ImageData) {
+        // переопределется в дерективе
+    },
 });
 
 
@@ -233,9 +236,7 @@ CropImage.prototype._preDraw = function() {
     this._deleteCroper()
 };
 
-CropImage.prototype.updateImage = function(base64ImageData) {
-    // переопределется в дерективе
-};
+
 
 CropImage.prototype.crop = function() {
     var imageObj = new Image();
