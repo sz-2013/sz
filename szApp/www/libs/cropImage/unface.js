@@ -51,8 +51,7 @@ var UnfaceImage = Imagable.extend({
         }
     },
     _canBeChanged: function(w, h, x, y){
-        return w >= this.settings.face.min && h >= this.settings.face.min &&
-               x > 0 && x + w < this.body.offsetLeft + this.body.offsetWidth &&
+        return x > 0 && x + w < this.body.offsetLeft + this.body.offsetWidth &&
                y > 0 && y + h < this.body.offsetTop + this.body.offsetHeight
     },
     _createFace: function(x, y){
@@ -77,6 +76,7 @@ var UnfaceImage = Imagable.extend({
 
             self.facetimer = setInterval(function(){
                 var neww = face.offsetWidth + k, newx = face.offsetTop - k/2, newy = face.offsetLeft - k/2;
+                if(neww < self.settings.face.min) self.removeFace(face)
                 if(!self._canBeChanged(neww, neww, newx, newy)) self._clearTimer()
                 face.style.width = neww + 'px';
                 face.style.height = neww + 'px';
@@ -136,4 +136,10 @@ var UnfaceImage = Imagable.extend({
         var base64ImageData = this.canvas.toDataURL();
         this.updateImage(base64ImageData, this.usedFaces)
     },
+    removeFace: function(face){
+        var i = this.facesList.indexOf(face)
+        if(~i) this.facesList.splice(i, 1)
+        this.facesArea.removeChild(face)
+        this._clearState()
+    }
 })
