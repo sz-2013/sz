@@ -261,8 +261,9 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.map_ppcontrol_remove = function($event){$scope.$broadcast('ppcontrol_remove', $event.currentTarget) }
     $scope.map_customPath = function(){$scope.$broadcast('customPath')}
     $scope.map_gBoxDetail = function(){$scope.$broadcast('gBoxDetail')}
-    $scope.message_send = function(){$scope.$broadcast('messageSend')}
+    $scope.message_send = function(){$scope.$broadcast('message-photoZip')}
     $scope.message_setFileModelSrc = function(el){$scope.$broadcast('setFileModelSrc', el)}
+    $scope.message_showFaces = function(){$scope.$broadcast('showFaces');}
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];

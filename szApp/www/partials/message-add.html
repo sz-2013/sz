@@ -83,9 +83,18 @@
             </div>
 
             <div class="messageAdd-photoCont">
-                <sz-photo-unface src="photo" ismobile="is_mobile" activeface="activeFace"></sz-photo-unface>
+                <sz-photo-unface src="photo" ismobile="is_mobile" activeface="activeFace" reduce="isReducePhoto"></sz-photo-unface>
+                <div  style="position: absolute; left: 0; right: 0; top: 0; background: rgba(255, 255, 255, .6); padding: 7px 0 5px 0;;z-index: 200;; text-align: left; margin: 0!important;" ng-show="showFacesArea" class="animate-fall-top navigation">
+                    <a ng-click="isReducePhoto=false">
+                        <i class="fa fa-plus fa-lg"></i>
+                    </a>
+                    
+                    <a ng-click="isReducePhoto=true">
+                        <i class="fa fa-minus fa-lg" ></i>
+                    </a>
+                </div>
                 <div  style="position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .6); padding-top: 5px;z-index: 200;">
-                    <div style="height: 60px; overflow-x: scroll; white-space: nowrap;">
+                    <div style="height: 60px; overflow-x: scroll; white-space: nowrap;" ng-show="showFacesArea" class="animate-fall-down">
                         <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
                         <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
                         <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">

@@ -10,6 +10,7 @@ var UnfaceImage = Imagable.extend({
         }
     },
     sub_initialize: function(body, isMobile){
+        this.is_enlarge = true //enlarge or reduce
         this.facesList = new Array;
         this._initfacesArea()
     },
@@ -72,7 +73,7 @@ var UnfaceImage = Imagable.extend({
             ev.preventDefault();
             self.is_down = true
             self.movedFace = this;
-            var k = self.settings.face.step, face = this;
+            var k = self.settings.face.step * (self.is_enlarge ? 1 : -1), face = this;
 
             self.facetimer = setInterval(function(){
                 var neww = face.offsetWidth + k, newx = face.offsetTop - k/2, newy = face.offsetLeft - k/2;
@@ -121,6 +122,10 @@ var UnfaceImage = Imagable.extend({
     setBg: function(data){
         this.bg = data;
         this.draw(data);
+    },
+    setIsEnlarge: function(val){
+        console.log(val)
+        this.is_enlarge = val;
     },
     clear: function(){
         this._clearFaces();

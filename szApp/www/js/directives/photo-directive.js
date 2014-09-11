@@ -111,13 +111,18 @@ angular.module("photo-directive", [])
             scope: {
                 src: '=', //file
                 ismobile: '=',
-                activeface: '='
+                activeface: '=',
+                isReducePhoto: '=reduce',
             },
             restrict: 'E',
             template: '<div class="imgUnface"></div>',
             replace: true,
             transclude: true,
             link: function($scope, element, attrs) {
+                UnfaceImage.prototype.updateImage = function(base64ImageData, usedFaces) {
+                    $scope.$emit('messageSend', base64ImageData, usedFaces);
+                };
+
                 var el = element[0];
                 el.style.height = el.offsetWidth + 'px';
                 function init(){
@@ -129,16 +134,20 @@ angular.module("photo-directive", [])
 
                     $scope.$watch('activeface', function(face){
                         if(face) $scope.unface.setActiveFace(face)
-                    })
+                    });
+
+                    $scope.$watch('isReducePhoto', function(val){
+                        $scope.unface.setIsEnlarge(!val)
+                    });
                 }
 
                 $scope.$watch('ismobile', function(val){
                     if(val!==undefined) init()
                 });
 
-                $scope.$on('zipImage', function(e){
+                $scope.$on('photoZip', function(e){
                     if($scope.unface) $scope.unface.zip()
-                })
+                });
             }
         }
     })

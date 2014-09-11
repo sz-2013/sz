@@ -81,16 +81,17 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
 
     setNavs()
 
-    $scope.$on('messageSend', function(e){
-        $scope.$broadcast('zipImage')
+    $scope.$on('message-photoZip', function(e){$scope.$broadcast('photoZip'); });
+    $scope.$on('messageSend', function(e, photo, facesList){
         /*$rootScope.showLoader = true;*/
-        /*console.log($scope.photo)
         var message = new Object;
         message.latitude = $scope.coordinates.latitude;
         message.longitude = $scope.coordinates.longitude;
         message.place = $scope.messagePlace.place_id;
-        message.photo = {img: $scope.photo, width: '', height: ''}
-        message.face = $scope.activeFace*/
+        message.photo = photo;
+        message.faces = facesList;
+        message.tags = new Array;
+        console.log(message)
         /*messageService.create(message,
             function(r){
                 console.log(r)
@@ -105,6 +106,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     $scope.$on('setCropPreview', function(e, fn){$scope.cropPreview = fn;});
     $scope.$on('setShowPhotoPreview', function(e, val){$scope.setShowPhotoPreview(val) });
     $scope.$on('setFileModelSrc', function(e, el){$scope.photoSrc = el;});
+    $scope.$on('showFaces', function(e){$scope.showFacesArea = !$scope.showFacesArea;});
     $scope.$on('setPhoto', function(e, data){$scope.photo = data; $scope.$apply()});
 
     function _getMessagePlaceInfo(){
@@ -127,6 +129,10 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
             _getMessagePlaceInfo();
             _makePhoto();
         }
+    });
+
+    $scope.$watch('faces', function(faces){
+        if(faces && faces.length) $scope.setActiveFace(faces[0])
     });
 
 
