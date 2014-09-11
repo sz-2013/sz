@@ -1,66 +1,6 @@
-
-
-<raphael-add-face action="faceAction" face="messageFace" ismobile="is_mobile" issend="showEditPhoto" ng-init="faceAction=1"
-    parent="'raphaelParent'" src="getActiveFace()" target="'messageAdd-messagePhoto'" start="showRaphaelAddFace"> </raphael-add-face>
-
-
-<div aria-hidden="true" aria-labelledby="editPhoto" class="modal fade"
-    id="messageAdd-editPhoto" role="dialog" sz-raphael-modal="showRaphaelAddFace"
-    sz-modal="showEditPhoto" tabindex="-1" ng-show="false">
-    <div class="modal-dialog">
-        <div class="modal-content dark-nav ">
-            <div class="dark-nav-header">
-                <button aria-hidden="true" data-dismiss="modal"
-                    class="btn btn-link pull-left close-modal" type="button">
-                    <i class="fa fa-times fa-lg"></i>
-                </button>
-
-                <h2>Edit a photo {{isParentShow()}}</h2>
-            </div><!-- /.dark-nav .dark-nav-header -->
-
-            <ul><li><span class="text-center">
-                <div class="photo-container" id="raphaelParent">
-                    <img id="messageAdd-messagePhoto">
-                </div>
-            </span></li></ul><!-- /.dark-nav ul -->
-
-            <div class="photo-menu-sub animate-fall-down"
-                ng-show="showPhotoMenuSub">
-                <i class="face-preview" ng-class="isFaceActive(f)"
-                    ng-click="$emit('selectFace', f)" ng-repeat="f in faces">
-                    <img ng-src={{f.face}}>
-                </i><!-- /.face-preview -->
-            </div> <!-- /.photo-menu-sub -->
-
-            <div class="dark-nav-footer" >
-                <div class="btn-group btn-group-justified photo-menu">
-                    <a class="btn btn-link" ng-class="{'active' : showPhotoMenuSub}"
-                        ng-click="showPhotoMenuSub=!showPhotoMenuSub">
-                        <i class="fa fa-smile-o fa-lg"></i>
-                    </a>
-
-                    <a class="btn btn-link" ng-class="{'active':faceAction===1}" ng-click="faceAction=1">
-                        <i class="fa fa-plus fa-lg"></i>
-                    </a>
-
-                    <a class="btn btn-link" ng-class="{'active':faceAction===0}" ng-click="faceAction=0">
-                        <i class="fa fa-minus fa-lg"></i>
-                    </a>
-                </div><!-- /.dark-nav .photo-menu -->
-
-                <button class="btn btn-primary btn-block"
-                    id="messageAdd-editPhoto-submit" ng-click="unfacePhoto()" type="button">
-                    <i class="fa fa-check fa-lg"></i>
-                </button><!-- /#messageAdd-editPhoto-submit -->
-            </div><!-- /.dark-nav .dark-nav-footer -->
-        </div><!-- /.dark-nav -->
-    </div>
-</div><!-- /#messageAdd-editPhoto -->
-
 <div class="photoPreview animate-fall-top" ng-show="showPhotoPreview">
     <div class="photoPreview-inner">
         <sz-photo-crop src="photoSrc" ismobile="is_mobile"></sz-photo-crop>
-        <!-- <div sz-photo-crop= class="imgCroper"></div> -->
     </div>
     <div class="btn-group photoPrevew-btns">
         <button class="btn btn-block btn-default btn-large" ng-click="cropPreview()">
@@ -72,65 +12,31 @@
     </div>
 </div>
 
-<div class="big-bordered-box" id="messageAdd">
-    <div class="big-bordered-box-inner" >
-            <div style="position: relative">
-                <div ng-show="messagePlace" style="margin-right: 85px;text-align: left; padding-left:7px; margin-top: 10px; padding-top:2px; padding-bottom: 2px; padding-right: 3px;">
-                    <h4 class="overflow-hidden" style="margin-bottom: 3px; margin-top:0; max-width:100%; overflow: hidden; white-space:nowrap; text-overflow: ellipsis;">{{messagePlace.place_name}} {{messagePlace.place_name}} </h4>
-                    <p class="overflow-hidden" ng-show="messagePlace.place_address" style="margin-top:0; font-size: 0.8em; max-width:100%; overflow: hidden; white-space:nowrap; text-overflow: ellipsis; margin-bottom:0;">
-                        {{messagePlace.place_address}} {{messagePlace.place_address}} {{messagePlace.place_address}} </p>
-                </div> <!-- /#messageAdd-messagePlace -->
-            </div>
+<div>
+    <div ng-show="messagePlace" class="messageAdd-header">
+        <h4 class="overflow-hidden messageAdd-header-name">{{messagePlace.place_name}}</h4>
+        <p class="overflow-hidden messageAdd-header-address" ng-show="messagePlace.place_address">
+            {{messagePlace.place_address}}</p>
+    </div>
 
-            <div class="messageAdd-photoCont">
-                <sz-photo-unface src="photo" ismobile="is_mobile" activeface="activeFace" reduce="isReducePhoto"></sz-photo-unface>
-                <div  style="position: absolute; left: 0; right: 0; top: 0; background: rgba(255, 255, 255, .6); padding: 7px 0 5px 0;;z-index: 200;; text-align: left; margin: 0!important;" ng-show="showFacesArea" class="animate-fall-top navigation">
-                    <a ng-click="isReducePhoto=false">
-                        <i class="fa fa-plus fa-lg"></i>
-                    </a>
-                    
-                    <a ng-click="isReducePhoto=true">
-                        <i class="fa fa-minus fa-lg" ></i>
-                    </a>
-                </div>
-                <div  style="position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .6); padding-top: 5px;z-index: 200;">
-                    <div style="height: 60px; overflow-x: scroll; white-space: nowrap;" ng-show="showFacesArea" class="animate-fall-down">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
-                        <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%; max-height: 90%; margin: 0 5px; cursor: pointer" ng-click="setActiveFace(face)">
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="text-center" style="margin-top: 7px; position: relative; bottom: 0;right:0; margin-left: 65px; z-index: 100;">
-                <div style="position: relative; display: inline-block; width: 24%; height: 20px; cursor: pointer;">
-                    <a class="btn btn-link" style="position: absolute; cursor: pointer">
-                        <i class="fa fa-picture-o fa-2x"></i>
-                    </a>
-                    <input type="file" name="photo" sz-file-model="photoPreview" style="padding: 0; width: 100%; border-radius: 0; position: absolute; top: 0; left: 0; height: 100%; opacity: 0; cursor: pointer">
-                </div>
-                <a class="btn btn-link" style="width: 24%;">
-                    <i class="fa fa-camera fa-2x"></i>
-                </a>
-                <a class="btn btn-link" style="width: 24%;">
-                    <i class="fa fa-tags fa-2x"></i>
-                </a>
-                <a class="btn btn-link" style="width: 24%;">
-                    <i class="fa fa-smile-o fa-2x"></i>
-                </a>
-            </div> -->
+    <div class="messageAdd-photoCont">
+        <sz-photo-unface src="photo" ismobile="is_mobile" activeface="activeFace" reduce="isReducePhoto"></sz-photo-unface>
+        <div  ng-show="showFacesArea" class="animate-fall-top navigation messageAdd-facesNav">
+            <a ng-click="isReducePhoto=false">
+                <i class="fa fa-plus fa-lg"></i>
+            </a>
 
-                    <!-- <div class="text-left">
-                        <div class="margin-top-sm" id="messageAdd-photoPrev" ng-show="pPhoto.photo">
-                            <img class="img-responsive" ng-src={{pPhoto.photo}}>
-                            <button class="btn btn-info btn-block text-center"
-                                id="messageAdd-photoPrev-remove" ng-click="removePhoto()">
-                                <i class="fa fa-times fa-lg"></i>
-                            </button>
-                        </div>
-                    </div> -->
-                <!-- /.box-inner-bottom -->
-
-        <!-- </form> -->
-    </div><!-- /.big-bordered-box-inner -->
-</div><!-- /#messageAdd.big-bordered-box -->
+            <a ng-click="isReducePhoto=true">
+                <i class="fa fa-minus fa-lg" ></i>
+            </a>
+        </div>
+        <div  class="messageAdd-facesArea animate-fall-down" ng-show="showFacesArea">
+            <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%;" ng-click="setActiveFace(face)" class="face" ng-class="isFaceActive(face)">
+            <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%;" ng-click="setActiveFace(face)" class="face" ng-class="isFaceActive(face)">
+            <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%;" ng-click="setActiveFace(face)" class="face" ng-class="isFaceActive(face)">
+            <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%;" ng-click="setActiveFace(face)" class="face" ng-class="isFaceActive(face)">
+            <img ng-repeat="face in faces" ng-src="{{face.face}}" style="max-width: {{100/faces.length - 1}}%;" ng-click="setActiveFace(face)" class="face" ng-class="isFaceActive(face)">
+        </div>
+    </div>
+</div>
 

@@ -139,4 +139,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     $scope.setActiveFace = function(face){
         $scope.activeFace = face
     }
+    $scope.isFaceActive = function(face){
+        return ($scope.activeFace && $scope.activeFace.id == face.id) ? 'active' : ''
+    }
 }
