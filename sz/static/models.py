@@ -153,6 +153,14 @@ class RoleUser(models.Model):
         return self.name
 
 
+class ClotheTag(models.Model):
+    """tag, what will be mark on photo"""
+    name = models.CharField(max_length=128, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class RolePlace(models.Model):
     """place role: shop, bot castle, other"""
     name = models.CharField(
