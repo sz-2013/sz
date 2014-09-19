@@ -12,8 +12,8 @@ var urls = {
     search :'#/',
     placeSelect :'#/places/select',
     map :'#/map',
-    messageAdd: function(id, isLibrary){
-        return '#/places/' + id + '/messages/add?library=' + isLibrary
+    messageAdd: function(id){
+        return '#/places/' + id + '/messages/add'
     },
     place :function(id){
         return '#/places/' + id

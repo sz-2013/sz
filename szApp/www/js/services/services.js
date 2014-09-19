@@ -62,8 +62,8 @@ szServices.factory('placeService', function($resource){
 
 
 szServices.factory('messageService', function($http, $resource, $rootScope){
-    var url = apiIp + '/api/messages/add';
-    
+/*    var url = apiIp + '/api/messages/add';
+
     var preview = function(preview, id, success, error){
         var previewurl = url + '/photopreviews/' + ( id || '' );
         var error = error || function(e){console.log(e); $rootScope.showLoader = false;}
@@ -84,12 +84,61 @@ szServices.factory('messageService', function($http, $resource, $rootScope){
         xhr.send(preview);
     }
 
-    var resource = $resource(url, {}, {
-        create: {method:'POST', params: {}, isArray:false}
-    });
+    var resource = {}
+    resource.create = function(message, success, error){
+        $http({
+            method: 'POST',
+            url: url,
+            data: message,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        })
+    }
     resource.preview = preview
-    return resource;
+    return resource;*/
 });
+
+szServices.factory('messageCreate', ['$rootScope', '$http', function($rootScope, $http){
+    var url = apiIp + '/api/messages/add';
+    function getXmlHttp(){
+        var xmlhttp;
+        try {
+            xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+            try {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (E) {
+                xmlhttp = false;
+            }
+        }
+        if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+            xmlhttp = new XMLHttpRequest();
+        }
+        return xmlhttp;
+    }
+    return function(data, onSuccess, onError){
+        var onSuccess = onSuccess || function(r){console.log(r)}
+        var onError = onError || function(r){console.log(r)}
+        data.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
+        var xhr = getXmlHttp();
+
+        xhr.onload = xhr.onerror = function(r) {
+            console.log([this.status != 200, this.responseText])
+            if(this.status == 200 || this.responseText == 'OK' || this.statusText == 'OK') {
+                onSuccess(this.responseText)
+                return;
+            }
+            onError(this);
+        };
+        xhr.upload.onprogress = function(event) {
+            //onProgress(event.loaded, event.total);
+            console.log([event.loaded, event.total])
+        }
+
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader('X-CSRF-Token', $http.defaults.headers.post['X-CSRFToken']);
+        xhr.send(data);
+    }
+}])
 
 
 

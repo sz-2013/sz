@@ -120,7 +120,7 @@ angular.module("photo-directive", [])
             transclude: true,
             link: function($scope, element, attrs) {
                 UnfaceImage.prototype.updateImage = function(base64ImageData, usedFaces) {
-                    $scope.$emit('messageSend', base64ImageData, usedFaces);
+                    $scope.$emit('messageSend', Helpers.dataURItoBlob(base64ImageData), usedFaces);
                 };
 
                 var el = element[0];
