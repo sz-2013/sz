@@ -2,7 +2,8 @@
 from django import forms
 from sz import settings
 # from sz.core import models
-from sz.api.fields import FacesListField, GameMapPathField
+from sz.api.fields import FacesListField, GameMapPathField, \
+    IntListField, ListField
 
 
 class PositionRequestForm(forms.Form):
@@ -67,18 +68,21 @@ class GameMapTileRequestForm(PositionRequestForm):
     y = forms.IntegerField(required=True)
 
 
-class MessagePhotoPreviewRequestForm(forms.Form):
-    photo = forms.ImageField(required=True)
-    photo_width = forms.FloatField(required=True)
-    photo_height = forms.FloatField(required=True)
-    faces_list = FacesListField(required=False)
+# class MessagePhotoPreviewRequestForm(forms.Form):
+#     photo = forms.ImageField(required=True)
+#     photo_width = forms.FloatField(required=True)
+#     photo_height = forms.FloatField(required=True)
+#     faces_list = FacesListField(required=False)
 
 
 class MessageAddRequestForm(PositionRequestForm):
-    place = forms.IntegerField(required=True)
-    text = forms.CharField(required=False)
-    photo_id = forms.IntegerField(required=False)
-    faces_list = FacesListField(required=False)
+    photo = forms.FileField(required=True)
+    place_id = forms.IntegerField(required=True)
+    faces = IntListField(required=True)
+    tags = ListField(required=False)
+    faces = FacesListField(required=False)
+    # text = forms.CharField(required=False)
+    # photo_id = forms.IntegerField(required=False)
 
 
 class GameMapPathPostRequestForm(forms.Form):

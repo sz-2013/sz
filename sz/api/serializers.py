@@ -9,8 +9,7 @@ from sz.api.fields import IdListField, \
     MessagePhotoPreviewFacesLIstField, StringDataField
 from sz.core import gis as gis_core
 from sz.core.models import User as modelUser
-from sz.message.models import Message as modelMessage, \
-    MessagePreview as modelMessagePreview
+from sz.message.models import Message as modelMessage
 from sz.place.models import Place as modelPlace
 from sz.static.models import Races as modelRaces, Gender as modelGender, \
     Face as modelFace, RoleUser as modelRoleUser, CharImage as modelCharImage
@@ -283,55 +282,45 @@ Message section
 """
 
 
-class MessagePhotoPreviewFacesListSerializer(serializers.Serializer):
-    x = serializers.FloatField(required=True)
-    y = serializers.FloatField(required=True)
-    width = serializers.FloatField(required=True)
-    height = serializers.FloatField(required=True)
-    face_id = serializers.IntegerField(required=True)
+# class MessagePhotoPreviewFacesListSerializer(serializers.Serializer):
+#     x = serializers.FloatField(required=True)
+#     y = serializers.FloatField(required=True)
+#     width = serializers.FloatField(required=True)
+#     height = serializers.FloatField(required=True)
+#     face_id = serializers.IntegerField(required=True)
 
 
-class MessagePhotoPreviewSerializer(serializers.Serializer):
-    user = serializers.CharField(required=True)
-    photo = serializers.ImageField(required=True)
-    photo_height = serializers.FloatField(required=True)
-    photo_width = serializers.FloatField(required=True)
-    face_id = serializers.IntegerField(required=True)
-    # face_id = serializers.ChoiceField(required=True, choices=[
-    #     (face.pk, face.pk) for face in modelFace.objects.all()
-    # ])
-    faces_list = MessagePhotoPreviewFacesLIstField(required=False)
-    pk = serializers.IntegerField(required=False)
+# class MessagePhotoPreviewSerializer(serializers.Serializer):
+#     user = serializers.CharField(required=True)
+#     photo = serializers.ImageField(required=True)
+#     photo_height = serializers.FloatField(required=True)
+#     photo_width = serializers.FloatField(required=True)
+#     face_id = serializers.IntegerField(required=True)
+#     # face_id = serializers.ChoiceField(required=True, choices=[
+#     #     (face.pk, face.pk) for face in modelFace.objects.all()
+#     # ])
+#     faces_list = MessagePhotoPreviewFacesLIstField(required=False)
+#     pk = serializers.IntegerField(required=False)
+
+#     def validate(self, attrs):
+#         attrs = super(MessagePhotoPreviewSerializer, self).validate(attrs)
+#         return modelMessagePreview.objects.unface_photo(**attrs)
+
+
+class MessageAddSerializer(serializers.Serializer):
+    user = serializers.IntegerField(required=True)
+    place = serializers.IntegerField(required=True)
+    photo = serializers.Field()
+    faces = serializers.Field()
+    tags = serializers.Field()
 
     def validate(self, attrs):
-        attrs = super(MessagePhotoPreviewSerializer, self).validate(attrs)
-        return modelMessagePreview.objects.unface_photo(**attrs)
-
-
-class MessageAddSerializer(serializers.ModelSerializer):
-    photo_id = serializers.IntegerField(required=False)
-
-    class Meta:
-        model = modelMessage
-        read_only_fields = ('date',)
-        exclude = ('stems',)
-
-    def validate(self, attrs):
-        """
-        Check that the start is before the stop.
-        """
-        text = attrs.get('text').strip() if attrs.get('text') else ''
-        photo_id = attrs.get('photo_id', None)
-        photo = modelMessagePreview.objects.get(
-            pk=photo_id) if photo_id else None
-        if not (photo or text != ""):
-            raise serializers.ValidationError("Message don't must be empty")
-        if photo and photo.user != attrs.get("user"):
-            raise serializers.ValidationError(
-                "Users in attrs and in MessagePreview mismatch")
+        print 'validate'
+        print attrs
         return attrs
 
     def restore_object(self, attrs, instance=None):
+        print 'restore_object'
         if not instance:
             instance = modelMessage.objects.createMessage(**attrs)
         return instance

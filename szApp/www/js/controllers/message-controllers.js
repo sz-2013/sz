@@ -84,25 +84,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
     $scope.$on('message-photoZip', function(e){$scope.$broadcast('photoZip'); });
     $scope.$on('messageSend', function(e, photo, facesList){
         $rootScope.showLoader = true;
-        /*var message = new Object;
-        message.latitude = $scope.coordinates.latitude;
-        message.longitude = $scope.coordinates.longitude;
-        message.place = $scope.messagePlace.place_id;
-        message.photo = Helpers.dataURItoBlob(photo);
-        message.faces = facesList;
-        message.tags = new Array;*/
-        /*var message = new messageCreate();
-        message.latitude = $scope.coordinates.latitude
-        message.longitude = $scope.coordinates.longitude
-        message.place = $scope.messagePlace.place_id
-        message.photo = Helpers.dataURItoBlob(photo);
-        message.faces = facesList
-        message.tags = new Array
-        console.log($scope.photoalt)
-        message.$save(function(r){
-                console.log(r)
-                $rootScope.showLoader = false;
-        })*//*
+        /*
         messageService.create(message,
             function(r){
                 //$scope.urls.getPath('afterMessageAdd($scope.messagePlace.place_id)')
@@ -111,7 +93,7 @@ function MessageAddController($scope, messageService, $routeParams, $location, p
         var data = new FormData()
         data.append('latitude', $scope.coordinates.latitude)
         data.append('longitude', $scope.coordinates.longitude)
-        data.append('place', $scope.messagePlace.place_id)
+        data.append('place_id', $scope.messagePlace.place_id)
         data.append('photo', photo)
         data.append('faces', facesList)
         data.append('tags', new Array)

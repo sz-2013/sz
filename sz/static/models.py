@@ -153,7 +153,7 @@ class RoleUser(models.Model):
         return self.name
 
 
-class ClotheTag(models.Model):
+class Tag(models.Model):
     """tag, what will be mark on photo"""
     name = models.CharField(max_length=128, unique=True)
 

@@ -31,4 +31,4 @@ class BuildingImageAdmin(admin.ModelAdmin):
 admin.site.register(BuildingImage, BuildingImageAdmin)
 admin.site.register(CharImage)
 # admin.site.register(Category)
-admin.site.register(MessagePreview)
+# admin.site.register(MessagePreview)

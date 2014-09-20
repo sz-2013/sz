@@ -83,6 +83,14 @@ class FacesListField(ListField):
                 raise forms.ValidationError(request_form.errors)
 
 
+class IntListField(ListField):
+    def _validate_elements(self, int_list):
+        for i in int_list:
+            if not isinstance(i, int):
+                raise forms.ValidationError(
+                    "All elements of list should be int")
+
+
 class GameMapPathField(ListField):
     notvalidError = 'This list can\'t to be a path: ' + \
                     'a path should contains only continuous boxes.'

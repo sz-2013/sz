@@ -117,14 +117,13 @@ szServices.factory('messageCreate', ['$rootScope', '$http', function($rootScope,
     }
     return function(data, onSuccess, onError){
         var onSuccess = onSuccess || function(r){console.log(r)}
-        var onError = onError || function(r){console.log(r)}
+        var onError = onError || function(r){console.log(JSON.parse(r.responseText))}
         data.append('csrfmiddlewaretoken', $http.defaults.headers.post['X-CSRFToken'])
         var xhr = getXmlHttp();
 
         xhr.onload = xhr.onerror = function(r) {
-            console.log([this.status != 200, this.responseText])
-            if(this.status == 200 || this.responseText == 'OK' || this.statusText == 'OK') {
-                onSuccess(this.responseText)
+            if(this.status == 200 || this.status == 201 || this.responseText == 'OK' || this.statusText == 'OK') {
+                onSuccess(JSON.parse(this.responseText).data)
                 return;
             }
             onError(this);
