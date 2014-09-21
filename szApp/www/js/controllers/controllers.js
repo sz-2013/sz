@@ -264,6 +264,7 @@ function MasterPageController($scope, $cookies, $http, $location, $timeout, sess
     $scope.message_send = function(){$scope.$broadcast('message-photoZip')}
     $scope.message_setFileModelSrc = function(el){$scope.$broadcast('setFileModelSrc', el)}
     $scope.message_showFaces = function(){$scope.$broadcast('showFaces');}
+    $scope.message_addTag = function(){$scope.$broadcast('addTag');}
 }
 
 //MasterPageController.$inject = ['$scope','$cookies', '$http', '$location', 'sessionService', 'staticValueService', 'geolocation'];
