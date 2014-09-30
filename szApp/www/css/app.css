@@ -710,6 +710,28 @@ transition: all 300ms ease-in-out;
     height: 100%;
 }
 
+.imgCroper .cropOverlay{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    filter: blur(8px);
+  -webkit-filter: blur(8px);
+  -moz-filter: blur(8px);
+}
+
+.imgCroper .cropOverlay:after{
+    background-color: rgba(255,255,255,.4);
+    content: "";
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .imgCroper .croper{
     width: 150px;
     height: 150px;
@@ -718,6 +740,19 @@ transition: all 300ms ease-in-out;
     top:0;
     left:0;
     box-sizing: border-box;
+    overflow: hidden;
+    text-align: left;
+    z-index: 100;
+}
+
+.imgCroper .croper img{
+    vertical-align: top;
+    background-repeat: no-repeat;
+    background-position-x: 50%;
+    background-position-y: 50%;
+    position: absolute;
+    left:0;
+    top:0;
 }
 
 .imgUnface{
@@ -840,4 +875,20 @@ transition: all 300ms ease-in-out;
     padding: 3px;
     border-color: #f2c900;
     border-radius: 3px;
+}
+.tagsAddArea{
+    background-color: red;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.tagsArea-cont{
+    background-color: blue;
+    position: absolute;
+    width: 100px;
+    height: 100px;
 }

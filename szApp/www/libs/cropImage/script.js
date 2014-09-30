@@ -124,12 +124,17 @@ var CropImage = Imagable.extend({
             if(self.dragok){
                 var newX = ev.clientX - self.body.offsetLeft - self.startX;
                 var newY = ev.clientY - self.body.offsetTop - self.startY;
-                if(newX > 0 &&
-                   newX < (self.w - self.croper.offsetWidth) &&
-                   newY > 0 &&
-                   newY < (self.h - self.croper.offsetHeight)){
+                var xMargin = newX - self.canvas.offsetLeft
+                var yMargin = newY - self.canvas.offsetTop
+                if(xMargin > 0 &&
+                   xMargin < (self.w - self.croper.offsetWidth) &&
+                   yMargin > 0 &&
+                   yMargin < (self.h - self.croper.offsetHeight)
+                ){
                     self.croper.style.left = newX + 'px';
                     self.croper.style.top = newY + 'px';
+
+                    self._updateClearImagePos()
                 }
             }
             if(self.resizeok){
@@ -137,6 +142,10 @@ var CropImage = Imagable.extend({
             }
         }
 
+        this._mousedown(body, function(ev){
+            if(self.croper) return
+            self._createCroper(ev)
+        })
         this._mousemove(body, move)
         this._mouseup(body)
     },
@@ -159,13 +168,18 @@ CropImage.prototype._resizeCrope = function(ev) {
     var newVal = croper.offsetWidth + dif*2
     var newX = cr.x - dif
     var newY = cr.y - dif
+    var xMargin = newX - this.canvas.offsetLeft
+    var yMargin = newY - this.canvas.offsetTop
+    console.log([newVal, difX, this.startX > zero.x])
     if( dif && newVal > this.settings.croper.min &&
-        newX > 0 && (newX + newVal) < this.w &&
-        newY > 0 && (newY + newVal) < this.h){
-        self.croper.style.left = newX + 'px';
-        self.croper.style.top = newY + 'px';
-        self.croper.style.width = newVal + 'px';
-        self.croper.style.height = newVal + 'px';
+        xMargin > 0 && (xMargin + newVal) < this.w &&
+        yMargin > 0 && (yMargin + newVal) < this.h){
+        this.croper.style.left = newX + 'px';
+        this.croper.style.top = newY + 'px';
+        this.croper.style.width = newVal + 'px';
+        this.croper.style.height = newVal + 'px';
+
+        this._updateClearImagePos()
     }
 
 };
@@ -175,8 +189,17 @@ CropImage.prototype._clearState = function() {
     this.resizeok = false;
 };
 
+CropImage.prototype._updateClearImagePos = function() {
+    var clearImage = this.clearImage;
+    clearImage.style.left = -1*(this.croper.offsetLeft - this.canvas.offsetLeft) + 'px'
+    clearImage.style.top = -1*(this.croper.offsetTop - this.canvas.offsetTop) + 'px'
+};
 
-CropImage.prototype._createCroper = function() {
+CropImage.prototype._createCroper = function(ev) {
+    var ev = this._getMouse(ev)
+    var x = ev.x
+    var y = ev.y
+
     var self = this, border = this.settings.croper.border;
     this.croper = croper = document.createElement('div')
     croper.className = 'croper'
@@ -200,8 +223,15 @@ CropImage.prototype._createCroper = function() {
     this._mousedown(croper, down)
 
     this.body.appendChild(croper)
-    croper.style.left = (this.w - croper.offsetWidth)/2 + 'px'
-    croper.style.top = (this.h - croper.offsetHeight)/2 + 'px'
+    croper.style.left = x - croper.offsetWidth/2 + 'px'
+    croper.style.top = y - croper.offsetHeight/2 + 'px'
+    /*croper.style.left = (this.w )/2 + 'px'
+    croper.style.top = (this.h - croper.offsetHeight)/2 + 'px'*/
+
+    this.clearImage = clearImage = document.createElement('img')
+    clearImage.setAttribute('src', this.img.data)
+    this._updateClearImagePos()
+    croper.appendChild(clearImage)
 };
 
 
@@ -227,7 +257,16 @@ CropImage.prototype._getK = function(w, h) {
 };
 
 CropImage.prototype._afterDrawImage = function() {
-    this._createCroper();
+    var overlay = this.overlay = document.createElement('div')
+    overlay.className = 'cropOverlay'
+    overlay.style.width = this.w + 'px'
+    overlay.style.height = this.h + 'px'
+    overlay.style.left = this.canvas.offsetLeft + 'px'
+    overlay.style.top = this.canvas.offsetTop + 'px'
+    overlay.style.backgroundImage = 'url('+ this.img.data + ')'
+    this.body.appendChild(overlay)
+    this.canvas.style.visibility = 'hidden'
+    //this._createCroper();
 };
 
 

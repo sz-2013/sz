@@ -86,7 +86,12 @@
 
 .animate-spread-center.ng-hide-add,
 .animate-spread-center.ng-hide-remove{
-    transition-timing-function:ease-in-out;
+    -webkit-transition: all .6s ease-in-out;
+    -moz-transition: all .6s ease-in-out;
+    -ms-transition: all .6s ease-in-out;
+    -o-transition: all .6s ease-in-out;
+    transition: all .6s ease-in-out;
+    display:block!important;
 }
 
 
@@ -97,11 +102,51 @@
     transform: translate3d(0, 100%, 0);
 }
 
+.animate-fall-down.ng-hide-remove.ng-hide-remove-active,
+.animate-fall-down.ng-hide-add {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+}
+
+
+.animate-fall-down.ng-hide-add,
+.animate-fall-down.ng-hide-remove{
+    -webkit-transition: all .6s ease;
+    -moz-transition: all .6s ease;
+    -ms-transition: all .6s ease;
+    -o-transition: all .6s ease;
+    transition: all .6s ease;
+    display:block!important;
+}
+
 /*-----------FallTop---------*/
 .animate-fall-top.ng-hide-add.ng-hide-add-active,
 .animate-fall-top.ng-hide-remove {
     -webkit-transform: translate3d(0, -100%, 0);
     transform: translate3d(0, -100%, 0);
+}
+
+.animate-fall-top.ng-hide-remove.ng-hide-remove-active,
+.animate-fall-top.ng-hide-add {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+}
+
+
+.animate-fall-top.ng-hide-add,
+.animate-fall-top.ng-hide-remove{
+    -webkit-transition: all .6s ease;
+    -moz-transition: all .6s ease;
+    -ms-transition: all .6s ease;
+    -o-transition: all .6s ease;
+    transition: all .6s ease;
+    display:block!important;
 }
 
 /*-----------FallLeft----------*/
@@ -111,13 +156,24 @@
     transform: translate3d(-100%, 0, 0);
 }
 
+.animate-fall-left.ng-hide-remove.ng-hide-remove-active,
+.animate-fall-left.ng-hide-add {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+}
+
+
 .animate-fall-left.ng-hide-add,
 .animate-fall-left.ng-hide-remove{
-    transition-timing-function:ease-in-out;
-    -webkit-transition-duration: 1s;
-    -o-transition-duration: 1s;
-    -moz-transition-duration: 1s;
-    transition-duration: 1s;
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -ms-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
+    display:block!important;
 }
 
 /*-----------Appearance----------*/
@@ -126,31 +182,24 @@
     opacity: 0;
 }
 
-.animate-appearance.ng-hide-add,
-.animate-appearance.ng-hide-remove{
-    transition-timing-function:ease-in-out;
-    -webkit-transition-duration: 1s;
-    -o-transition-duration: 1s;
-    -moz-transition-duration: 1s;
-    transition-duration: 1s;
+.animate-appearance.ng-hide-remove.ng-hide-remove-active,
+.animate-appearance.ng-hide-add {
+    opacity: 1;
 }
 
-/*-----------Common-----------*/
-.ng-hide-add,
-.ng-hide-remove{
-    -webkit-transition: all .3s ease;
-    -moz-transition: all .3s ease;
-    -ms-transition: all .3s ease;
-    -o-transition: all .3s ease;
-    transition: all .3s ease;
+
+.animate-appearance.ng-hide-add,
+.animate-appearance.ng-hide-remove{
+    -webkit-transition: all .6s ease;
+    -moz-transition: all .6s ease;
+    -ms-transition: all .6s ease;
+    -o-transition: all .6s ease;
+    transition: all .6s ease;
     display:block!important;
 }
 
-.ng-hide-add,
-.ng-hide-remove.ng-hide-remove-active {
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-}
+/*-----------Common-----------*/
+
 
 .animate-easy.ng-hide-add,
 .animate-easy.ng-hide-remove{
