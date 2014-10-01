@@ -1,2 +1,8 @@
-erlastic
-bert
+Django==1.6
+pillow
+djangorestframework
+psycopg2
+django-imagekit
+South
+foursquare
+simplejson
